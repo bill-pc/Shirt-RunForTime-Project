@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="vi">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ thống Quản lý Sản Xuất</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        :root {
+:root {
             --xanh-dam: #142850;
             --xanh-dam-hon: #0f1f3d;
             --xanh-sang: #0099ff;
@@ -265,6 +255,13 @@
         .dropdown button:hover i {
             color: #fff;
         }
+        .dropdown-item span {
+    color: var(--mau-chu-chinh);
+        }
+
+        .dropdown-item:hover span {
+            color: #fff;
+        }
 
         /* ===== LAYOUT ===== */
         .main-layout-wrapper {
@@ -413,106 +410,86 @@
                 transform: translateY(0);
             }
         }
-    </style>
-</head>
+        /* --- Bố cục chính --- */
+/* Bố cục chính: chia hai cột */
+.main-container {
+    display: flex;
+    margin-top: 120px; /* phía dưới header + nav */
+    min-height: calc(100vh - 120px);
+    background-color: #f8fafc;
+}
 
-<body>
-    <header class="header">
-        <div class="logo" id="logo-interlock">
-            <span>R</span><span class="middle-letter">F</span><span>T</span>
-        </div>
-        <h1>HỆ THỐNG QUẢN LÝ SẢN XUẤT</h1>
-        <div class="user-controls">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <i class="fa-regular fa-bell"></i>
-            <a href="#" class="user-link">
-                <i class="fa-regular fa-circle-user"></i>
-                <span>Tên nhân viên</span>
-            </a>
-        </div>
-    </header>
+/* === SIDEBAR === */
+.sidebar-nav {
+    width: 240px;
+    background-color: #f1f6ff;
+    border-right: 1px solid #d7e2f1;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
 
-    <nav class="navigation">
-        <div class="nav-links">
-            <a href="#" class="nav-button">Trang chủ</a>
-            <a href="#" class="nav-button">Giới thiệu</a>
-            <button class="nav-button" id="menuDanhMuc">Danh mục</button>
+/* Tiêu đề “DANH MỤC CHỨC NĂNG” */
+.sidebar-nav h3 {
+    background-color: #86aafc;
+    color: white;
+    font-weight: 700;
+    text-align: center;
+    padding: 14px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
 
-            <div class="dropdown" id="dropdownDanhMuc">
-                <button data-section="tongquan"><i class="fa-solid fa-chart-line"></i> Tổng quan & Báo cáo</button>
-                <button data-section="nhansu"><i class="fa-solid fa-users"></i> Nhân sự</button>
-                <button data-section="sanxuat"><i class="fa-solid fa-industry"></i> Sản xuất</button>
-                <button data-section="khoNVL"><i class="fa-solid fa-boxes-stacked"></i> Kho nguyên liệu</button>
-                <button data-section="xuong"><i class="fa-solid fa-gears"></i> Xưởng sản xuất</button>
-                <button data-section="qc"><i class="fa-solid fa-clipboard-check"></i> Kiểm tra chất lượng</button>
-                <button data-section="khoTP"><i class="fa-solid fa-truck"></i> Kho thành phẩm</button>
-                <button data-section="congnhan"><i class="fa-solid fa-person-digging"></i> Công việc & Báo cáo</button>
-            </div>
-        </div>
-        <a href="#" class="nav-button">Đăng xuất</a>
-    </nav>
+/* Danh sách nút */
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
 
-    <div class="main-layout-wrapper">
-        <nav class="sidebar-nav">
-            <h3>DANH MỤC CHỨC NĂNG</h3>
-            <ul id="sidebarList">
-                <li><a href="#">Trang tổng quan</a></li>
-            </ul>
-        </nav>
+.sidebar-nav ul li {
+    margin-bottom: 10px;
+}
 
-        <main class="main-content">
-            <h2>Trang nội dung chính</h2>
-            <p>Chọn một mục trong <b>Danh mục</b> để hiển thị các chức năng tương ứng.</p>
-        </main>
-    </div>
-    <footer class="footer">
-        <p>© 2025 Hệ thống Quản lý Sản xuất Áo. Đã đăng ký bản quyền.</p>
-        <p>Liên hệ: support@qlao.com | Điện thoại: 1900 1234</p>
+.sidebar-nav ul li a {
+    display: block;
+    background-color: #fff;
+    color: #333;
+    padding: 12px 14px;
+    text-align: center;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+}
 
-        <div class="footer-links">
-            <a href="#">Chính sách bảo mật</a>
-            <a href="#">Điều khoản sử dụng</a>
-            <a href="#">Trợ giúp & Hỗ trợ</a>
-        </div>
+.sidebar-nav ul li a:hover,
+.sidebar-nav ul li a.active {
+    background-color: #86aafc;
+    color: #fff;
+    transform: translateY(-2px);
+}
 
-        <p class="version">Phiên bản 1.0.2</p>
-    </footer>
+/* === NỘI DUNG CHÍNH === */
+.content {
+    flex: 1;
+    background-color: #f8fafc;
+    padding: 40px;
+}
 
-    <script>
-        const btnMenu = document.getElementById("menuDanhMuc");
-        const dropdown = document.getElementById("dropdownDanhMuc");
-        const sidebarList = document.getElementById("sidebarList");
+.content h1 {
+    color: #0d1a44;
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+}
 
-        const danhMucData = {
-            tongquan: ["Đăng nhập", "Đăng xuất", "Thông tin cá nhân", "Báo cáo tổng hợp"],
-            nhansu: ["Thêm nhân viên", "Xem nhân viên", "Xóa nhân viên", "Sửa nhân viên"],
-            sanxuat: ["Tạo đơn hàng sản xuất", "Lập kế hoạch sản xuất", "Duyệt kế hoạch sản xuất"],
-            khoNVL: ["Tạo yêu cầu nhập nguyên vật liệu", "Nhập kho nguyên vật liệu", "Xuất nguyên vật liệu", "Thống kê kho nguyên vật liệu"],
-            xuong: ["Xem công việc", "Theo dõi tiến độ", "Yêu cầu cung cấp NVL", "Yêu cầu kiểm tra chất lượng"],
-            qc: ["Cập nhật thành phẩm", "Báo cáo chất lượng"],
-            khoTP: ["Nhập kho thành phẩm", "Xuất kho thành phẩm", "Thống kê kho thành phẩm"],
-            congnhan: ["Lịch làm việc", "Báo cáo sự cố"]
-        };
+.content p {
+    color: #444;
+    font-size: 1rem;
+}
 
-        btnMenu.addEventListener("click", () => dropdown.classList.toggle("show"));
-
-        dropdown.querySelectorAll("button[data-section]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const section = btn.dataset.section;
-                const chucnang = danhMucData[section] || [];
-                sidebarList.innerHTML = chucnang
-                    .map(item => `<li><a href="#">${item}</a></li>`)
-                    .join("");
-                dropdown.classList.remove("show");
-            });
-        });
-
-        document.addEventListener("click", e => {
-            if (!btnMenu.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.remove("show");
-            }
-        });
-    </script>
-</body>
-
-</html>
