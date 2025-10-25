@@ -255,13 +255,6 @@
         .dropdown button:hover i {
             color: #fff;
         }
-        .dropdown-item span {
-    color: var(--mau-chu-chinh);
-        }
-
-        .dropdown-item:hover span {
-            color: #fff;
-        }
 
         /* ===== LAYOUT ===== */
         .main-layout-wrapper {
@@ -410,6 +403,36 @@
                 transform: translateY(0);
             }
         }
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding: 35px;
+            background-color: #fafcff;
+        }
+
+        .main-content h2 {
+            font-size: 1.3em;
+            color: var(--xanh-dam);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .main-content p {
+            font-size: 0.96em;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         /* --- Bố cục chính --- */
 /* Bố cục chính: chia hai cột */
 .main-container {
@@ -419,61 +442,7 @@
     background-color: #f8fafc;
 }
 
-/* === SIDEBAR === */
-.sidebar-nav {
-    width: 240px;
-    background-color: #f1f6ff;
-    border-right: 1px solid #d7e2f1;
-    padding: 25px 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-}
 
-/* Tiêu đề “DANH MỤC CHỨC NĂNG” */
-.sidebar-nav h3 {
-    background-color: #86aafc;
-    color: white;
-    font-weight: 700;
-    text-align: center;
-    padding: 14px;
-    border-radius: 8px;
-    width: 100%;
-    font-size: 0.95rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-/* Danh sách nút */
-.sidebar-nav ul {
-    list-style: none;
-    padding: 0;
-    width: 100%;
-}
-
-.sidebar-nav ul li {
-    margin-bottom: 10px;
-}
-
-.sidebar-nav ul li a {
-    display: block;
-    background-color: #fff;
-    color: #333;
-    padding: 12px 14px;
-    text-align: center;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 500;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    transition: all 0.2s ease;
-}
-
-.sidebar-nav ul li a:hover,
-.sidebar-nav ul li a.active {
-    background-color: #86aafc;
-    color: #fff;
-    transform: translateY(-2px);
-}
 
 /* === NỘI DUNG CHÍNH === */
 .content {
@@ -492,4 +461,121 @@
     color: #444;
     font-size: 1rem;
 }
+/* === Cải thiện giao diện bảng danh sách === */
 
+.main-content .request-list {
+    margin-top: 25px; /* Giảm khoảng cách trên một chút */
+    padding: 20px;    /* Thêm padding xung quanh khu vực bảng */
+    background-color: #fff; /* Nền trắng cho khu vực bảng */
+    border-radius: 8px;   /* Bo góc khu vực */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.07); /* Bóng đổ rõ hơn chút */
+    border: 1px solid #e1eaf3; /* Viền nhẹ */
+}
+
+.main-content .section-title {
+    background-color: #e2edf7; /* Màu nền xanh nhạt hơn */
+    color: #142850;          /* Màu chữ xanh đậm */
+    padding: 10px 15px;      /* Giảm padding dọc */
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 25px;     /* Tăng khoảng cách dưới */
+    border: 1px solid #cddbea; /* Viền nhạt hơn */
+}
+
+/* === Bảng dữ liệu === */
+.data-table.list-table {
+    width: 100%;
+    border-collapse: collapse; /* Gộp viền */
+    margin-top: 0;           /* Bỏ margin top vì đã có padding ở request-list */
+    border: none;            /* Bỏ viền ngoài bảng (vì đã có viền khu vực) */
+    font-size: 0.95em;
+    box-shadow: none;        /* Bỏ bóng đổ riêng của bảng */
+    border-radius: 0;        /* Bỏ bo góc riêng của bảng */
+    overflow: visible;       /* Đổi lại thành visible */
+}
+
+/* === Header của bảng === */
+.data-table.list-table thead tr {
+    background-color: #f1f5f9; /* Nền header xám xanh nhạt */
+    color: #334155;          /* Màu chữ header đậm hơn */
+    text-align: center;
+    font-weight: 600;         /* Đậm hơn chút */
+    border-bottom: 2px solid #cbd5e1; /* Viền dưới header rõ ràng */
+}
+
+.data-table.list-table th {
+    padding: 14px 15px;       /* Tăng padding header */
+    border-right: 1px solid #e2e8f0; /* Viền phải mờ hơn */
+    /* Bỏ border-bottom ở đây */
+}
+.data-table.list-table th:last-child {
+    border-right: none;
+}
+.data-table.list-table th:nth-child(2), /* Cột Tên kế hoạch */
+.data-table.list-table th:nth-child(5) { /* Cột Người tạo */
+    text-align: left;
+}
+
+
+/* === Nội dung bảng (tbody) === */
+.data-table.list-table tbody tr {
+    border-bottom: 1px solid #e2e8f0; /* Viền dưới mỗi dòng mờ hơn */
+    background-color: #fff;        /* Nền trắng rõ ràng */
+    transition: background-color 0.15s ease-in-out; /* Hiệu ứng hover mượt hơn */
+}
+
+/* === Zebra Striping (Màu xen kẽ) === */
+.data-table.list-table tbody tr:nth-child(even) {
+    background-color: #f8fafc; /* Nền xám cực nhạt cho dòng chẵn */
+}
+
+/* Hiệu ứng hover cho các dòng */
+.data-table.list-table tbody tr:hover {
+    background-color: #eef2ff; /* Màu nền xanh nhạt khi rê chuột */
+}
+
+.data-table.list-table td {
+    padding: 12px 15px;       /* Padding đồng đều cho ô dữ liệu */
+    border-right: 1px solid #e2e8f0; /* Viền phải mờ hơn */
+    vertical-align: middle;
+}
+.data-table.list-table td:last-child {
+    border-right: none;
+    text-align: center;
+}
+/* Căn lề các cột */
+.data-table.list-table td:first-child, /* STT */
+.data-table.list-table td:nth-child(3), /* Bắt đầu */
+.data-table.list-table td:nth-child(4) { /* Kết thúc */
+    text-align: center;
+}
+.data-table.list-table td:nth-child(2), /* Tên kế hoạch */
+.data-table.list-table td:nth-child(5) { /* Người tạo */
+    text-align: left;
+}
+
+
+/* === Nút "Xem chi tiết" === */
+.btn-details {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #3b82f6; /* Màu xanh dương tươi hơn */
+    color: white;
+    padding: 7px 14px;       /* Giảm padding nút chút */
+    border-radius: 5px;
+    font-size: 0.88em;       /* Chữ nhỏ hơn chút */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Thêm hiệu ứng transform */
+    font-weight: 500;
+}
+
+.btn-details:hover {
+    background-color: #2563eb; /* Màu xanh dương đậm hơn */
+    transform: translateY(-1px); /* Hiệu ứng nhấc nhẹ nút */
+}
+
+.btn-details:active {
+     transform: translateY(0px); /* Hiệu ứng nhấn nút */
+}
