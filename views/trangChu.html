@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Sản Xuất</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --xanh-dam: #142850;
+            --xanh-dam-hon: #0f1f3d;
+            --xanh-sang: #0099ff;
+            --mau-nen-trang: #f4f6fa;
+            --mau-nen-container: #ffffff;
+            --mau-vien: #d6d9e1;
+            --mau-chu-chinh: #222;
+            --mau-xam-icon: #cbd0da;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: var(--mau-nen-trang);
+            color: var(--mau-chu-chinh);
+            line-height: 1.5;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px;
+            background-color: var(--xanh-dam);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header .logo {
+            font-weight: 800;
+            font-size: 1.65em;
+            letter-spacing: -2px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            clip-path: inset(0% 0% 0% 0% round 8px);
+            
+        }
+
+        #logo-interlock {
+            background-color: #5f7ea9;
+            padding: 6px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            height: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            /* Thêm chút bóng đổ */
+        }
+
+        #logo-interlock span {
+            color: #fff;
+            /* Màu chữ mặc định là trắng */
+            padding: 0 8px;
+            /* Padding ngang cho từng chữ */
+            transition: all 0.3s ease;
+            /* Thêm hiệu ứng chuyển động mượt mà */
+            line-height: 1;
+            /* Đảm bảo chiều cao dòng không ảnh hưởng kích thước chữ */
+        }
+
+        /* Định kiểu riêng cho chữ F để lồng ghép */
+        #logo-interlock .middle-letter {
+            position: relative;
+            z-index: 2;
+            /* Để F nằm trên R và T nếu có sự chồng chéo */
+            background-color: var(--xanh-dam-hon);
+            /* Giữ màu nền RF */
+            /* Tạo hiệu ứng cắt chéo hoặc lồng ghép cho F */
+            transform: skewX(-10deg);
+            /* Nghiêng chữ F */
+            padding: 0 12px;
+            /* Tăng padding để chữ F rộng hơn */
+            margin: 0 -5px;
+            /* Kéo chữ F chồng lên R và T một chút */
+        }
+        /* Định kiểu cho chữ T để nổi bật */
+        #logo-interlock span:last-child {
+            background-color: var(--xanh-sang);
+            /* Nền xanh sáng cho T */
+            color: var(--xanh-dam-hon);
+            /* Màu chữ xanh đậm hơn cho T */
+            font-weight: 900;
+            /* Tăng độ đậm cho T */
+            padding: 0 12px;
+            /* Padding ngang cho T */
+            transform: skewX(-10deg);
+            /* Nghiêng T tương tự F */
+            margin-left: -5px;
+            /* Kéo T chồng lên F */
+            border-top-right-radius: 8px;
+            /* Bo góc riêng cho T nếu muốn */
+            border-bottom-right-radius: 8px;
+            /* Bo góc riêng cho T nếu muốn */
+        }
+
+        /* Điều chỉnh lại chữ T để nó không bị lệch quá */
+        #logo-interlock span:last-child::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -10px;
+            /* Điều chỉnh vị trí của phần nền để trông liền mạch */
+            bottom: 0;
+            width: 10px;
+            background-color: inherit;
+            z-index: -1;
+        }
+
+        .header h1 {
+            font-size: 1.35em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .user-controls i {
+            font-size: 20px;
+            color: var(--mau-xam-icon);
+            cursor: pointer;
+            transition: color 0.3s, transform 0.2s;
+        }
+
+        .user-controls i:hover {
+            color: var(--xanh-sang);
+            transform: scale(1.15);
+        }
+
+        .user-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--xanh-dam-hon);
+            color: #fff;
+            border-radius: 6px;
+            padding: 6px 12px;
+            text-decoration: none;
+            transition: background 0.3s, box-shadow 0.3s;
+            font-weight: 500;
+        }
+
+        .user-link:hover {
+            background-color: var(--xanh-sang);
+            box-shadow: 0 0 6px rgba(0, 153, 255, 0.5);
+        }
+
+        /* ===== NAVIGATION ===== */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--xanh-dam-hon);
+            padding: 10px 25px;
+            position: fixed;
+            top: 65px;
+            /* nằm ngay dưới header */
+            left: 0;
+            width: 100%;
+            border-bottom: 2px solid var(--xanh-sang);
+            z-index: 999;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            position: relative;
+        }
+
+        .nav-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #fff;
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+
+        .nav-button:hover {
+            background-color: var(--xanh-sang);
+            border-color: var(--xanh-sang);
+            box-shadow: 0 2px 6px rgba(0, 153, 255, 0.4);
+        }
+
+        /* ===== DROPDOWN DANH MỤC ===== */
+        .dropdown {
+            position: absolute;
+            top: 45px;
+            left: 180px;
+            background: var(--mau-nen-container);
+            border: 1px solid var(--mau-vien);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+            min-width: 250px;
+            z-index: 10;
+            animation: fadeIn 0.25s ease;
+            overflow: hidden;
+        }
+
+        .dropdown.show {
+            display: flex;
+        }
+
+        .dropdown button {
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 12px 18px;
+            font-size: 0.95em;
+            color: var(--mau-chu-chinh);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dropdown button i {
+            color: gray;
+            width: 18px;
+            text-align: center;
+        }
+
+        .dropdown button:hover {
+            background-color: var(--xanh-sang);
+            color: #fff;
+        }
+
+        .dropdown button:hover i {
+            color: #fff;
+        }
+
+        /* ===== LAYOUT ===== */
+        .main-layout-wrapper {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 0;
+            max-width: 1400px;
+            margin: 145px auto 25px auto;
+            /* tạo khoảng trống dưới header + navigation */
+            background-color: var(--mau-nen-container);
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+            min-height: 70vh;
+            overflow: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar-nav {
+            padding: 22px 18px;
+            background-color: #edf3fc;
+            border-right: 1px solid #cfd8e3;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-nav h3 {
+            font-size: 1.05em;
+            text-align: center;
+            font-weight: 700;
+            color: var(--xanh-dam);
+            background-color: #99bdfc;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #cdd8f3;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav ul li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-nav ul li a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            /* 🔹 Cho phép chữ tự xuống dòng mềm mại */
+            text-align: center;
+            /* 🔹 Căn giữa chữ theo chiều ngang */
+            word-break: break-word;
+            /* 🔹 Cắt chữ nếu quá dài */
+            text-decoration: none;
+            color: var(--mau-chu-chinh);
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-size: 1em;
+            font-weight: 500;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+
+
+        .sidebar-nav ul li a:hover,
+        .sidebar-nav ul li a.active {
+            background-color: var(--xanh-dam);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin: 30px auto 20px auto;
+            background-color: var(--xanh-dam);
+            padding: 30px 20px;
+            color: #e6e9f0;
+            text-align: center;
+            font-size: 0.95em;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+
+
+        }
+
+        .footer p {
+            margin-bottom: 8px;
+        }
+
+        .footer .footer-links {
+            margin: 10px 0;
+        }
+
+        .footer .footer-links a {
+            text-decoration: none;
+            color: #cfd8ef;
+            margin: 0 10px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .footer .footer-links a:hover {
+            color: var(--xanh-sang);
+        }
+
+        .footer .version {
+            color: #a8b2cc;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding: 35px;
+            background-color: #fafcff;
+        }
+
+        .main-content h2 {
+            font-size: 1.3em;
+            color: var(--xanh-dam);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .main-content p {
+            font-size: 0.96em;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo" id="logo-interlock">
+            <span>R</span><span class="middle-letter">F</span><span>T</span>
+        </div>
+        <h1>HỆ THỐNG QUẢN LÝ SẢN XUẤT</h1>
+        <div class="user-controls">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-regular fa-bell"></i>
+            <a href="#" class="user-link">
+                <i class="fa-regular fa-circle-user"></i>
+                <span>Tên nhân viên</span>
+            </a>
+        </div>
+    </header>
+
+    <nav class="navigation">
+        <div class="nav-links">
+            <a href="#" class="nav-button">Trang chủ</a>
+            <a href="#" class="nav-button">Giới thiệu</a>
+            <button class="nav-button" id="menuDanhMuc">Danh mục</button>
+
+            <div class="dropdown" id="dropdownDanhMuc">
+                <button data-section="tongquan"><i class="fa-solid fa-chart-line"></i> Tổng quan & Báo cáo</button>
+                <button data-section="nhansu"><i class="fa-solid fa-users"></i> Nhân sự</button>
+                <button data-section="sanxuat"><i class="fa-solid fa-industry"></i> Sản xuất</button>
+                <button data-section="khoNVL"><i class="fa-solid fa-boxes-stacked"></i> Kho nguyên liệu</button>
+                <button data-section="xuong"><i class="fa-solid fa-gears"></i> Xưởng sản xuất</button>
+                <button data-section="qc"><i class="fa-solid fa-clipboard-check"></i> Kiểm tra chất lượng</button>
+                <button data-section="khoTP"><i class="fa-solid fa-truck"></i> Kho thành phẩm</button>
+                <button data-section="congnhan"><i class="fa-solid fa-person-digging"></i> Công việc & Báo cáo</button>
+            </div>
+        </div>
+        <a href="#" class="nav-button">Đăng xuất</a>
+    </nav>
+
+    <div class="main-layout-wrapper">
+        <nav class="sidebar-nav">
+            <h3>DANH MỤC CHỨC NĂNG</h3>
+            <ul id="sidebarList">
+                <li><a href="#">Trang tổng quan</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <h2>Trang nội dung chính</h2>
+            <p>Chọn một mục trong <b>Danh mục</b> để hiển thị các chức năng tương ứng.</p>
+        </main>
+    </div>
+    <footer class="footer">
+        <p>© 2025 Hệ thống Quản lý Sản xuất Áo. Đã đăng ký bản quyền.</p>
+        <p>Liên hệ: support@qlao.com | Điện thoại: 1900 1234</p>
+
+        <div class="footer-links">
+            <a href="#">Chính sách bảo mật</a>
+            <a href="#">Điều khoản sử dụng</a>
+            <a href="#">Trợ giúp & Hỗ trợ</a>
+        </div>
+
+        <p class="version">Phiên bản 1.0.2</p>
+    </footer>
+
+    <script>
+        const btnMenu = document.getElementById("menuDanhMuc");
+        const dropdown = document.getElementById("dropdownDanhMuc");
+        const sidebarList = document.getElementById("sidebarList");
+
+        const danhMucData = {
+            tongquan: ["Đăng nhập", "Đăng xuất", "Thông tin cá nhân", "Báo cáo tổng hợp"],
+            nhansu: ["Thêm nhân viên", "Xem nhân viên", "Xóa nhân viên", "Sửa nhân viên"],
+            sanxuat: ["Tạo đơn hàng sản xuất", "Lập kế hoạch sản xuất", "Duyệt kế hoạch sản xuất"],
+            khoNVL: ["Tạo yêu cầu nhập nguyên vật liệu", "Nhập kho nguyên vật liệu", "Xuất nguyên vật liệu", "Thống kê kho nguyên vật liệu"],
+            xuong: ["Xem công việc", "Theo dõi tiến độ", "Yêu cầu cung cấp NVL", "Yêu cầu kiểm tra chất lượng"],
+            qc: ["Cập nhật thành phẩm", "Báo cáo chất lượng"],
+            khoTP: ["Nhập kho thành phẩm", "Xuất kho thành phẩm", "Thống kê kho thành phẩm"],
+            congnhan: ["Lịch làm việc", "Báo cáo sự cố"]
+        };
+
+        btnMenu.addEventListener("click", () => dropdown.classList.toggle("show"));
+
+        dropdown.querySelectorAll("button[data-section]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const section = btn.dataset.section;
+                const chucnang = danhMucData[section] || [];
+                sidebarList.innerHTML = chucnang
+                    .map(item => `<li><a href="#">${item}</a></li>`)
+                    .join("");
+                dropdown.classList.remove("show");
+            });
+        });
+
+        document.addEventListener("click", e => {
+            if (!btnMenu.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove("show");
+            }
+        });
+    </script>
+</body>
+
+</html>
