@@ -1,7 +1,12 @@
 <?php
-require_once 'app/controllers/HomeController.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Lấy tham số ?page= từ URL
+// Nạp controller chính
+require_once 'app/controllers/HomeController.php';
+require_once 'app/controllers/BaoCaoSuCoController.php';
+
+// Lấy tham số ?page= từ URL (nếu không có, mặc định là 'home')
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 
 switch ($page) {
@@ -10,16 +15,35 @@ switch ($page) {
         $controller->index();
         break;
 
-    case 'baocaosuco':  // ✅ Sửa lại key này
+    // ✅ Trang hiển thị form lập báo cáo sự cố
+    case 'baocaosuco':
         include './app/views/lapbaocaosuco.php';
         break;
 
-    case 'lichlamviec': // ✅ nên viết không dấu, không khoảng trắng
+    // ✅ Trang hiển thị lịch làm việc
+    case 'lichlamviec':
         include './app/views/lichlamviec.php';
         break;
+    case 'search':
+        require_once './app/controllers/SearchController.php';
+        $controller = new SearchController();
+        $controller->search();
+        break;
 
+    // ✅ Khi người dùng nhấn GỬI báo cáo, xử lý POST
+    case 'luu-baocaosuco':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller = new BaoCaoSuCoController();
+            $controller->luuBaoCao(); // Gọi hàm xử lý lưu báo cáo
+        } else {
+            header('Location: index.php?page=baocaosuco');
+            exit;
+        }
+        break;
+
+    
     default:
-        echo "404 - Trang không tồn tại!";
+        echo "<h2 style='text-align:center; margin-top:50px;'>404 - Trang không tồn tại!</h2>";
         break;
 }
 ?>
