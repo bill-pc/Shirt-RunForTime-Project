@@ -149,6 +149,7 @@ require_once 'app/views/layouts/nav.php';
             <hr>
 
             <form action="index.php?page=luu-baocaosuco" method="POST" enctype="multipart/form-data" class="report-form">
+                <label for="ten_baocao">Tên báo cáo</label> <input type="text" id="ten_baocao" name="ten_baocao" placeholder="Nhập tên báo cáo..." required>
                 <label for="search_device">Mã thiết bị</label>
                 <div class="search-box">
                     <input type="text" id="search_device" name="ma_thiet_bi" placeholder="Nhập mã thiết bị...">
@@ -180,7 +181,7 @@ require_once 'app/views/layouts/nav.php';
         </div>
 
         <script>
-       document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function() {
     const input = document.getElementById("search_device");
     const resultBox = document.getElementById("search_results");
     const tenThietBiInput = document.getElementById("ten_thiet_bi");
