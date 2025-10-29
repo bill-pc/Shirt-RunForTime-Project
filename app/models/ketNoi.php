@@ -1,5 +1,5 @@
 <?php
-class Database {
+class KetNoi {
     // === THAY ĐỔI THÔNG TIN KẾT NỐI CỦA BẠN Ở ĐÂY ===
     private $host = "localhost";
     private $user = "root";

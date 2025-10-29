@@ -7,7 +7,7 @@ class PhieuYeuCauModel {
 
     public function __construct() {
         // Tên file của bạn có thể là ketNoi.php, phải đảm bảo nó chứa class Database
-        $db = new Database();
+        $db = new KetNoi();
         $this->conn = $db->connect();
     }
 

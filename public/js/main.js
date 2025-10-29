@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const dropdown = document.getElementById("dropdownDanhMuc");
     const sidebarList = document.getElementById("sidebarList");
 
-    // --- Dữ liệu và Link Map (Giữ nguyên) ---
     const danhMucData = {
         tongquan: ["Đăng nhập", "Đăng xuất", "Thông tin cá nhân", "Báo cáo tổng hợp"],
         nhansu: ["Thêm nhân viên", "Xem nhân viên", "Xóa nhân viên", "Sửa nhân viên"],
@@ -22,63 +21,68 @@ document.addEventListener("DOMContentLoaded", function () {
         "Yêu cầu kiểm tra chất lượng": "index.php?page=yeu-cau-kiem-tra",
         "Lịch làm việc": "index.php?page=lichlamviec",
         "Báo cáo sự cố": "index.php?page=baocaosuco"
-        // ... thêm các link khác
     };
-    // --- Kết thúc Dữ liệu ---
 
-
-    /* === SỬA LỖI Ở ĐÂY === */
-
-    // 1. Tạo hàm để điền nội dung sidebar
     function populateSidebar(sectionKey) {
-        // Kiểm tra xem sidebarList có tồn tại không
-        if (!sidebarList) {
-            console.error("Không tìm thấy phần tử #sidebarList");
-            return; 
+        if (!sidebarList) return;
+        const chucnang = danhMucData[sectionKey] || [];
+        if (chucnang.length === 0) {
+            sidebarList.innerHTML = `<li class="sidebar-alert">Chưa có chức năng nào trong mục này</li>`;
+        } else {
+            sidebarList.innerHTML = chucnang
+                .map(item => {
+                    const url = linkMap[item] || "#";
+                    return `<li><a href="${url}">${item}</a></li>`;
+                })
+                .join("");
         }
-
-        const chucnang = danhMucData[sectionKey] || []; // Lấy danh sách chức năng
-        
-        sidebarList.innerHTML = chucnang
-            .map(item => {
-                const url = linkMap[item] || "#"; 
-                return `<li><a href="${url}">${item}</a></li>`;
-            })
-            .join("");
+        localStorage.setItem("lastSelectedSection", sectionKey);
     }
 
-    // 2. Gọi hàm này NGAY KHI TRANG TẢI XONG
-    //    Hãy chọn một mục mặc định, ví dụ 'xuong' hoặc 'congnhan'
-    //    Bạn có thể lưu lựa chọn cuối cùng vào localStorage để nhớ lần sau
-    const defaultSection = 'xuong'; // <-- CHỌN MỤC MẶC ĐỊNH Ở ĐÂY
-    populateSidebar(defaultSection);
+    // --- Kiểm tra trạng thái đăng nhập ---
+    const currentPage = window.location.search;
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    const isHomePage = currentPage === "" || currentPage === "?page=home";
 
-    /* === KẾT THÚC SỬA LỖI === */
+    // --- Hiển thị sidebar mặc định ---
+    if (!isLoggedIn) {
+        localStorage.removeItem("lastSelectedSection");
+        sidebarList.innerHTML = `<li class="sidebar-alert">⚠️ Hãy đăng nhập trước để sử dụng các chức năng</li>`;
+    } else if (isHomePage) {
+        sidebarList.innerHTML = `<li class="sidebar-alert">Vui lòng chọn danh mục ở trên</li>`;
+    } else {
+        const lastSection = localStorage.getItem("lastSelectedSection");
+        if (lastSection) populateSidebar(lastSection);
+    }
 
-
-    // --- Logic Dropdown (Giữ nguyên, chỉ gọi hàm populateSidebar) ---
-    if (btnMenu && dropdown) { // Thêm kiểm tra null
-        btnMenu.addEventListener("click", () => dropdown.classList.toggle("show"));
+    // --- Dropdown ---
+    if (btnMenu && dropdown) {
+        btnMenu.addEventListener("click", () => {
+            if (!isLoggedIn) {
+                alert("Vui lòng đăng nhập để sử dụng danh mục chức năng!");
+                return;
+            }
+            dropdown.classList.toggle("show");
+        });
 
         dropdown.querySelectorAll("button[data-section]").forEach(btn => {
             btn.addEventListener("click", () => {
+                if (!isLoggedIn) {
+                    alert("Vui lòng đăng nhập để chọn chức năng!");
+                    return;
+                }
                 const section = btn.dataset.section;
-                
-                // Gọi hàm để điền sidebar thay vì lặp code
-                populateSidebar(section); 
-                
+                populateSidebar(section);
                 dropdown.classList.remove("show");
             });
         });
 
-        // Đóng dropdown khi click ra ngoài
         document.addEventListener("click", e => {
-            if (!btnMenu.contains(e.target) && !dropdown.contains(e.target)) {
+            if (dropdown.classList.contains("show") &&
+                !btnMenu.contains(e.target) &&
+                !dropdown.contains(e.target)) {
                 dropdown.classList.remove("show");
             }
         });
-    } else {
-        console.warn("Không tìm thấy #menuDanhMuc hoặc #dropdownDanhMuc");
     }
-
 });

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 25, 2025 lúc 11:20 PM
+-- Thời gian đã tạo: Th10 29, 2025 lúc 06:02 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -236,7 +236,8 @@ CREATE TABLE `nguoidung` (
 --
 
 INSERT INTO `nguoidung` (`maND`, `hoTen`, `chucVu`, `soDienThoai`, `email`, `diaChi`, `maTK`) VALUES
-(1, 'TranKienQuoc', 'Giam Doc', '0346512104', 'trandjvjdSVds', 'sgarghsrdgsfdr', 1);
+(1, 'TranKienQuoc', 'Giam Doc', '0346512104', 'trandjvjdSVds', 'sgarghsrdgsfdr', 1),
+(2, 'Trần Kiến Quốc', 'Giam Doc', '0346512104', 'trankienquoc@gmail.com', '124 Nguyễn Oanh', 2);
 
 -- --------------------------------------------------------
 
@@ -363,7 +364,8 @@ CREATE TABLE `taikhoan` (
 --
 
 INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
-(1, 'trankienquoc', '12345', 'Hoạt động');
+(1, 'trankienquoc', '12345', 'Hoạt động'),
+(2, 'QKT', '12345', 'Hoạt động');
 
 -- --------------------------------------------------------
 
@@ -583,7 +585,7 @@ ALTER TABLE `chitietphieuyeucaukiemtrachatluong`
 -- AUTO_INCREMENT cho bảng `chitiet_phieuyeucaucapnvl`
 --
 ALTER TABLE `chitiet_phieuyeucaucapnvl`
-  MODIFY `maCTPhieuYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `maCTPhieuYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT cho bảng `congviec`
@@ -619,7 +621,7 @@ ALTER TABLE `kho`
 -- AUTO_INCREMENT cho bảng `nguoidung`
 --
 ALTER TABLE `nguoidung`
-  MODIFY `maND` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `maND` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT cho bảng `nvl`
@@ -637,7 +639,7 @@ ALTER TABLE `phieuxuatnvl`
 -- AUTO_INCREMENT cho bảng `phieuyeucaucungcapnvl`
 --
 ALTER TABLE `phieuyeucaucungcapnvl`
-  MODIFY `maYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `maYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT cho bảng `phieuyeucaukiemtrachatluong`
@@ -655,7 +657,7 @@ ALTER TABLE `san_pham`
 -- AUTO_INCREMENT cho bảng `taikhoan`
 --
 ALTER TABLE `taikhoan`
-  MODIFY `maTK` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `maTK` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT cho bảng `thietbi`

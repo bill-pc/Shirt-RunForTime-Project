@@ -8,7 +8,7 @@ class KeHoachSanXuatModel {
 
     public function __construct() {
         // Giả sử tệp ketNoi.php định nghĩa class Database với hàm connect()
-        $this->conn = (new Database())->connect();
+        $this->conn = (new KetNoi())->connect();
     }
 
     /* === SỬA HÀM NÀY ĐỂ LỌC KHSX ĐÃ YÊU CẦU NVL === */
