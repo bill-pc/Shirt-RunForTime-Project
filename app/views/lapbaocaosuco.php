@@ -97,7 +97,7 @@ require_once 'app/views/layouts/nav.php';
             display: block;
             width: 100%;
             margin-top: 10px;
-            padding: 10px;
+            padding: 50px;
             border: 1px dashed #b8c4d9;
             border-radius: 10px;
             background-color: #f9fbff;
@@ -150,6 +150,13 @@ require_once 'app/views/layouts/nav.php';
 
             <form action="index.php?page=luu-baocaosuco" method="POST" enctype="multipart/form-data" class="report-form">
                 <label for="ten_baocao">Tên báo cáo</label> <input type="text" id="ten_baocao" name="ten_baocao" placeholder="Nhập tên báo cáo..." required>
+                <!-- 🔽 THÊM PHẦN CHỌN XƯỞNG -->
+                <label for="xuong">Xưởng</label>
+                <select id="xuong" name="xuong">
+                <option value="">Chọn xưởng</option>
+                <option value="1">Xưởng cắt</option>
+                <option value="2">Xưởng may</option>
+                </select>
                 <label for="search_device">Mã thiết bị</label>
                 <div class="search-box">
                     <input type="text" id="search_device" name="ma_thiet_bi" placeholder="Nhập mã thiết bị...">
@@ -181,13 +188,22 @@ require_once 'app/views/layouts/nav.php';
         </div>
 
         <script>
-    document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
     const input = document.getElementById("search_device");
     const resultBox = document.getElementById("search_results");
     const tenThietBiInput = document.getElementById("ten_thiet_bi");
+    const xuongSelect = document.getElementById("xuong");
 
     input.addEventListener("input", async function() {
         const keyword = this.value.trim();
+        const xuong = xuongSelect.value;
+
+        if (!xuong) {
+            alert("Vui lòng chọn xưởng trước khi tìm thiết bị!");
+            input.value = "";
+            return;
+        }
+
         if (keyword.length === 0) {
             resultBox.style.display = "none";
             resultBox.innerHTML = '';
@@ -195,7 +211,7 @@ require_once 'app/views/layouts/nav.php';
         }
 
         try {
-            const res = await fetch(`index.php?page=search&type=thietbi&keyword=${encodeURIComponent(keyword)}`);
+            const res = await fetch(`index.php?page=search&type=thietbi&keyword=${encodeURIComponent(keyword)}&xuong=${encodeURIComponent(xuong)}`);
             const data = await res.json();
 
             resultBox.innerHTML = "";
@@ -226,8 +242,7 @@ require_once 'app/views/layouts/nav.php';
         }
     });
 });
-
-        </script>
+</script>
 
     </main>
 </div>

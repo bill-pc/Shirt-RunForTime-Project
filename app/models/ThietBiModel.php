@@ -20,5 +20,18 @@ class ThietBiModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function timThietBiTheoTuKhoaVaXuong($keyword, $maXuong) {
+        $sql = "SELECT maThietBi, tenThietBi 
+                FROM thietbi 
+                WHERE maXuong = :maXuong 
+                AND (maThietBi LIKE :kw OR tenThietBi LIKE :kw)
+                LIMIT 10";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':maXuong', $maXuong, PDO::PARAM_INT);
+        $stmt->bindValue(':kw', '%' . $keyword . '%', PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
 ?>

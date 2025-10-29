@@ -15,7 +15,7 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Cơ sở dữ liệu: `qlsx`
@@ -35,7 +35,7 @@ CREATE TABLE `baocaoloi` (
   `thoiGian` date DEFAULT NULL,
   `moTa` varchar(255) DEFAULT NULL,
   `maThietBi` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -48,7 +48,7 @@ CREATE TABLE `calamviec` (
   `tenCa` varchar(10) NOT NULL,
   `gioBatDau` datetime NOT NULL,
   `gioKetThuc` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -66,7 +66,7 @@ CREATE TABLE `chitietkehoachsanxuat` (
   `tenNVL` varchar(50) NOT NULL,
   `loaiNVL` varchar(50) NOT NULL,
   `soLuongNVL` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `chitietkehoachsanxuat`
@@ -89,7 +89,7 @@ CREATE TABLE `chitietphieuxuatnvl` (
   `soLuong` int(11) NOT NULL,
   `maPhieu` int(11) NOT NULL,
   `maXuong` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -103,7 +103,7 @@ CREATE TABLE `chitietphieuyeucaukiemtrachatluong` (
   `maSanPham` int(11) NOT NULL,
   `soLuong` int(11) NOT NULL DEFAULT 0,
   `maYC` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -119,7 +119,7 @@ CREATE TABLE `chitiet_phieuyeucaucapnvl` (
   `donViTinh` varchar(20) DEFAULT NULL,
   `maYCCC` int(11) NOT NULL,
   `maNVL` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -133,7 +133,7 @@ CREATE TABLE `congviec` (
   `moTa` varchar(200) DEFAULT NULL,
   `trangThai` varchar(30) NOT NULL DEFAULT 'Đang thực hiện',
   `ngayHetHan` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -149,7 +149,7 @@ CREATE TABLE `donhangsanxuat` (
   `trangThai` varchar(50) NOT NULL,
   `ngayGiao` date NOT NULL,
   `maSanPham` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `donhangsanxuat`
@@ -170,7 +170,7 @@ CREATE TABLE `ghinhanthanhphamtheongay` (
   `maSanPham` int(11) NOT NULL,
   `soLuongSPHoanThanh` int(11) NOT NULL,
   `ngayLam` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `ghinhanthanhphamtheongay`
@@ -192,7 +192,7 @@ CREATE TABLE `kehoachsanxuat` (
   `thoiGianKetThuc` date NOT NULL,
   `trangThai` varchar(50) NOT NULL DEFAULT 'Chờ duyệt',
   `maND` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `kehoachsanxuat`
@@ -213,7 +213,7 @@ CREATE TABLE `kho` (
   `maKho` int(11) NOT NULL,
   `tenKho` varchar(100) NOT NULL,
   `diaChi` varchar(200) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -229,7 +229,7 @@ CREATE TABLE `nguoidung` (
   `email` varchar(50) DEFAULT NULL,
   `diaChi` varchar(100) DEFAULT NULL,
   `maTK` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `nguoidung`
@@ -251,7 +251,7 @@ CREATE TABLE `nvl` (
   `soLuongTonKho` int(11) NOT NULL DEFAULT 0,
   `donViTinh` varchar(20) DEFAULT NULL,
   `moTa` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `nvl`
@@ -273,7 +273,7 @@ CREATE TABLE `phieuxuatnvl` (
   `tenNguoiLap` varchar(100) DEFAULT NULL,
   `ngayLap` date NOT NULL DEFAULT curdate(),
   `maND` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -289,7 +289,7 @@ CREATE TABLE `phieuyeucaucungcapnvl` (
   `maND` int(11) NOT NULL,
   `maKHSX` int(11) NOT NULL,
   `tenPhieu` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -304,7 +304,7 @@ CREATE TABLE `phieuyeucaukiemtrachatluong` (
   `soLuong` int(11) NOT NULL DEFAULT 0,
   `trangThaiPhieu` varchar(100) NOT NULL,
   `tenNguoiLap` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -320,7 +320,7 @@ CREATE TABLE `phieuyeucaunhapkhonvl` (
   `nhaCungCap` varchar(100) DEFAULT NULL,
   `trangThai` varchar(255) DEFAULT NULL,
   `tenNguoiLap` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -336,7 +336,7 @@ CREATE TABLE `san_pham` (
   `donVi` varchar(20) DEFAULT NULL,
   `moTa` varchar(255) DEFAULT NULL,
   `trangThaiSanPham` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `san_pham`
@@ -356,7 +356,7 @@ CREATE TABLE `taikhoan` (
   `tenDangNhap` varchar(50) NOT NULL,
   `matKhau` varchar(100) NOT NULL,
   `trangThai` varchar(20) DEFAULT 'Hoạt động'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `taikhoan`
@@ -376,7 +376,7 @@ CREATE TABLE `thietbi` (
   `tenThietBi` varchar(100) NOT NULL,
   `viTri` varchar(100) DEFAULT NULL,
   `trangThai` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -387,7 +387,7 @@ CREATE TABLE `thietbi` (
 CREATE TABLE `xuong` (
   `maXuong` int(11) NOT NULL,
   `tenXuong` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `xuong`

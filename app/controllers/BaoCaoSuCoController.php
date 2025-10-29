@@ -19,16 +19,16 @@ class BaoCaoSuCoController {
 
             // ✅ Xử lý upload hình ảnh (nếu có)
             $hinhAnh = null;
-            if (!empty($_FILES['hinhAnh']['name'])) {
+            if (!empty($_FILES['hinh_anh']['name'])) {
                 $targetDir = "uploads/";
                 if (!file_exists($targetDir)) {
                     mkdir($targetDir, 0777, true);
                 }
 
-                $fileName = time() . '_' . basename($_FILES['hinhAnh']['name']);
+                $fileName = time() . '_' . basename($_FILES['hinh_anh']['name']);
                 $hinhAnh = $targetDir . $fileName;
 
-                move_uploaded_file($_FILES['hinhAnh']['tmp_name'], $hinhAnh);
+                move_uploaded_file($_FILES['hinh_anh']['tmp_name'], $hinhAnh);
             }
 
             // ✅ Lưu vào DB (không lưu tên thiết bị)
