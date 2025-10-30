@@ -86,7 +86,16 @@ switch ($page) {
         }
         break;
 
+        case 'tao-yeu-cau-nhap-kho':
+            require_once './app/controllers/YeuCauNhapKhoController.php';
+            $controller = new YeuCauNhapKhoController();
+            $controller->index();
+            break;
+        
+
+
     default:
         echo "404 - Trang không tồn tại!";
         break;
+
 }

@@ -18,8 +18,9 @@
 
     <div class="main-container">
         <!-- Sidebar -->
-        <?php require_once 'layouts/sidebar.php';
-        ; ?>
+        <?php require_once 'app/views/layouts/sidebar.php'; ?>
+
+    
 
 
         <!-- Nội dung chính -->

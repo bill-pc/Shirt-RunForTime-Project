@@ -3,6 +3,7 @@ require_once 'app/views/layouts/header.php';
 require_once 'app/views/layouts/nav.php';
 ?>
 
+
 <div class="main-layout-wrapper">
     <?php require_once 'app/views/layouts/sidebar.php'; ?>
 
@@ -67,12 +68,27 @@ require_once 'app/views/layouts/nav.php';
         </button>
     </div>
 </div>
+<!-- Modal tài khoản bị dừng -->
+<div class="modal-overlay" id="account-locked-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+     background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+    <div class="modal-content" 
+        style="background:white; padding:30px 40px; border-radius:10px; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+        <p style="font-size:1.1em; font-weight:bold; color:#e67e22; margin-bottom:20px;">
+            ⚠️ Tài khoản của bạn đã bị dừng, không thể đăng nhập!
+        </p>
+        <button id="btn-account-locked-close" 
+            style="background:#f0f0f0; color:#333; border:1px solid #ccc; padding:8px 20px; border-radius:5px; cursor:pointer;">
+            X | Đóng
+        </button>
+    </div>
+</div>
+
 
 <?php
 require_once 'app/views/layouts/footer.php';
 ?>
 
-<script>
+<!-- <script>
 document.addEventListener("DOMContentLoaded", function() {
     const modal = document.getElementById('login-fail-modal');
     const btnClose = document.getElementById('btn-login-fail-close');
@@ -88,4 +104,37 @@ document.addEventListener("DOMContentLoaded", function() {
     btnClose.addEventListener('click', () => modal.style.display = 'none');
     modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
 });
+</script> -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const failModal = document.getElementById('login-fail-modal');
+    const failClose = document.getElementById('btn-login-fail-close');
+
+    const lockedModal = document.getElementById('account-locked-modal');
+    const lockedClose = document.getElementById('btn-account-locked-close');
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // ⚠️ Nếu có lỗi đăng nhập sai mật khẩu
+    if (urlParams.has('error') && urlParams.get('error') === '1') {
+        failModal.style.display = 'flex';
+        const newUrl = window.location.pathname + window.location.search.replace(/&?error=1/, '').replace(/\?$/, '');
+        window.history.replaceState({ path: newUrl }, '', newUrl);
+    }
+
+    // ⚠️ Nếu tài khoản bị dừng
+    if (urlParams.has('error') && urlParams.get('error') === 'locked') {
+        lockedModal.style.display = 'flex';
+        const newUrl = window.location.pathname + window.location.search.replace(/&?error=locked/, '').replace(/\?$/, '');
+        window.history.replaceState({ path: newUrl }, '', newUrl);
+    }
+
+    // Đóng modal
+    failClose.addEventListener('click', () => failModal.style.display = 'none');
+    failModal.addEventListener('click', e => { if (e.target === failModal) failModal.style.display = 'none'; });
+
+    lockedClose.addEventListener('click', () => lockedModal.style.display = 'none');
+    lockedModal.addEventListener('click', e => { if (e.target === lockedModal) lockedModal.style.display = 'none'; });
+});
 </script>
+
