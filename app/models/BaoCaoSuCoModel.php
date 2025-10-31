@@ -5,7 +5,7 @@ class BaoCaoSuCoModel {
     private $conn;
 
     public function __construct() {
-        $database = new Database();
+        $database = new KetNoi();
         $this->conn = $database->connect();
     }
 

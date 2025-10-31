@@ -5,33 +5,61 @@ class ThietBiModel {
     private $conn;
 
     public function __construct() {
-        $database = new Database();
-        $this->conn = $database->connect();
+        $database = new KetNoi();
+        $this->conn = $database->connect(); // MySQLi connection
     }
 
-    // ✅ Hàm tìm thiết bị theo từ khóa
+    // ✅ Tìm thiết bị theo từ khóa (tự do)
     public function timThietBiTheoTuKhoa($keyword) {
         $sql = "SELECT maThietBi, tenThietBi 
                 FROM thietbi 
-                WHERE maThietBi LIKE :kw OR tenThietBi LIKE :kw
+                WHERE maThietBi LIKE ? OR tenThietBi LIKE ?
                 LIMIT 10";
+
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':kw', '%' . $keyword . '%', PDO::PARAM_STR);
+        if (!$stmt) {
+            die("Lỗi prepare: " . $this->conn->error);
+        }
+
+        $like = "%{$keyword}%";
+        $stmt->bind_param("ss", $like, $like);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $stmt->close();
+        return $data;
     }
+
+    // ✅ Tìm thiết bị theo từ khóa và mã xưởng (lọc theo xưởng)
     public function timThietBiTheoTuKhoaVaXuong($keyword, $maXuong) {
         $sql = "SELECT maThietBi, tenThietBi 
                 FROM thietbi 
-                WHERE maXuong = :maXuong 
-                AND (maThietBi LIKE :kw OR tenThietBi LIKE :kw)
+                WHERE maXuong = ? 
+                AND (maThietBi LIKE ? OR tenThietBi LIKE ?)
                 LIMIT 10";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':maXuong', $maXuong, PDO::PARAM_INT);
-        $stmt->bindValue(':kw', '%' . $keyword . '%', PDO::PARAM_STR);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            die("Lỗi prepare: " . $this->conn->error);
+        }
+
+        $like = "%{$keyword}%";
+        $stmt->bind_param("iss", $maXuong, $like, $like);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $stmt->close();
+        return $data;
+    }
 }
 ?>

@@ -2,19 +2,60 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Nạp controller chính
-require_once 'app/controllers/HomeController.php';
-require_once 'app/controllers/BaoCaoSuCoController.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Lấy tham số ?page= từ URL (nếu không có, mặc định là 'home')
+// Lấy tham số ?page= từ URL
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+
+// ---------------------------
+// Login / Logout
+// ---------------------------
+if ($page === 'login' || $page === 'login-process' || $page === 'logout') {
+    require_once 'app/controllers/LoginController.php';
+    $controller = new LoginController();
+
+    switch ($page) {
+        case 'login':
+            $controller->index();
+            break;
+
+        case 'login-process':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->handleLogin();
+            } else {
+                header("Location: index.php?page=login");
+                exit;
+            }
+            break;
+
+        case 'logout':
+            $controller->logout();
+            break;
+    }
+    exit;
+}
+
+// ---------------------------
+// Kiểm tra session trước các trang khác
+// ---------------------------
+if (!isset($_SESSION['user']) && $page !== 'home') {
+    header("Location: index.php?page=login");
+    exit;
+}
+
+// ---------------------------
+// Các trang khác
+// ---------------------------
 
 switch ($page) {
     case 'home':
+        require_once 'app/controllers/HomeController.php';
         $controller = new HomeController();
         $controller->index();
         break;
-// Nhân viên
+
         // ✅ Trang hiển thị form lập báo cáo sự cố
         case 'baocaosuco':
             include './app/views/lapbaocaosuco.php';
@@ -68,7 +109,6 @@ switch ($page) {
                 $nvController->index();
             }
             break;
-
         // (nếu bạn vẫn muốn route xác nhận bằng GET)
         case 'xacnhan-xoa-nhanvien':
             require_once '.app/controllers/XoaNhanVienController.php';
@@ -85,9 +125,94 @@ switch ($page) {
                 $controller->index(); // ✅ Xem danh sách nhân viên
             }
             break;
+///Kho NVL
+        case 'thongke-khonvl':
+            require_once 'app/controllers/ThongKeNVlController.php';
+            $c = new ThongKeController();
+            $c->index();
+            break;
 
+        case 'thongke_export':
+            require_once 'app/controllers/ThongKeNVLController.php';
+            $c = new ThongKeController();
+            $c->exportCsv();
+            break;
 
+//kho thành phẩm
+        case 'xuatthanhpham':
+            require_once 'app/controllers/XuatThanhPhamController.php';
+            $controller = new XuatThanhPhamController();
+            $controller->index();
+            break;
 
+        case 'xuatthanhpham_xuat':
+            require_once 'app/controllers/XuatThanhPhamController.php';
+            $controller = new XuatThanhPhamController();
+            $controller->xuat();
+            break;
+
+case 'tao-yeu-cau-nvl':
+        require_once './app/controllers/YeuCauNVLController.php';
+        $controller = new YeuCauNVLController();
+        $controller->index();
+        break;
+
+    case 'chi-tiet-yeu-cau':
+        require_once './app/controllers/YeuCauNVLController.php';
+        $controller = new YeuCauNVLController();
+        $controller->chiTiet();
+        break;
+
+    case 'luu-yeu-cau-nvl':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once 'app/controllers/YeuCauNVLController.php';
+            $controller = new YeuCauNVLController();
+            $controller->luuPhieu();
+        } else {
+            header('Location: index.php?page=tao-yeu-cau-nvl');
+            exit;
+        }
+        break;
+    case 'thong-tin-ca-nhan':
+        require_once 'app/controllers/ProfileController.php';
+        $controller = new ProfileController();
+        $controller->index();
+        break;
+    case 'phe-duyet-cac-yeu-cau':
+        require_once 'app/controllers/PheDuyetController.php';
+        $controller = new PheDuyetController();
+        $controller->index();
+        break;
+    case 'chi-tiet-phe-duyet-yeu-cau':
+        require_once 'app/controllers/PheDuyetController.php';
+        $controller = new PheDuyetController();
+        $controller->chiTiet();
+        break;
+    case 'duyet-phieu':
+        require_once 'app/controllers/PheDuyetController.php';
+        $controller = new PheDuyetController();
+        $controller->duyet();
+        break;
+
+    case 'tuchoi-phieu':
+        require_once 'app/controllers/PheDuyetController.php';
+        $controller = new PheDuyetController();
+        $controller->tuChoi();
+        break;
+    case 'xuat-kho-nvl':
+        require_once 'app/controllers/XuatKhoNVLController.php';
+        (new XuatKhoNVLController())->danhSachPhieu();
+        break;
+
+    case 'chi-tiet-xuat-kho':
+        require_once 'app/controllers/XuatKhoNVLController.php';
+        (new XuatKhoNVLController())->chiTietPhieu();
+        break;
+
+    case 'luu-phieu-xuat-kho':
+        require_once 'app/controllers/XuatKhoNVLController.php';
+        (new XuatKhoNVLController())->luuPhieu();
+        break;
         
 
     default:

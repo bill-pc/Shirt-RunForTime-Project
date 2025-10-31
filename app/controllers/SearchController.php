@@ -1,6 +1,6 @@
 <?php
 require_once 'app/models/ThietBiModel.php';
-
+require_once 'app/models/NguyenVatLieuModel.php';
 class SearchController {
     public function search() {
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
@@ -23,6 +23,18 @@ class SearchController {
             } else {
                 // Giữ lại hàm cũ để tránh lỗi nếu người chưa chọn xưởng
                 $result = $model->timThietBiTheoTuKhoa($keyword);
+            }
+
+            echo json_encode($result);
+            return;
+        }
+        if ($type === 'nvl') {
+            $model = new NguyenVatLieuModel();
+
+            
+            if ($xuong > 0) {
+            
+                $result = $model->timNVLTheoTuKhoa($keyword);
             }
 
             echo json_encode($result);
