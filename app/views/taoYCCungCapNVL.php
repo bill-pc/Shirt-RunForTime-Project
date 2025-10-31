@@ -22,10 +22,10 @@ require_once 'app/views/layouts/nav.php';
                 <thead>
                     <tr style="background-color: #f8f9fa;">
                         <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center;">STT</th>
-                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Tên kế hoạch</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center;">Tên kế hoạch</th>
                         <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center;">Bắt đầu</th>
                         <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center;">Kết thúc</th>
-                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Người tạo</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center;">Người tạo</th>
                         <th style="border: 1px solid #dee2e6; padding: 12px;"></th>
                     </tr>
                 </thead>
@@ -38,19 +38,19 @@ require_once 'app/views/layouts/nav.php';
                     ?>
                             <tr style="text-align: center;">
                                 <td style="border: 1px solid #dee2e6; padding: 10px;"><?php echo $stt++; ?></td>
-                                <td style="border: 1px solid #dee2e6; padding: 10px; text-align: left;"><?php echo htmlspecialchars($khsx['tenKHSX']); ?></td>
+                                <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;"><?php echo htmlspecialchars($khsx['tenKHSX']); ?></td>
                                 <td style="border: 1px solid #dee2e6; padding: 10px;"><?php echo date('d/m/Y', strtotime($khsx['thoiGianBatDau'])); ?></td>
                                 <td style="border: 1px solid #dee2e6; padding: 10px;">
                                     <?php echo isset($khsx['thoiGianKetThuc']) ? date('d/m/Y', strtotime($khsx['thoiGianKetThuc'])) : 'N/A'; ?>
                                 </td>
-                                <td style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">
+                                <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
                                     <?php echo isset($khsx['tenNguoiTao']) ? htmlspecialchars($khsx['tenNguoiTao']) : 'N/A'; ?>
                                 </td>
                                 <td style="border: 1px solid #dee2e6; padding: 10px;">
                                     <a href="index.php?page=chi-tiet-yeu-cau&maKHSX=<?php echo $khsx['maKHSX']; ?>"
                                        class="btn-details"
                                        style="display: inline-block; text-decoration: none; background-color: #007bff; color: white; padding: 8px 12px; border-radius: 5px; font-size: 0.9em;">
-                                        Xem chi tiết
+                                        ➜ Xem chi tiết
                                     </a>
                                 </td>
                             </tr>

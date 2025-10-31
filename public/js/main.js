@@ -4,9 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const sidebarList = document.getElementById("sidebarList");
 
     const danhMucData = {
-        tongquan: ["Đăng nhập", "Đăng xuất", "Thông tin cá nhân", "Báo cáo tổng hợp"],
+        tongquan: [ "Thông tin cá nhân", "Báo cáo tổng hợp"],
         nhansu: ["Thêm nhân viên", "Xem nhân viên", "Xóa nhân viên", "Sửa nhân viên"],
-        sanxuat: ["Tạo đơn hàng sản xuất", "Lập kế hoạch sản xuất", "Duyệt kế hoạch sản xuất"],
+        sanxuat: ["Tạo đơn hàng sản xuất", "Lập kế hoạch sản xuất", "Phê duyệt yêu các yêu cầu sản xuất"],
         khoNVL: ["Tạo yêu cầu nhập nguyên vật liệu", "Nhập kho nguyên vật liệu", "Xuất nguyên vật liệu", "Thống kê kho nguyên vật liệu"],
         xuong: ["Xem công việc", "Theo dõi tiến độ", "Yêu cầu cung cấp NVL", "Yêu cầu kiểm tra chất lượng"],
         qc: ["Cập nhật thành phẩm", "Báo cáo chất lượng"],
@@ -20,7 +20,10 @@ document.addEventListener("DOMContentLoaded", function () {
         "Yêu cầu cung cấp NVL": "index.php?page=tao-yeu-cau-nvl",
         "Yêu cầu kiểm tra chất lượng": "index.php?page=yeu-cau-kiem-tra",
         "Lịch làm việc": "index.php?page=lichlamviec",
-        "Báo cáo sự cố": "index.php?page=baocaosuco"
+        "Báo cáo sự cố": "index.php?page=baocaosuco",
+        "Thông tin cá nhân": "index.php?page=thong-tin-ca-nhan",
+        "Phê duyệt yêu các yêu cầu sản xuất": "index.php?page=phe-duyet-cac-yeu-cau",
+        "Xuất nguyên vật liệu": "index.php?page=xuat-kho-nvl",
     };
 
     function populateSidebar(sectionKey) {

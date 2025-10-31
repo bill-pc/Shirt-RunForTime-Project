@@ -85,6 +85,46 @@ switch ($page) {
             exit;
         }
         break;
+    case 'thong-tin-ca-nhan':
+        require_once 'app/controllers/ProfileController.php';
+        $controller = new ProfileController();
+        $controller->index();
+        break;
+    case 'phe-duyet-cac-yeu-cau':
+        require_once 'app/controllers/PheDuyetController.php';
+        $controller = new PheDuyetController();
+        $controller->index();
+        break;
+    case 'chi-tiet-phe-duyet-yeu-cau':
+        require_once 'app/controllers/PheDuyetController.php';
+        $controller = new PheDuyetController();
+        $controller->chiTiet();
+        break;
+    case 'duyet-phieu':
+        require_once 'app/controllers/PheDuyetController.php';
+        $controller = new PheDuyetController();
+        $controller->duyet();
+        break;
+
+    case 'tuchoi-phieu':
+        require_once 'app/controllers/PheDuyetController.php';
+        $controller = new PheDuyetController();
+        $controller->tuChoi();
+        break;
+    case 'xuat-kho-nvl':
+        require_once 'app/controllers/XuatKhoNVLController.php';
+        (new XuatKhoNVLController())->danhSachPhieu();
+        break;
+
+    case 'chi-tiet-xuat-kho':
+        require_once 'app/controllers/XuatKhoNVLController.php';
+        (new XuatKhoNVLController())->chiTietPhieu();
+        break;
+
+    case 'luu-phieu-xuat-kho':
+        require_once 'app/controllers/XuatKhoNVLController.php';
+        (new XuatKhoNVLController())->luuPhieu();
+        break;
 
     default:
         echo "404 - Trang không tồn tại!";
