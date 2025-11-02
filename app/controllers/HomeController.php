@@ -1,5 +1,6 @@
 <?php
 require_once 'app/models/DanhMucModel.php';
+require_once 'app/models/HomeModel.php';
 
 class HomeController {
     public function index() {
@@ -18,6 +19,10 @@ class HomeController {
         $isLoggedIn = true;
         $danhMucModel = new DanhMucModel();
         $danhMucData = $danhMucModel->getDanhMuc();
+
+        $homeModel = new HomeModel();
+        $thongKe = $homeModel->layThongKeTongQuan();
+         $duLieuBieuDo = $homeModel->layNangSuatTheoNgay(7);
 
         require_once 'app/views/home.php';
     }

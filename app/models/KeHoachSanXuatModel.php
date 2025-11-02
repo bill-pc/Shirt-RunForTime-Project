@@ -105,5 +105,22 @@ class KeHoachSanXuatModel {
         $stmt->close();
         return $data;
     }
+    public function getAllPlansForNhapKho() {
+    $sql = "SELECT maKHSX, tenKHSX, thoiGianBatDau, thoiGianKetThuc, trangThai
+            FROM kehoachsanxuat
+            WHERE trangThai = 'Đã duyệt'";
+    
+    $stmt = $this->conn->prepare($sql);
+    if (!$stmt) {
+        die('❌ Lỗi prepare: ' . $this->conn->error);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+
 }
 ?>

@@ -23,7 +23,7 @@ class LoginController {
         $sql = "SELECT tk.*, nd.hoTen 
                 FROM taikhoan tk 
                 LEFT JOIN nguoidung nd ON tk.maTK = nd.maTK 
-                WHERE tenDangNhap = ?";
+                WHERE tenDangNhap = ? and nd.trangThai=1";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $username);
         $stmt->execute();

@@ -4,9 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const sidebarList = document.getElementById("sidebarList");
 
     const danhMucData = {
-        tongquan: [ "Thông tin cá nhân", "Báo cáo tổng hợp"],
+        tongquan: [ "Thông tin cá nhân", "Báo cáo tổng hợp", "Phê duyệt kế hoạch sản xuất"],
         nhansu: ["Thêm nhân viên", "Xem nhân viên", "Xóa nhân viên", "Sửa nhân viên"],
-        sanxuat: ["Tạo đơn hàng sản xuất", "Lập kế hoạch sản xuất", "Phê duyệt yêu các yêu cầu sản xuất"],
+        sanxuat: ["Tạo đơn hàng sản xuất", "Lập kế hoạch sản xuất", "Phê duyệt các yêu cầu sản xuất"],
         khoNVL: ["Tạo yêu cầu nhập nguyên vật liệu", "Nhập kho nguyên vật liệu", "Xuất nguyên vật liệu", "Thống kê kho nguyên vật liệu"],
         xuong: ["Xem công việc", "Theo dõi tiến độ", "Yêu cầu cung cấp NVL", "Yêu cầu kiểm tra chất lượng"],
         qc: ["Cập nhật thành phẩm", "Báo cáo chất lượng"],
@@ -18,12 +18,23 @@ document.addEventListener("DOMContentLoaded", function () {
         "Xem công việc": "index.php?page=xem-cong-viec",
         "Theo dõi tiến độ": "index.php?page=theo-doi-tien-do",
         "Yêu cầu cung cấp NVL": "index.php?page=tao-yeu-cau-nvl",
-        "Yêu cầu kiểm tra chất lượng": "index.php?page=yeu-cau-kiem-tra",
         "Lịch làm việc": "index.php?page=lichlamviec",
         "Báo cáo sự cố": "index.php?page=baocaosuco",
+        "Xem công việc": "index.php?page=xemcongviec",
+        "Thêm nhân viên": "index.php?page=themnhanvien",
+        "Xóa nhân viên": "index.php?page=xoanhanvien&id",
+        "Xem nhân viên": "index.php?page=xemnhanvien",
+        "Thống kê kho nguyên vật liệu": "index.php?page=thongke-khonvl",
+        "Xuất kho thành phẩm": "index.php?page=xuatthanhpham",
         "Thông tin cá nhân": "index.php?page=thong-tin-ca-nhan",
-        "Phê duyệt yêu các yêu cầu sản xuất": "index.php?page=phe-duyet-cac-yeu-cau",
+        "Phê duyệt các yêu cầu sản xuất": "index.php?page=phe-duyet-cac-yeu-cau",
         "Xuất nguyên vật liệu": "index.php?page=xuat-kho-nvl",
+        "Tạo yêu cầu nhập nguyên vật liệu": "index.php?page=tao-yeu-cau-nhap-kho",
+        "Nhập kho nguyên vật liệu": "index.php?page=nhap-kho-nvl",
+        "Yêu cầu kiểm tra chất lượng": "index.php?page=tao-yeu-cau-kiem-tra-chat-luong",
+        "Phê duyệt kế hoạch sản xuất": "index.php?page=phe-duyet-ke-hoach-sx",
+        "Sửa nhân viên": "index.php?page=suanhanvien"
+        
     };
 
     function populateSidebar(sectionKey) {

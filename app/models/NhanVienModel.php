@@ -1,0 +1,91 @@
+<?php
+require_once 'ketNoi.php';
+
+class NhanVienModel {
+    private $conn;
+
+    public function __construct() {
+        $db = new KetNoi();
+        $this->conn = $db->connect();
+    }
+
+    /**
+     * 🟢 Thêm nhân viên mới vào bảng nguoidung
+     */
+    public function insert($data) {
+        $sql = "INSERT INTO nguoidung (hoTen, chucVu, soDienThoai, email, diaChi, maTK)
+                VALUES (?, ?, ?, ?, ?, ?)";
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            die("❌ Lỗi prepare: " . $this->conn->error);
+        }
+
+        $hoTen = trim($data['hoTen'] ?? '');
+        $chucVu = trim($data['chucVu'] ?? '');
+        $soDienThoai = trim($data['soDienThoai'] ?? '');
+        $email = trim($data['email'] ?? '');
+        $diaChi = trim($data['diaChi'] ?? '');
+        $maTK = (int)($data['maTK'] ?? 1);
+
+        $stmt->bind_param("sssssi", $hoTen, $chucVu, $soDienThoai, $email, $diaChi, $maTK);
+        $result = $stmt->execute();
+
+        if (!$result) {
+            error_log("❌ Lỗi khi thêm nhân viên: " . $stmt->error);
+        }
+
+        $stmt->close();
+        return $result;
+    }
+
+    /**
+     * 🟡 Kiểm tra trùng email hoặc số điện thoại
+     */
+    public function checkDuplicate($email, $soDienThoai) {
+        $sql = "SELECT COUNT(*) AS total FROM nguoidung WHERE email = ? OR soDienThoai = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            die("❌ Lỗi prepare: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("ss", $email, $soDienThoai);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['total'] > 0;
+    }
+
+    /**
+     * 🟢 Lấy tất cả nhân viên
+     */
+    public function getAll() {
+        $sql = "SELECT * FROM nguoidung";
+        $result = $this->conn->query($sql);
+        if (!$result) {
+            die("❌ Lỗi truy vấn: " . $this->conn->error);
+        }
+
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    /**
+     * 🟢 Lấy thông tin nhân viên theo ID
+     */
+    public function getById($id) {
+        $sql = "SELECT * FROM nguoidung WHERE maND = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            die("❌ Lỗi prepare: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result;
+    }
+}
+?>

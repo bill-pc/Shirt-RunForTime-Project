@@ -1,0 +1,93 @@
+<?php
+require_once 'app/models/NhanVienModel.php';
+require_once 'app/models/TaiKhoanModel.php'; // Gọi thêm model tài khoản
+
+class ThemNhanVienController {
+    private $nhanVienModel;
+    private $taiKhoanModel;
+
+    public function __construct() {
+        $this->nhanVienModel = new NhanVienModel();
+        $this->taiKhoanModel = new TaiKhoanModel();
+    }
+
+    public function index() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Lấy dữ liệu từ form
+            $hoTen = trim($_POST['fullName'] ?? '');
+            $diaChi = trim($_POST['address'] ?? '');
+            $soDienThoai = trim($_POST['phone'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $chucVu = trim($_POST['position'] ?? '');
+
+            // --- 1. Kiểm tra bắt buộc ---
+            if ($hoTen === '' || $soDienThoai === '' || $email === '' || $chucVu === '') {
+                $message = 'Vui lòng nhập đầy đủ Họ tên, Số điện thoại, Email và Chức vụ.';
+                header('Location: index.php?page=themnhanvien&error=' . urlencode($message));
+                exit;
+            }
+
+            // --- 2. Kiểm tra định dạng email ---
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message = 'Email không hợp lệ.';
+                header('Location: index.php?page=themnhanvien&error=' . urlencode($message));
+                exit;
+            }
+
+            // --- 3. Kiểm tra định dạng số điện thoại ---
+            if (!preg_match('/^[0-9]{10,11}$/', $soDienThoai)) {
+                $message = 'Số điện thoại không hợp lệ (chỉ gồm 10-11 chữ số).';
+                header('Location: index.php?page=themnhanvien&error=' . urlencode($message));
+                exit;
+            }
+
+            // --- 4. Kiểm tra trùng ---
+            if ($this->nhanVienModel->checkDuplicate($email, $soDienThoai)) {
+                $message = 'Email hoặc Số điện thoại đã tồn tại.';
+                header('Location: index.php?page=themnhanvien&error=' . urlencode($message));
+                exit;
+            }
+
+            // --- 5. Tạo tài khoản ---
+            $tenDangNhap = explode('@', $email)[0]; // Lấy phần trước @
+            $matKhau = password_hash('123456', PASSWORD_DEFAULT); // Mật khẩu mặc định
+            $trangThai = 'Hoạt động';
+
+            // Gọi hàm createAccount (đúng cú pháp, truyền 2 tham số)
+            $maTK = $this->taiKhoanModel->createAccount($tenDangNhap, $matKhau, $trangThai);
+
+            if (!$maTK) {
+                $message = 'Không thể tạo tài khoản cho nhân viên.';
+                header('Location: index.php?page=themnhanvien&error=' . urlencode($message));
+                exit;
+            }
+
+            // --- 6. Thêm nhân viên ---
+            $success = $this->nhanVienModel->insert([
+                'hoTen' => $hoTen,
+                'diaChi' => $diaChi,
+                'soDienThoai' => $soDienThoai,
+                'email' => $email,
+                'chucVu' => $chucVu,
+                'maTK' => $maTK
+            ]);
+
+            // --- 7. Kết quả ---
+            if ($success) {
+                $message = 'Thêm nhân viên và tạo tài khoản thành công.';
+                header('Location: index.php?page=themnhanvien&success=' . urlencode($message));
+                exit;
+            } else {
+                $message = 'Lưu nhân viên thất bại.';
+                header('Location: index.php?page=themnhanvien&error=' . urlencode($message));
+                exit;
+            }
+        } else {
+            // --- 8. Hiển thị form ---
+            $success = $_GET['success'] ?? '';
+            $error = $_GET['error'] ?? '';
+            require 'app/views/themnhanvien.php';
+        }
+    }
+}
+?>
