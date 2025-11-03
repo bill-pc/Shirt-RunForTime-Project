@@ -44,25 +44,66 @@ switch ($page) {
             exit; // Dừng thực thi script sau khi chuyển hướng
         }
         break;
+    case 'lap-bao-cao':
+        include 'app/views/xemBaoCao.php';
+        break;
     case 'lap-ke-hoach':
+        // 1. TẢI TẤT CẢ CÁC MODEL MÀ KHSXController SẼ CẦN
         require_once 'app/models/DonHangSanXuatModel.php';
-        require_once 'app/controllers/KHSXController.php';
-        $controller = new KHSXController();
+        require_once 'app/models/KeHoachSanXuatModel.php';
+        require_once 'app/models/XuongModel.php';
+        require_once 'app/models/NVLModel.php';
+        require_once 'app/models/GhiNhanThanhPhamModel.php';
+        require_once 'app/models/SanPhamModel.php';
+
+        // 2. SAU ĐÓ MỚI TẢI CONTROLLER
+        require_once 'app/controllers/KHSXController.php'; // (Dòng 59 cũ của bạn)
+
+        $controller = new KHSXController(); // Bây giờ hàm __construct() sẽ chạy đúng
         $controller->create();
         break;
 
     case 'ajax-tim-kiem':
         require_once 'app/models/DonHangSanXuatModel.php';
+
+        require_once 'app/models/KeHoachSanXuatModel.php';
+        require_once 'app/models/XuongModel.php';
+        require_once 'app/models/NVLModel.php';
+        require_once 'app/models/GhiNhanThanhPhamModel.php';
+        require_once 'app/models/SanPhamModel.php';
         require_once 'app/controllers/KHSXController.php';
+
         $controller = new KHSXController();
         $controller->ajaxTimKiem();
         break;
-        
-    case 'ajax-get-chitiet':
+
+    case 'ajax-get-modal-data':
         require_once 'app/models/DonHangSanXuatModel.php';
+        require_once 'app/models/XuongModel.php';
+        require_once 'app/models/NVLModel.php';
+        require_once 'app/models/GhiNhanThanhPhamModel.php';
+        require_once 'app/models/SanPhamModel.php';
+        require_once 'app/models/KeHoachSanXuatModel.php';
         require_once 'app/controllers/KHSXController.php';
+
         $controller = new KHSXController();
-        $controller->ajaxGetChiTiet();
+        $controller->ajaxGetModalData();
+        break;
+
+
+    case 'luu-ke-hoach':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once 'app/models/DonHangSanXuatModel.php';
+            require_once 'app/models/KeHoachSanXuatModel.php';
+            require_once 'app/models/XuongModel.php';
+            require_once 'app/models/NVLModel.php';
+            require_once 'app/models/GhiNhanThanhPhamModel.php';
+            require_once 'app/models/SanPhamModel.php';
+            require_once 'app/controllers/KHSXController.php';
+
+            $controller = new KHSXController();
+            $controller->store();
+        }
         break;
     default:
         echo "404 - Trang không tồn tại!";
