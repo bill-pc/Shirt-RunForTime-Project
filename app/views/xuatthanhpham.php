@@ -136,7 +136,14 @@ require_once 'app/views/layouts/nav.php';
                         <td><?= htmlspecialchars($dh['tenSanPham']) ?></td>
                         <td><?= htmlspecialchars($dh['soLuongTon']) ?></td>
                         <td>
-                            <input type="number" id="soLuong<?= $dh['maDonHang'] ?>" min="1" max="<?= $dh['soLuongTon'] ?>">
+                            <input 
+                                type="number" 
+                                id="soLuong<?= $dh['maDonHang'] ?>" 
+                                min="1" 
+                                max="<?= htmlspecialchars($dh['soLuongTon']) ?>" 
+                                value="<?= htmlspecialchars($dh['soLuong']) ?>" 
+                            >
+
                         </td>
                         <td>
                             <input type="text" id="ghiChu<?= $dh['maDonHang'] ?>">

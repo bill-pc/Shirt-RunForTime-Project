@@ -149,7 +149,7 @@ require_once 'app/views/layouts/nav.php';
             <hr>
 
             <form action="index.php?page=luu-baocaosuco" method="POST" enctype="multipart/form-data" class="report-form">
-                <label for="ten_baocao">Tên báo cáo</label> <input type="text" id="ten_baocao" name="ten_baocao" placeholder="Nhập tên báo cáo..." required>
+                <label for="ten_baocao">Tên báo cáo</label> <input type="text" id="ten_baocao" name="ten_baocao" placeholder="" required>
                 <!-- 🔽 THÊM PHẦN CHỌN XƯỞNG -->
                 <label for="xuong">Xưởng</label>
                 <select id="xuong" name="xuong">
@@ -157,11 +157,11 @@ require_once 'app/views/layouts/nav.php';
                 <option value="1">Xưởng cắt</option>
                 <option value="2">Xưởng may</option>
                 </select>
-                <label for="search_device">Mã thiết bị</label>
-                <div class="search-box">
-                    <input type="text" id="search_device" name="ma_thiet_bi" placeholder="Nhập mã thiết bị...">
-                    <div id="search_results" class="search-results"></div>
-                </div>
+                <label for="ma_thiet_bi">Mã thiết bị</label>
+                    <select id="ma_thiet_bi" name="ma_thiet_bi">
+                        <option value="">-- Chọn thiết bị --</option>
+                    </select>
+
 
                 <label for="ten_thiet_bi">Tên thiết bị</label>
                 <input type="text" id="ten_thiet_bi" name="ten_thiet_bi" readonly>
@@ -187,62 +187,58 @@ require_once 'app/views/layouts/nav.php';
             </form>
         </div>
 
-        <script>
+     <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const input = document.getElementById("search_device");
-    const resultBox = document.getElementById("search_results");
-    const tenThietBiInput = document.getElementById("ten_thiet_bi");
     const xuongSelect = document.getElementById("xuong");
+    const maThietBiSelect = document.getElementById("ma_thiet_bi");
+    const tenThietBiInput = document.getElementById("ten_thiet_bi");
+    const tenBaoCaoInput = document.getElementById("ten_baocao");
 
-    input.addEventListener("input", async function() {
-        const keyword = this.value.trim();
-        const xuong = xuongSelect.value;
+    // Khi chọn xưởng => load danh sách thiết bị
+    xuongSelect.addEventListener("change", async function() {
+        const xuong = this.value;
+        maThietBiSelect.innerHTML = '<option value="">-- Chọn thiết bị --</option>';
+        tenThietBiInput.value = '';
+        tenBaoCaoInput.value = '';
 
-        if (!xuong) {
-            alert("Vui lòng chọn xưởng trước khi tìm thiết bị!");
-            input.value = "";
-            return;
-        }
-
-        if (keyword.length === 0) {
-            resultBox.style.display = "none";
-            resultBox.innerHTML = '';
-            return;
-        }
+        if (!xuong) return;
 
         try {
-            const res = await fetch(`index.php?page=search&type=thietbi&keyword=${encodeURIComponent(keyword)}&xuong=${encodeURIComponent(xuong)}`);
+            const res = await fetch(`index.php?page=search&type=thietbi&keyword=&xuong=${encodeURIComponent(xuong)}`);
             const data = await res.json();
 
-            resultBox.innerHTML = "";
             if (data.length > 0) {
                 data.forEach(item => {
-                    const option = document.createElement("div");
+                    const option = document.createElement("option");
+                    option.value = item.maThietBi;
                     option.textContent = `${item.maThietBi} - ${item.tenThietBi}`;
-                    option.onclick = () => {
-                        input.value = item.maThietBi;
-                        tenThietBiInput.value = item.tenThietBi;
-                        resultBox.style.display = "none";
-                    };
-                    resultBox.appendChild(option);
+                    option.dataset.ten = item.tenThietBi;
+                    maThietBiSelect.appendChild(option);
                 });
-                resultBox.style.display = "block";
             } else {
-                resultBox.innerHTML = "<div style='padding:8px;color:gray;'>Không tìm thấy kết quả.</div>";
-                resultBox.style.display = "block";
+                const opt = document.createElement("option");
+                opt.textContent = "Không có thiết bị nào trong xưởng này";
+                maThietBiSelect.appendChild(opt);
             }
         } catch (err) {
-            console.error('Lỗi khi tìm thiết bị:', err);
+            console.error("Lỗi khi tải thiết bị:", err);
         }
     });
 
-    document.addEventListener("click", function(e) {
-        if (!input.contains(e.target) && !resultBox.contains(e.target)) {
-            resultBox.style.display = "none";
+    // Khi chọn thiết bị => tự điền tên thiết bị và tên báo cáo
+    maThietBiSelect.addEventListener("change", function() {
+        const selected = this.options[this.selectedIndex];
+        const tenTB = selected.dataset.ten || "";
+        tenThietBiInput.value = tenTB;
+        if (tenTB) {
+            tenBaoCaoInput.value = "Báo cáo sự cố - " + tenTB;
+        } else {
+            tenBaoCaoInput.value = "";
         }
     });
 });
 </script>
+
 
     </main>
 </div>

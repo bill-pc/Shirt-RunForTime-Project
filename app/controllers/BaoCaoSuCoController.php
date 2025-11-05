@@ -30,9 +30,10 @@ class BaoCaoSuCoController {
 
                 move_uploaded_file($_FILES['hinh_anh']['tmp_name'], $hinhAnh);
             }
-
+            // ✅ Lấy mã người dùng từ session (đã lưu khi login)
+            $maND = $_SESSION['user']['maTK'];
             // ✅ Lưu vào DB (không lưu tên thiết bị)
-            $result = $this->model->themBaoCao($maThietBi, $tenBaoCao, $loaiLoi, $moTa, $hinhAnh);
+            $result = $this->model->themBaoCao($maND,$maThietBi, $tenBaoCao, $loaiLoi, $moTa, $hinhAnh);
 
             // ✅ Phản hồi
             if ($result) {

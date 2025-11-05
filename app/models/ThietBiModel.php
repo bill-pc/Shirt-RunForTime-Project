@@ -61,5 +61,26 @@ class ThietBiModel {
         $stmt->close();
         return $data;
     }
+        // ✅ Lấy toàn bộ thiết bị theo mã xưởng
+    public function layThietBiTheoXuong($maXuong) {
+        $sql = "SELECT maThietBi, tenThietBi FROM thietbi WHERE maXuong = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            die("Lỗi prepare: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("i", $maXuong);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $stmt->close();
+        return $data;
+    }
+
 }
 ?>

@@ -11,10 +11,10 @@ class XuatThanhPhamModel {
 
     // 🔹 Lấy danh sách đơn hàng chưa xuất kho
     public function getDonHangChuaXuat() {
-        $sql = "SELECT dh.maDonHang, dh.tenDonHang, sp.tenSanPham, sp.soLuongTon
-                FROM donhangsanxuat dh
-                JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
-                WHERE dh.trangThai != 'Đã xuất kho'";
+    $sql = "SELECT dh.maDonHang, dh.tenDonHang, sp.tenSanPham, sp.soLuongTon, dh.soLuong
+            FROM donhangsanxuat dh
+            JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
+            WHERE dh.trangThai != 'Đã xuất kho'";
 
         $result = $this->conn->query($sql);
         $data = [];

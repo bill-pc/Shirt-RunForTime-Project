@@ -1,6 +1,7 @@
 <?php
 require_once 'app/models/ThietBiModel.php';
 require_once 'app/models/NguyenVatLieuModel.php';
+
 class SearchController {
     public function search() {
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
@@ -9,42 +10,42 @@ class SearchController {
 
         header('Content-Type: application/json; charset=utf-8');
 
-        if (empty($keyword)) {
-            echo json_encode(array());
-            return;
-        }
-
         if ($type === 'thietbi') {
             $model = new ThietBiModel();
 
-            // ✅ Nếu có mã xưởng thì lọc theo xưởng
-            if ($xuong > 0) {
-                $result = $model->timThietBiTheoTuKhoaVaXuong($keyword, $xuong);
-            } else {
-                // Giữ lại hàm cũ để tránh lỗi nếu người chưa chọn xưởng
-                $result = $model->timThietBiTheoTuKhoa($keyword);
+            // ✅ Nếu chỉ có xưởng (không nhập keyword)
+            if ($xuong > 0 && empty($keyword)) {
+                $result = $model->layThietBiTheoXuong($xuong);
+                echo json_encode($result);
+                return;
             }
 
-            echo json_encode($result);
+            // ✅ Nếu có keyword và xưởng
+            if ($xuong > 0 && !empty($keyword)) {
+                $result = $model->timThietBiTheoTuKhoaVaXuong($keyword, $xuong);
+                echo json_encode($result);
+                return;
+            }
+
+            // ✅ Nếu chỉ có keyword (tìm tự do)
+            if (!empty($keyword)) {
+                $result = $model->timThietBiTheoTuKhoa($keyword);
+                echo json_encode($result);
+                return;
+            }
+
+            echo json_encode([]);
             return;
         }
+
         if ($type === 'nvl') {
             $model = new NguyenVatLieuModel();
-
-            
-            if ($xuong > 0) {
-            
-                $result = $model->timNVLTheoTuKhoa($keyword);
-            }
-
+            $result = $model->goiYNVL($keyword);
             echo json_encode($result);
             return;
         }
 
-        echo json_encode([
-            "status" => "ok",
-            "message" => "Không có type hợp lệ"
-        ]);
+        echo json_encode(["status" => "error", "message" => "Type không hợp lệ"]);
     }
 }
 ?>

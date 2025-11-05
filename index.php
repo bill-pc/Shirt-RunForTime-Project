@@ -129,6 +129,7 @@ switch ($page) {
     // ✅ Khi người dùng nhấn GỬI báo cáo, xử lý POST
     case 'luu-baocaosuco':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once './app/controllers/BaoCaoSuCoController.php';
             $controller = new BaoCaoSuCoController();
             $controller->luuBaoCao(); // Gọi hàm xử lý lưu báo cáo
         } else {
@@ -195,18 +196,19 @@ switch ($page) {
             $controller->index(); // ✅ Xem danh sách nhân viên
         }
         break;
-    ///Kho NVL
-    case 'thongke-khonvl':
-        require_once 'app/controllers/ThongKeNVlController.php';
-        $c = new ThongKeController();
-        $c->index();
-        break;
+   // Kho NVL
+case 'thongke-khonvl':
+    require_once 'app/controllers/ThongKeNVLController.php'; // chữ V L hoa đúng
+    $c = new ThongKeNVLController();
+    $c->index();
+    break;
 
-    case 'thongke_export':
-        require_once 'app/controllers/ThongKeNVLController.php';
-        $c = new ThongKeController();
-        $c->exportCsv();
-        break;
+case 'xuatcsv-thongkenvl':
+    require_once 'app/controllers/ThongKeNVLController.php';
+    $controller = new ThongKeNVLController();
+    $controller->xuatCSV();
+    break;
+
 
     //kho thành phẩm
     case 'xuatthanhpham':

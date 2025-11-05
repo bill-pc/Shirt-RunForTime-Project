@@ -62,15 +62,18 @@ require_once 'app/views/layouts/nav.php';
                 <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
                     <div>
                         <label>Thời gian bắt đầu:</label><br>
-                        <input type="date" name="start_date" required>
+                        <input type="date" id="start_date" name="start_date" required>
                     </div>
                     <div>
                         <label>Thời gian kết thúc:</label><br>
-                        <input type="date" name="end_date" required>
+                        <input type="date" id="end_date" name="end_date" required>
                     </div>
                     <div>
                         <label>Tên NVL:</label><br>
-                        <input type="text" name="tenNVL" placeholder="Nhập tên NVL...">
+                        <input type="text" name="tenNVL" id="inputTenNVL" placeholder="Nhập tên NVL...">
+<ul id="suggestionsNVL" 
+    style="position:absolute; background:white; border:1px solid #ccc; list-style:none; padding:0; margin-top:0; width:200px; max-height:150px; overflow-y:auto; display:none; z-index:10;"></ul>
+
                     </div>
                 </div>
 
@@ -103,11 +106,18 @@ require_once 'app/views/layouts/nav.php';
             </table>
 
             <!-- Nút xuất CSV -->
-            <div style="text-align:center; margin-top:15px;">
-                <form method="POST" action="index.php?page=thongke_export">
-                    <button type="submit" class="btn btn-primary">Xuất báo cáo</button>
-                </form>
+            <div>
+                <form id="formExport" method="GET" action="index.php">
+            <input type="hidden" name="page" value="xuatcsv-thongkenvl">
+            <input type="hidden" id="csv_start_date" name="start_date" value="">
+            <input type="hidden" id="csv_end_date" name="end_date" value="">
+            <input type="hidden" id="csv_tenNVL" name="tenNVL" value="">
+            <input type="hidden" id="csv_loai" name="loai" value="">
+            <button type="submit" class="btn btn-success">📄 Xuất CSV</button>
+            </form>
             </div>
+
+
         </div>
     </main>
 </div>
@@ -117,15 +127,27 @@ document.getElementById('formThongKe').addEventListener('submit', async function
     e.preventDefault();
 
     const formData = new FormData(this);
+    // đem form POST về cùng route để controller trả JSON
     const res = await fetch('index.php?page=thongke-khonvl', {
         method: 'POST',
         body: formData
     });
-    const data = await res.json();
+
+    // nếu server trả lỗi hoặc không phải JSON, xử lý an toàn
+    let data = [];
+    try {
+        data = await res.json();
+    } catch (err) {
+        console.error('Lỗi khi parse JSON:', err);
+        const tbody = document.querySelector('#tableKho tbody');
+        tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">Lỗi server, kiểm tra log.</td></tr>`;
+        return;
+    }
+
     const tbody = document.querySelector('#tableKho tbody');
     tbody.innerHTML = '';
 
-    if (data.length > 0) {
+    if (Array.isArray(data) && data.length > 0) {
         data.forEach(row => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -141,7 +163,96 @@ document.getElementById('formThongKe').addEventListener('submit', async function
     } else {
         tbody.innerHTML = `<tr><td colspan="6" style="color:gray;text-align:center;">Không có dữ liệu để hiển thị</td></tr>`;
     }
+    document.getElementById('formThongKe').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const res = await fetch('index.php?page=thongke-khonvl', {
+        method: 'POST',
+        body: formData
+    });
+
+    let data = [];
+    try {
+        data = await res.json();
+    } catch (err) {
+        console.error('Lỗi khi parse JSON:', err);
+        const tbody = document.querySelector('#tableKho tbody');
+        tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">Lỗi server, kiểm tra log.</td></tr>`;
+        return;
+    }
+
+    const tbody = document.querySelector('#tableKho tbody');
+    tbody.innerHTML = '';
+
+    if (Array.isArray(data) && data.length > 0) {
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.maNVL}</td>
+                <td>${row.tenNVL}</td>
+                <td>${row.donViTinh}</td>
+                <td>${row.tongNhap}</td>
+                <td>${row.tongXuat}</td>
+                <td>${row.tonKho}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } else {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:gray;text-align:center;">Không có dữ liệu để hiển thị</td></tr>`;
+    }
+
+    // 👉 Cập nhật hidden input trong form xuất CSV
+    document.getElementById('csv_start_date').value = document.getElementById('start_date').value;
+    document.getElementById('csv_end_date').value = document.getElementById('end_date').value;
+    document.getElementById('csv_tenNVL').value = document.getElementById('tenNVL').value;
+    const loai = document.querySelector('input[name="loai_baocao"]:checked');
+    document.getElementById('csv_loai').value = loai ? loai.value : '';
 });
+
+});
+// --- Gợi ý tên NVL khi nhập ---
+const inputNVL = document.getElementById('inputTenNVL');
+const suggestBox = document.getElementById('suggestionsNVL');
+
+inputNVL.addEventListener('input', async function() {
+    const keyword = this.value.trim();
+    if (keyword.length < 1) {
+        suggestBox.style.display = 'none';
+        return;
+    }
+
+    const res = await fetch(`index.php?page=search&type=nvl&keyword=${encodeURIComponent(keyword)}`);
+    const data = await res.json();
+
+    suggestBox.innerHTML = '';
+    if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item.label;
+            li.style.padding = '5px 10px';
+            li.style.cursor = 'pointer';
+            li.addEventListener('click', () => {
+                inputNVL.value = item.label;
+                suggestBox.style.display = 'none';
+            });
+            li.addEventListener('mouseover', () => li.style.background = '#f0f0f0');
+            li.addEventListener('mouseout', () => li.style.background = '');
+            suggestBox.appendChild(li);
+        });
+        suggestBox.style.display = 'block';
+    } else {
+        suggestBox.style.display = 'none';
+    }
+});
+
+// Ẩn gợi ý khi click ngoài
+document.addEventListener('click', (e) => {
+    if (!suggestBox.contains(e.target) && e.target !== inputNVL) {
+        suggestBox.style.display = 'none';
+    }
+});
+
 </script>
 
 <?php require_once 'app/views/layouts/footer.php'; ?>
