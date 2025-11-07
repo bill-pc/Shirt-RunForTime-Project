@@ -146,22 +146,21 @@ require_once 'app/views/layouts/nav.php';
 
         <div class="report-form-container">
             <h2>Lập báo cáo lỗi và sự cố</h2>
-            <hr>
+            
 
             <form action="index.php?page=luu-baocaosuco" method="POST" enctype="multipart/form-data" class="report-form">
-                <label for="ten_baocao">Tên báo cáo</label> <input type="text" id="ten_baocao" name="ten_baocao" placeholder="" required>
                 <!-- 🔽 THÊM PHẦN CHỌN XƯỞNG -->
                 <label for="xuong">Xưởng</label>
                 <select id="xuong" name="xuong">
-                <option value="">Chọn xưởng</option>
-                <option value="1">Xưởng cắt</option>
-                <option value="2">Xưởng may</option>
+                    <option value="">Chọn xưởng</option>
+                    <option value="1">Xưởng cắt</option>
+                    <option value="2">Xưởng may</option>
                 </select>
-                <label for="ma_thiet_bi">Mã thiết bị</label>
-                    <select id="ma_thiet_bi" name="ma_thiet_bi">
-                        <option value="">-- Chọn thiết bị --</option>
-                    </select>
 
+                <label for="ma_thiet_bi">Mã thiết bị</label>
+                <select id="ma_thiet_bi" name="ma_thiet_bi" required>
+                    <option value="">-- Chọn thiết bị --</option>
+                </select>
 
                 <label for="ten_thiet_bi">Tên thiết bị</label>
                 <input type="text" id="ten_thiet_bi" name="ten_thiet_bi" readonly>
@@ -187,19 +186,17 @@ require_once 'app/views/layouts/nav.php';
             </form>
         </div>
 
-     <script>
+    <script>
 document.addEventListener("DOMContentLoaded", function() {
     const xuongSelect = document.getElementById("xuong");
     const maThietBiSelect = document.getElementById("ma_thiet_bi");
     const tenThietBiInput = document.getElementById("ten_thiet_bi");
-    const tenBaoCaoInput = document.getElementById("ten_baocao");
 
     // Khi chọn xưởng => load danh sách thiết bị
     xuongSelect.addEventListener("change", async function() {
         const xuong = this.value;
         maThietBiSelect.innerHTML = '<option value="">-- Chọn thiết bị --</option>';
         tenThietBiInput.value = '';
-        tenBaoCaoInput.value = '';
 
         if (!xuong) return;
 
@@ -225,16 +222,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Khi chọn thiết bị => tự điền tên thiết bị và tên báo cáo
+    // Khi chọn thiết bị => tự điền tên thiết bị
     maThietBiSelect.addEventListener("change", function() {
         const selected = this.options[this.selectedIndex];
-        const tenTB = selected.dataset.ten || "";
+        const tenTB = selected ? (selected.dataset.ten || "") : "";
         tenThietBiInput.value = tenTB;
-        if (tenTB) {
-            tenBaoCaoInput.value = "Báo cáo sự cố - " + tenTB;
-        } else {
-            tenBaoCaoInput.value = "";
-        }
     });
 });
 </script>
