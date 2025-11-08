@@ -9,20 +9,19 @@ require_once './app/views/layouts/nav.php';
     <div class="container">
 
       <!-- Tabs -->
-    <div class="page-header">
-  <h2>TẠO YÊU CẦU NHẬP KHO NGUYÊN VẬT LIỆU</h2>
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('list', event)">Danh sách phiếu</button>
-        <button class="tab" onclick="switchTab('create', event)">Lập phiếu mới</button>
-      </div>
+      <div class="page-header">
+        <h2>TẠO YÊU CẦU NHẬP KHO NGUYÊN VẬT LIỆU</h2>
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('list', event)">Danh sách phiếu</button>
+          <button class="tab" onclick="switchTab('create', event)">Lập phiếu mới</button>
         </div>
+      </div>
 
       <!-- Section: Danh sách phiếu -->
       <section id="list" class="section active">
         <div class="card">
           <div class="card-header">
             <h2>Danh sách phiếu yêu cầu nhập kho</h2>
-            <!-- <button class="btn-primary" onclick="switchTab('create', event)">➕ Lập phiếu mới</button> -->
           </div>
 
           <div class="table-container">
@@ -45,10 +44,15 @@ require_once './app/views/layouts/nav.php';
                       <td><?= htmlspecialchars($phieu['soLuongNVL']) ?></td>
                       <td>
                         <?php if ($phieu['trangThai'] === 'Đã duyệt'): ?>
-                          <span class="status-badge status-approved">✓ Đã duyệt</span>
-                        <?php else: ?>
-                          <span class="status-badge status-pending">⏳ Chờ duyệt</span>
-                        <?php endif; ?>
+                        <span class="status-badge status-approved">Đã duyệt</span>
+                      <?php elseif ($phieu['trangThai'] === 'Đã nhập kho'): ?>
+                        <span class="status-badge status-success">Đã nhập kho</span>
+                      <?php elseif ($phieu['trangThai'] === 'Từ chối'): ?>
+                        <span class="status-badge status-rejected">Từ chối</span>
+                      <?php else: ?>
+                        <span class="status-badge status-pending">Chờ duyệt</span>
+                      <?php endif; ?>
+
                       </td>
                       <td><button class="btn-primary btn-small">Xem</button></td>
                     </tr>
@@ -70,8 +74,6 @@ require_once './app/views/layouts/nav.php';
           </div>
 
           <form method="POST" action="index.php?page=luu-phieu-nhap-kho">
-            <!-- <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Thông tin cơ bản</h3> -->
-
             <div class="form-row">
               <div class="form-group">
                 <label for="ngayLap" class="required">Ngày lập phiếu</label>
@@ -94,7 +96,6 @@ require_once './app/views/layouts/nav.php';
               <textarea id="ghiChu" name="ghiChu" placeholder="Nhập ghi chú nếu có..."></textarea>
             </div>
 
-            <!-- <h3 style="margin-top:2rem; margin-bottom:1rem; color: var(--primary);">Chọn nguyên vật liệu từ kế hoạch sản xuất</h3> -->
             <div class="form-group">
               <label for="maKHSX" class="required">Kế hoạch sản xuất</label>
               <select id="maKHSX" name="maKHSX" required>
@@ -110,7 +111,7 @@ require_once './app/views/layouts/nav.php';
             </div>
 
             <div class="table-container">
-              <table>
+              <table id="tableNVL">
                 <thead>
                   <tr>
                     <th><input type="checkbox" id="selectAll"></th>
@@ -164,4 +165,90 @@ function switchTab(tab, e) {
   document.getElementById(tab).classList.add('active');
   e.target.classList.add('active');
 }
+
+// Khi chọn kế hoạch sản xuất
+document.getElementById('maKHSX').addEventListener('change', async (e) => {
+  const maKHSX = e.target.value;
+  if (!maKHSX) return;
+
+  // ✅ Bước 1: Kiểm tra kế hoạch đã lập phiếu hay chưa
+  try {
+    const checkRes = await fetch(`app/controllers/ajax_check_khsx.php?maKHSX=${maKHSX}`);
+    const { exists } = await checkRes.json();
+
+    if (exists) {
+      alert('⚠️ Kế hoạch sản xuất này đã được lập phiếu yêu cầu nhập kho NVL rồi!');
+      e.target.value = ''; // reset chọn
+      document.querySelector('#tableNVL tbody').innerHTML = `
+        <tr><td colspan="7" style="text-align:center; color:gray;">Vui lòng chọn kế hoạch khác</td></tr>`;
+      return;
+    }
+  } catch (error) {
+    console.error('Lỗi kiểm tra kế hoạch:', error);
+  }
+
+  // ✅ Bước 2: Nếu chưa tồn tại, tiếp tục load danh sách NVL
+  try {
+   const res = await fetch(`app/controllers/ajax_get_nvl.php?maKHSX=${maKHSX}`);
+    const data = await res.json();
+    const tbody = document.querySelector('#tableNVL tbody');
+
+    if (!Array.isArray(data) || data.length === 0) {
+      tbody.innerHTML = `
+        <tr><td colspan="7" style="text-align:center; color:gray;">
+          Không có nguyên vật liệu cho kế hoạch này
+        </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(item => `
+      <tr>
+        <td><input type="checkbox" name="nvl[]" value="${item.maNVL}"></td>
+        <td>${item.maNVL}</td>
+        <td>${item.tenNVL}</td>
+        <td>${item.soLuongCan}</td>
+        <td>${item.donViTinh ?? '-'}</td>
+        <td>${item.soLuongTonKho ?? 0}</td>
+        <td>${Math.max(item.soLuongCan - (item.soLuongTonKho ?? 0), 0)}</td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Lỗi tải NVL:', error);
+  }
+});
+
+// Cập nhật đếm số lượng NVL được chọn
+// Cập nhật đếm số lượng NVL được chọn
+document.addEventListener('change', (e) => {
+  if (e.target.name === 'nvl[]') {
+    const checked = document.querySelectorAll('input[name="nvl[]"]:checked').length;
+    document.getElementById('selectedCount').textContent = checked;
+  }
+
+  if (e.target.id === 'selectAll') {
+    const all = document.querySelectorAll('input[name="nvl[]"]');
+    all.forEach(cb => cb.checked = e.target.checked);
+    document.getElementById('selectedCount').textContent = e.target.checked ? all.length : 0;
+  }
+});
+
+// ✅ Kiểm tra trước khi submit form
+document.querySelector('form').addEventListener('submit', function(e) {
+  const rows = document.querySelectorAll('#tableNVL tbody tr');
+  let canNhapCount = 0;
+
+  rows.forEach(row => {
+    const cell = row.children[6]; // cột “Cần nhập”
+    if (cell && parseFloat(cell.textContent) > 0) {
+      canNhapCount++;
+    }
+  });
+
+  if (canNhapCount === 0) {
+    e.preventDefault();
+    alert("⚠️ Tất cả nguyên vật liệu đều đủ tồn kho. Không cần lập phiếu nhập kho!");
+    return false;
+  }
+});
+
 </script>

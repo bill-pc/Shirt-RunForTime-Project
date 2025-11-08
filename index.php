@@ -1,6 +1,11 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+?>
+
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -235,7 +240,7 @@ case 'chi-tiet-yeu-cau-nhap-kho':
     (new YeuCauNhapKhoController())->chiTiet();
     break;
 
-case 'luu-yeu-cau-nhap-kho':
+    case 'luu-phieu-nhap-kho':
     require_once './app/controllers/YeuCauNhapKhoController.php';
     (new YeuCauNhapKhoController())->luuPhieu();
     break;
@@ -249,6 +254,12 @@ case 'nhap-kho-nvl':
     $controller = new YeuCauKiemTraChatLuongController();
     $controller->index();
     break;
+     // Thêm đoạn này 👇
+    case 'tao-yeu-cau-kiem-tra-chat-luong-create':
+        require_once 'app/controllers/YeuCauKiemTraChatLuongController.php';
+        $controller = new YeuCauKiemTraChatLuongController();
+        $controller->create();
+        break;
 
 case 'tao-yeu-cau-kiem-tra-chat-luong-process':
     require_once './app/controllers/YeuCauKiemTraChatLuongController.php';
@@ -256,17 +267,31 @@ case 'tao-yeu-cau-kiem-tra-chat-luong-process':
     $controller->create();
     break;
 
-    case 'phe-duyet-ke-hoach-sx':
-    require_once './app/controllers/PheDuyetKeHoachSXController.php';
+case 'phe-duyet-ke-hoach-sx':
+    require_once 'app/controllers/PheDuyetKeHoachSXController.php';
     $controller = new PheDuyetKeHoachSXController();
     $controller->index();
     break;
 
-case 'phe-duyet-ke-hoach-sx-process':
-    require_once './app/controllers/PheDuyetKeHoachSXController.php';
+case 'phe-duyet-ke-hoach-sx-process': // <- thêm dòng này
+    require_once 'app/controllers/PheDuyetKeHoachSXController.php';
     $controller = new PheDuyetKeHoachSXController();
     $controller->duyetKeHoach();
     break;
+case 'ajax-get-approval-history':
+    require_once 'app/controllers/PheDuyetKeHoachSXController.php';
+    $controller = new PheDuyetKeHoachSXController();
+    $controller->ajaxGetApprovalHistory();
+    break;
+
+
+case 'ajax-get-plan-detail':
+    require_once 'app/controllers/PheDuyetKeHoachSXController.php';
+    $controller = new PheDuyetKeHoachSXController();
+    $controller->ajaxGetPlanDetail();
+    break;
+
+
 case 'capnhatnv':
     require_once './app/controllers/SuaNhanVienController.php';
     $controller = new SuaNhanVienController();
@@ -287,4 +312,14 @@ case 'suathongtinnv':
     default:
         echo "404 - Trang không tồn tại!";
         break;
+case 'ajax-get-details-nhapkho':
+    require_once './app/controllers/NhapKhoNVLController.php';
+    (new NhapKhoNVLController())->ajaxGetDetails();
+    break;
+
+case 'luu-phieu-nhap-nvl':
+    require_once './app/controllers/NhapKhoNVLController.php';
+    (new NhapKhoNVLController())->luuPhieu();
+    break;
+
 }

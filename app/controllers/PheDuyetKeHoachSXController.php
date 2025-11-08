@@ -1,25 +1,67 @@
 <?php
-class PheDuyetKeHoachSXController {
+require_once './app/models/PheDuyetKeHoachSXModel.php';
 
-    // Hiển thị trang danh sách kế hoạch chờ phê duyệt
-    public function index() {
-        $viewPath = __DIR__ . '/../views/pheDuyetKeHoachSX.php';
-        if (file_exists($viewPath)) {
-            require_once $viewPath;
-        } else {
-            echo "<h3 style='color:red;'>❌ Không tìm thấy view: $viewPath</h3>";
-        }
+class PheDuyetKeHoachSXController {
+    private $model;
+
+    public function __construct() {
+        $this->model = new PheDuyetKeHoachSXModel();
     }
 
-    // (Tuỳ chọn) Xử lý phê duyệt hoặc từ chối kế hoạch
-    public function duyetKeHoach() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $maKH = $_POST['maKeHoach'] ?? '';
-            $trangThai = $_POST['trangThai'] ?? 'Chờ duyệt';
-            $ghiChu = $_POST['ghiChu'] ?? '';
+    public function index() {
+        $plans = $this->model->getPendingPlans();
+        require_once __DIR__ . '/../views/pheDuyetKeHoachSX.php';
+    }
 
-            // TODO: Gọi model cập nhật DB sau khi duyệt
-            echo "<script>alert('✅ Đã cập nhật trạng thái kế hoạch $maKH thành \"$trangThai\"'); window.location='index.php?page=phe-duyet-ke-hoach-sx';</script>";
+    // ✅ Xử lý phê duyệt / từ chối
+    public function duyetKeHoach() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $maKH = intval($_POST['maKeHoach'] ?? 0);
+        $ghiChu = $_POST['ghiChu'] ?? '';
+        $trangThai = $_POST['trangThai'] ?? 'Đã duyệt';
+        $nguoiThucHien = $_SESSION['user']['hoTen'] ?? 'Hệ thống';
+
+        if ($maKH <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Thiếu mã kế hoạch']);
+            exit;
         }
+
+        // ✅ Cập nhật trạng thái kế hoạch
+        $this->model->updatePlanStatus($maKH, $trangThai, $ghiChu);
+
+        // ✅ Ghi lịch sử phê duyệt
+        $this->model->addApprovalHistory($maKH, $trangThai, $ghiChu, $nguoiThucHien);
+
+        echo json_encode(['success' => true, 'message' => 'Cập nhật thành công']);
+        exit;
     }
 }
+
+
+    // ✅ AJAX chi tiết kế hoạch
+    public function ajaxGetPlanDetail() {
+        header('Content-Type: application/json; charset=utf-8');
+        require_once 'app/models/KeHoachSanXuatModel.php';
+        $model = new KeHoachSanXuatModel();
+
+        $maKHSX = intval($_GET['maKHSX'] ?? 0);
+        $plan = $model->getPlanById($maKHSX);
+        $materials = $model->getMaterialsForPlan($maKHSX);
+
+        echo json_encode([
+            'maKHSX' => $maKHSX,
+            'tenKHSX' => $plan['tenKHSX'] ?? '',
+            'ngayBatDau' => $plan['thoiGianBatDau'] ?? '',
+            'ngayKetThuc' => $plan['thoiGianKetThuc'] ?? '',
+            'nguyenVatLieu' => $materials
+        ], JSON_UNESCAPED_UNICODE);
+    }
+    public function ajaxGetApprovalHistory() {
+    header('Content-Type: application/json; charset=utf-8');
+    $maKHSX = intval($_GET['maKHSX'] ?? 0);
+    echo json_encode($this->model->getApprovalHistory($maKHSX), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+}
+?>
