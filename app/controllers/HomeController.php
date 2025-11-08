@@ -2,8 +2,10 @@
 require_once 'app/models/DanhMucModel.php';
 require_once 'app/models/HomeModel.php';
 
-class HomeController {
-    public function index() {
+class HomeController
+{
+    public function index()
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -22,7 +24,12 @@ class HomeController {
 
         $homeModel = new HomeModel();
         $thongKe = $homeModel->layThongKeTongQuan();
-         $duLieuBieuDo = $homeModel->layNangSuatTheoNgay(7);
+        $duLieuBieuDo = $homeModel->layNangSuatTheoNgay(7);
+
+        $KHSXDangTrienKhai = $homeModel->layKHSXDangTrienKhai();
+        $KHSXDaThucHien = $homeModel->layKHSXDaThucHien();
+        $tonKhoNVL = $homeModel->layTonKhoNVL();
+
 
         require_once 'app/views/home.php';
     }
