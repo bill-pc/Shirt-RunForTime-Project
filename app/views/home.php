@@ -14,71 +14,39 @@
             margin: 0;
         }
 
-        /* 🌟 Trang chào mừng khi chưa đăng nhập */
-        /* 🌟 Khối chứa toàn bộ vùng chào mừng */
         .welcome-container {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 60px 20px;
-            background: #ffffffff;
-            animation: fadeIn 0.8s ease-in-out;
+            background: #fff;
+            animation: fadeIn .8s ease-in-out;
         }
 
-        /* 🌟 Thẻ chính hiển thị nội dung */
         .welcome-card {
-            background: #cfd1d5ff;
-            border-radius: 18px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-            padding: 60px 50px;
-            max-width: 650px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .1);
+            padding: 50px 40px;
+            max-width: 720px;
             width: 100%;
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .welcome-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        /* 🌟 Tiêu đề và nội dung */
-        .welcome-card h1 {
-            color: #085da7;
-            font-size: 2em;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .welcome-card p {
-            color: #555;
-            font-size: 1.1em;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        /* 🌟 Nút đăng nhập */
         .login-btn {
-            background: linear-gradient(45deg, #007bff, #0056d2);
-            color: white;
+            background: linear-gradient(45deg, #006bff, #004bd1);
+            color: #fff;
             border: none;
-            padding: 12px 35px;
-            border-radius: 30px;
-            font-size: 1em;
+            padding: 14px 40px;
+            border-radius: 35px;
+            font-size: 1.05em;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, .35);
+            transition: .25s;
         }
 
-        .login-btn:hover {
-            background: linear-gradient(45deg, #0069d9, #004bb5);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
-        }
-
-        /* 🌟 Hiệu ứng xuất hiện mượt */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -91,25 +59,13 @@
             }
         }
 
-
-        /* 🌟 Dashboard */
         .dashboard-container {
             flex: 1;
-            padding: 30px 40px;
-            background-color: #f5f7fa;
-        }
-
-        .dashboard-title {
-            font-size: 1.8em;
-            font-weight: 700;
-            color: #085da7;
-            margin-bottom: 10px;
-        }
-
-        .dashboard-subtitle {
-            font-size: 1em;
-            color: #555;
-            margin-bottom: 25px;
+            min-width: 0;
+            /* 🔥 Cho phép nội dung tự co khi màn hình nhỏ */
+            padding: 30px 20px;
+            overflow-x: hidden;
+            /* 🔥 Ngăn không cho tràn ngang */
         }
 
         .dashboard-stats {
@@ -119,184 +75,274 @@
         }
 
         .card {
-            background-color: #fff;
+            background: #fff;
             padding: 25px 20px;
             border-radius: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+        }
+
+        .panel {
+            background: #fff;
+            padding: 22px;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+        }
+
+        .grid-2-1 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eef0f3;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .table th {
+            color: #6b7280;
             text-align: left;
         }
 
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-        }
-
-        .card h3 {
-            color: #343a40;
-            font-size: 1.05em;
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 10px;
         }
 
-        .card p {
-            font-size: 1.8em;
-            color: #007bff;
-            font-weight: bold;
-            margin: 5px 0;
+        .b-approved {
+            background: #e7f1ff;
+            color: #1f74ff;
         }
 
-        .card small {
-            font-size: 0.85em;
-            color: #6c757d;
+        .b-running {
+            background: #e8fff2;
+            color: #1ea25a;
         }
 
-        /* 🌟 Biểu đồ */
-        .dashboard-chart {
-            margin-top: 40px;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            padding: 30px;
+        .b-pending {
+            background: #fff5e6;
+            color: #b35c00;
         }
 
-        .chart-title {
-            color: #085da7;
-            font-size: 1.2em;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        canvas {
-            width: 100% !important;
-            max-width: 100%;
-            height: 400px !important;
-            display: block;
-            margin: 0 auto;
+        .b-done {
+            background: #efe9ff;
+            color: #6f3eea;
         }
     </style>
 </head>
 
 <body>
+
     <?php include 'app/views/layouts/header.php'; ?>
     <?php include 'app/views/layouts/nav.php'; ?>
 
     <div class="main-container">
+
         <?php include 'app/views/layouts/sidebar.php'; ?>
 
         <?php if (!$isLoggedIn): ?>
-            <!-- 🟢 Giao diện chưa đăng nhập -->
+
+            <!-- ============ GIAO DIỆN CHƯA ĐĂNG NHẬP ============ -->
             <div class="welcome-container">
                 <div class="welcome-card">
-                    <h1>👋 Chào mừng đến với Hệ thống Quản lý Sản Xuất</h1>
-                    <p>Quản lý kế hoạch, nguyên vật liệu và sản xuất chỉ trong một nền tảng!</p>
-
-                    <button class="login-btn" onclick="window.location.href='index.php?page=login'">
-                        🔐 Đăng nhập ngay
-                    </button>
-
-
+                    <h1 style="font-size:2.2em;font-weight:800;color:#0b63ce;margin-bottom:12px;">👋 Chào mừng bạn đến hệ
+                        thống QLSX</h1>
+                    <p style="font-size:1.05em;color:#555;line-height:1.6;margin-bottom:28px;">
+                        Giải pháp quản lý sản xuất thông minh – theo dõi kế hoạch, nguyên vật liệu và năng suất trong một
+                        nền tảng duy nhất.
+                    </p>
+                    <button class="login-btn" onclick="window.location.href='index.php?page=login'">🔐 Đăng nhập
+                        ngay</button>
                 </div>
             </div>
 
-
         <?php else: ?>
-            <!-- 🔹 Giao diện khi đã đăng nhập -->
-            <div class="dashboard-container">
-                <h1 class="dashboard-title">👋 Chào mừng bạn trở lại, <?= $_SESSION['user']['hoTen'] ?? '' ?>!</h1>
-                <p class="dashboard-subtitle">Dưới đây là tổng quan về hoạt động sản xuất hôm nay:</p>
 
+            <!-- ============ DASHBOARD ============ -->
+            <div class="dashboard-container">
+
+                <!-- Welcome -->
+                <div class="panel" style="margin-bottom:25px;">
+                    <h1 style="font-size:1.9em;font-weight:700;color:#0b63ce;margin:0;">
+                        👋 Chào mừng bạn, <?= htmlspecialchars($_SESSION['user']['hoTen'] ?? '') ?>!
+                    </h1>
+                    <p style="color:#666;margin-top:8px;">Dưới đây là tổng quan hoạt động sản xuất hôm nay.</p>
+                </div>
+
+                <!-- Cards thống kê -->
                 <div class="dashboard-stats">
-                    <div class="card">
+                    <div class="card" style="background:linear-gradient(135deg,#007bff,#2a73da);color:#fff;">
                         <h3>📋 Kế hoạch sản xuất</h3>
-                        <p><?= $thongKe['tongKHSX'] ?? 0 ?> kế hoạch</p>
+                        <p><?= $thongKe['tongKHSX'] ?? 0 ?></p>
                         <small>✅ Đã duyệt: <?= $thongKe['daDuyet'] ?? 0 ?> | ⏳ Chờ duyệt:
                             <?= $thongKe['choDuyet'] ?? 0 ?></small>
                     </div>
 
-                    <div class="card">
+                    <div class="card" style="background:linear-gradient(135deg,#28a745,#56d57a);color:#fff;">
                         <h3>📦 Nguyên vật liệu</h3>
-                        <p><?= $thongKe['tongNVL'] ?? 0 ?> loại NVL</p>
-                        <small>Quản lý kho NVL và tồn kho</small>
+                        <p><?= $thongKe['tongNVL'] ?? 0 ?></p>
+                        <small>Quản lý kho NVL</small>
                     </div>
 
-                    <div class="card">
+                    <div class="card" style="background:linear-gradient(135deg,#ff9500,#ffb85c);color:#fff;">
                         <h3>🚚 Đơn hàng sản xuất</h3>
-                        <p><?= $thongKe['tongDonHang'] ?? 0 ?> đơn hàng</p>
+                        <p><?= $thongKe['tongDonHang'] ?? 0 ?></p>
                         <small>Cập nhật tiến độ giao hàng</small>
                     </div>
 
-                    <div class="card">
+                    <div class="card" style="background:linear-gradient(135deg,#7045d8,#a26bff);color:#fff;">
                         <h3>⚙️ Thiết bị</h3>
-                        <p><?= $thongKe['tongThietBi'] ?? 0 ?> thiết bị</p>
-                        <small>Theo dõi tình trạng hoạt động xưởng</small>
+                        <p><?= $thongKe['tongThietBi'] ?? 0 ?></p>
+                        <small>Theo dõi tình trạng</small>
                     </div>
                 </div>
 
-                <div class="dashboard-chart">
-                    <h2 class="chart-title">📈 Biểu đồ năng suất theo ngày</h2>
-                    <canvas id="chartNangSuat"></canvas>
+                <!-- Năng suất + KHSX đang triển khai -->
+                <div class="grid-2-1" style="margin-top:25px;margin-bottom:25px;">
+                    <div class="panel">
+                        <h3>📈 Năng suất sản xuất theo ngày</h3>
+                        <canvas id="chartNangSuat"></canvas>
+                    </div>
+
+                    <div class="panel">
+                        <h3>📋 KHSX đang triển khai</h3>
+                        <table class="table">
+                            <tr>
+                                <th>Tên KHSX</th>
+                                <th>Đơn hàng</th>
+                                <th>Thời gian</th>
+                                <th>Trạng thái</th>
+                            </tr>
+
+                            <?php if (!empty($KHSXDangTrienKhai)): ?>
+                                <?php foreach ($KHSXDangTrienKhai as $row): ?>
+                                    <tr>
+                                        <td><?= $row['tenKHSX'] ?></td>
+                                        <td><?= $row['maDonHang'] ?></td>
+                                        <td><?= $row['thoiGianBatDau'] ?> – <?= $row['thoiGianKetThuc'] ?></td>
+                                        <td>
+                                            <?php
+                                            $st = trim($row['trangThai']);
+                                            $cls = 'b-pending';
+                                            if ($st == 'Đã duyệt')
+                                                $cls = 'b-approved';
+                                            if ($st == 'Đang sản xuất')
+                                                $cls = 'b-running';
+                                            ?>
+                                            <span class="badge <?= $cls ?>"><?= $st ?></span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="4" style="text-align:center;">Không có dữ liệu</td>
+                                </tr>
+                            <?php endif; ?>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
+                <!-- Tồn kho + KHSX đã thực hiện -->
+                <div class="grid-2-1">
+                    <div class="panel">
+                        <h3>🏭 Tồn kho NVL (Top 5)</h3>
+                        <canvas id="chartTonKho"></canvas>
+                    </div>
+
+                    <div class="panel">
+                        <h3>✅ KHSX đã thực hiện</h3>
+                        <table class="table">
+                            <tr>
+                                <th>Tên KHSX</th>
+                                <th>Đơn hàng</th>
+                                <th>Thời gian</th>
+                                <th>Trạng thái</th>
+                            </tr>
+
+                            <?php if (!empty($KHSXDaThucHien)): ?>
+                                <?php foreach ($KHSXDaThucHien as $row): ?>
+                                    <tr>
+                                        <td><?= $row['tenKHSX'] ?></td>
+                                        <td><?= $row['maDonHang'] ?></td>
+                                        <td><?= $row['thoiGianBatDau'] ?> – <?= $row['thoiGianKetThuc'] ?></td>
+                                        <td>
+                                            <span class="badge b-done"><?= $row['trangThai'] ?></span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="4" style="text-align:center;">Không có dữ liệu</td>
+                                </tr>
+                            <?php endif; ?>
+                        </table>
+                    </div>
+                </div>
+
+            </div> <!-- END dashboard-container -->
+
+            <!-- Chart -->
             <script>
-                const labels = <?= json_encode(array_column($duLieuBieuDo ?? [], 'ngay')) ?>;
-                const dataValues = <?= json_encode(array_map('intval', array_column($duLieuBieuDo ?? [], 'tongSoLuong'))) ?>;
-                const ctx = document.getElementById('chartNangSuat').getContext('2d');
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(33, 114, 243, 0.9)');
-                gradient.addColorStop(0.7, 'rgba(33, 114, 243, 0.6)');
-                gradient.addColorStop(1, 'rgba(33, 114, 243, 0.3)');
+                const nsLabels = <?= json_encode(array_column($duLieuBieuDo, 'ngay')) ?>;
+                const nsValues = <?= json_encode(array_column($duLieuBieuDo, 'tongSoLuong')) ?>;
 
-                new Chart(ctx, {
+                new Chart(document.getElementById('chartNangSuat'), {
                     type: 'bar',
                     data: {
-                        labels: labels.map(date => new Date(date).toLocaleDateString('vi-VN')),
+                        labels: nsLabels,
                         datasets: [{
-                            label: 'Sản phẩm hoàn thành',
-                            data: dataValues,
-                            backgroundColor: gradient,
-                            borderRadius: 12,
-                            borderSkipped: false,
-                            hoverBackgroundColor: '#1b6de1',
+                            data: nsValues,
+                            backgroundColor: '#1f74ff'
                         }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 1200, easing: 'easeOutQuart' },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: '#0b5ed7',
-                                titleColor: '#fff',
-                                bodyColor: '#fff',
-                                borderColor: '#0b5ed7',
-                                borderWidth: 1,
-                                padding: 10,
-                                displayColors: false
-                            },
-                            datalabels: {
-                                color: '#333',
-                                anchor: 'end',
-                                align: 'top',
-                                font: { size: 13, weight: '600' },
-                                formatter: value => value > 0 ? value : ''
-                            }
-                        },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { color: '#495057', font: { size: 13, weight: 500 }, padding: 8 } },
-                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)', lineWidth: 1 }, ticks: { color: '#6c757d', font: { size: 12 } } }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
+                    }
                 });
+
+                const nvlLabels = <?= json_encode(array_column($tonKhoNVL, 'tenNVL')) ?>;
+                const nvlValues = <?= json_encode(array_column($tonKhoNVL, 'soLuongTonKho')) ?>;
+
+                new Chart(document.getElementById('chartTonKho'), {
+                    type: 'bar',
+                    data: {
+                        labels: nvlLabels,
+                        datasets: [{
+                            data: nvlValues,
+                            backgroundColor: ['#1f74ff', '#ff8d2c', '#20c76a', '#8b4dff', '#ff3e6c']
+                        }]
+                    }
+                });
+                document.querySelectorAll('.dropdown-item').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const section = this.dataset.section;
+                        loadSidebar(section);
+                    });
+                });
+
+                function loadSidebar(sectionName) {
+                    fetch('loadSidebar.php?section=' + sectionName)
+                        .then(res => res.text())
+                        .then(html => {
+                            document.querySelector('.sidebar').innerHTML = html;
+                        });
+                }
             </script>
+
         <?php endif; ?>
+
     </div>
 
     <?php include 'app/views/layouts/footer.php'; ?>
+
 </body>
 
 </html>

@@ -27,8 +27,14 @@ $tenNguoiLap = $_SESSION['user']['hoTen'] ?? 'Chưa đăng nhập';
                 <div class="form-section1">
                     <div class="form-input-group1">
                         <label>Tên phiếu</label>
+                        <?php
+                            $tenPhieuGoc = $thongTinPhieu['tenPhieu'] ?? '';
+                            $pos = strpos($tenPhieuGoc, "KHSX");
+                            $maKH = ($pos !== false) ? substr($tenPhieuGoc, $pos) : '';
+                            ?>
                         <input type="text" name="tenPhieu"
-                            value="<?= htmlspecialchars($thongTinPhieu['tenPhieu'] ?? '') ?>" required>
+                                value="<?php echo 'Xuất NVL ' . htmlspecialchars($maKH); ?>"
+                                required>
                     </div>
 
                     <div class="form-input-group1">
@@ -83,16 +89,19 @@ $tenNguoiLap = $_SESSION['user']['hoTen'] ?? 'Chưa đăng nhập';
                             </td>
 
                             <td style="text-align:center;">
-                                <select name="xuongNhan[]" required
-                                        style="padding:5px; border-radius:4px; width:120px;">
-                                    <option value="">-- Chọn xưởng --</option>
-                                    <?php foreach ($dsXuong as $xuong): ?>
-                                        <option value="<?= htmlspecialchars($xuong['maXuong']) ?>">
-                                            <?= htmlspecialchars($xuong['tenXuong']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <?php
+                                    // lấy xưởng tương ứng với maNVL của dòng hiện tại
+                                    $xuongRow = $mapXuongTheoNVL[$maNVL] ?? null;
+                                ?>
+                                <?php if (!empty($xuongRow)) : ?>
+                                    <?= htmlspecialchars($xuongRow['tenXuong']) ?>
+                                    <input type="hidden" name="xuongNhan[]" value="<?= htmlspecialchars($xuongRow['maXuong']) ?>">
+                                <?php else: ?>
+                                    <span style="color:red;">Không tìm thấy xưởng</span>
+                                    <input type="hidden" name="xuongNhan[]" value="">
+                                <?php endif; ?>
                             </td>
+
 
                             <td style="text-align:center;">
                                 <input type="text" name="ghiChu[]" class="input-normal" placeholder="Ghi chú...">

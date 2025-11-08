@@ -91,6 +91,7 @@ class KeHoachSanXuatModel {
             return [];
         }
 
+
         if (!$stmt->execute()) {
             error_log('❌ Lỗi execute getPendingPlans: ' . $stmt->error);
             return [];

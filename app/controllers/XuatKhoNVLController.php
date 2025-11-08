@@ -1,22 +1,26 @@
 <?php
 require_once 'app/models/PhieuXuatKhoModel.php';
 
-class XuatKhoNVLController {
+class XuatKhoNVLController
+{
 
     private $model;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new PhieuXuatNVLModel();
     }
 
     // ✅ Danh sách phiếu yêu cầu NVL đã duyệt
-    public function danhSachPhieu() {
+    public function danhSachPhieu()
+    {
         $danhSachPhieu = $this->model->getAllPhieuXuat();
         require_once 'app/views/xuatKhoNVL.php';
     }
 
     // ✅ Xem và tạo phiếu xuất vật liệu từ YCCC
-    public function chiTietPhieu() {
+    public function chiTietPhieu()
+    {
         if (!isset($_GET['maYCCC'])) {
             header("Location: index.php?page=xuat-kho-nvl");
             exit();
@@ -24,22 +28,25 @@ class XuatKhoNVLController {
 
         $maYCCC = intval($_GET['maYCCC']);
 
-        // ✅ Lấy thông tin phiếu yêu cầu chính
-        $thongTinPhieu = [
-            'maYCCC' => $maYCCC,
-            'tenPhieu' => $_GET['tenPhieu'] ?? 'Phiếu xuất NVL',
-            'tenNguoiLap' => $_SESSION['tenNguoiDung'] ?? 'Chưa xác định'
-        ];
+        // ✅ Lấy thông tin phiếu yêu cầu thật từ database
+        $thongTinPhieu = $this->model->getThongTinPhieuTheoMaYCCC($maYCCC);
 
-        // ✅ Lấy danh sách NVL trong phiếu yêu cầu
+        if (!$thongTinPhieu) {
+            header("Location: index.php?page=xuat-kho-nvl&error=notfound");
+            exit();
+        }
+
+        // ✅ Lấy danh sách NVL và xưởng
         $dsNVL = $this->model->getChiTietNVLTheoYCCC($maYCCC);
-        $dsXuong = $this->model->getDanhSachXuong();
+        $mapXuongTheoNVL = $this->model->getXuongTheoYCCCTheoNVL($maYCCC);
+
 
         require_once 'app/views/xuatKhoNVL_ChiTiet.php';
     }
 
     // ✅ Lưu phiếu xuất NVL
-    public function luuPhieu() {
+    public function luuPhieu()
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: index.php?page=xuat-kho-nvl");
             exit();
@@ -52,5 +59,5 @@ class XuatKhoNVLController {
         }
         exit();
     }
-    
+
 }

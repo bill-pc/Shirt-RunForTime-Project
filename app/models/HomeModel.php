@@ -1,5 +1,5 @@
 <?php
-require_once 'app/models/KetNoi.php';
+require_once 'ketNoi.php';
 
 class HomeModel {
     private $conn;
@@ -47,6 +47,52 @@ class HomeModel {
         $data[] = $row;
     }
     return $data;
+}
+    // ✅ Lấy KHSX đang chạy
+// ✅ KHSX đang triển khai
+public function layKHSXDangTrienKhai() {
+    $sql = "
+        SELECT 
+            tenKHSX,
+            maDonHang,
+            thoiGianBatDau,
+            thoiGianKetThuc,
+            trangThai
+        FROM kehoachsanxuat
+        WHERE trangThai IN ('Đang sản xuất', 'Đã duyệt')
+        ORDER BY thoiGianBatDau DESC
+        LIMIT 10
+    ";
+    return $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+}
+
+// ✅ KHSX đã thực hiện
+public function layKHSXDaThucHien() {
+    $sql = "
+        SELECT 
+            tenKHSX,
+            maDonHang,
+            thoiGianBatDau,
+            thoiGianKetThuc,
+            trangThai
+        FROM kehoachsanxuat
+        WHERE trangThai IN ('Hoàn thành', 'Đã kết thúc')
+        ORDER BY thoiGianKetThuc DESC
+        LIMIT 10
+    ";
+    return $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+}
+
+
+// ✅ Lấy tồn kho NVL để vẽ biểu đồ
+public function layTonKhoNVL() {
+    $sql = "
+        SELECT tenNVL, soLuongTonKho
+        FROM nvl
+        ORDER BY soLuongTonKho DESC
+        LIMIT 5
+    ";
+    return $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
 }
