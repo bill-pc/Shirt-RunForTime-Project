@@ -33,7 +33,28 @@ class BaoCaoSuCoController {
             $moTa       = isset($_POST['mo_ta']) ? $_POST['mo_ta'] : null;
 
             // Lấy maND (mã tài khoản) từ session
-            $maND = $_SESSION['user']['maTK'];
+            $maND = null;
+
+// Nếu session có sẵn maND thì dùng luôn
+if (!empty($_SESSION['user']['maND'])) {
+    $maND = $_SESSION['user']['maND'];
+} else {
+    // Nếu chỉ có maTK -> truy vấn để tìm maND tương ứng
+    $maTK = $_SESSION['user']['maTK'];
+    $db = new KetNoi();
+    $conn = $db->connect();
+    $sql = "SELECT maND FROM nguoidung WHERE maTK = ? LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $maTK);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res && $res->num_rows > 0) {
+        $row = $res->fetch_assoc();
+        $maND = $row['maND'];
+    }
+    $stmt->close();
+}
+
 
             // Lấy hoTen người dùng: ưu tiên session nếu có, nếu không lấy từ bảng nguoidung
             $hoTen = '';
