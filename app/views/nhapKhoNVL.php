@@ -13,11 +13,19 @@ require_once 'app/views/layouts/nav.php';
           <div class="form-group">
             <label for="requestRef">Phiếu Yêu Cầu Nhập Kho (chỉ phiếu đã duyệt)</label>
             <select id="requestRef" onchange="loadFromRequest(this.value)">
-              <option value="">-- Không chọn (nhập thủ công) --</option>
-              <option value="PYC-2025-001">PYC-2025-001 - ✅ Đã duyệt</option>
-              <option value="PYC-2025-002">PYC-2025-002 - ⏳ Chờ duyệt</option>
-              <option value="PYC-2025-003">PYC-2025-003 - ❌ Từ chối</option>
-            </select>
+  <option value="">-- Chọn phiếu yêu cầu đã duyệt --</option>
+  <?php if (!empty($requests)): ?>
+      <?php foreach ($requests as $row): ?>
+          <option value="<?= htmlspecialchars($row['maYCNK']) ?>">
+              <?= htmlspecialchars($row['maYCNK']) ?> - <?= htmlspecialchars($row['nhaCungCap']) ?> (<?= htmlspecialchars($row['ngayLap']) ?>)
+          </option>
+      <?php endforeach; ?>loadFromRequest
+
+  <?php else: ?>
+      <option disabled>Không có phiếu nào đã duyệt</option>
+  <?php endif; ?>
+</select>
+
             <small style="color:#555; display:block; margin-top:5px;">
               Hệ thống chỉ cho phép lấy dữ liệu từ các phiếu <b>Đã duyệt</b>.
             </small>
@@ -36,15 +44,17 @@ require_once 'app/views/layouts/nav.php';
           <!-- Bảng hiển thị NVL -->
           <div class="table-container">
             <table>
-              <thead>
-                <tr>
-                  <th>Tên NVL</th>
-                  <th>Số lượng</th>
-                  <th>Đơn vị</th>
-                  <th>Loại</th>
-                </tr>
-              </thead>
-              <tbody id="linesBody"></tbody>
+                  <thead>
+      <tr>
+        <th>Tên NVL</th>
+        <th>Số lượng yêu cầu</th>
+        <th>Tồn kho</th>
+        <th>Cần nhập</th>
+        <th>Đơn vị</th>
+        <th>Loại</th>
+      </tr>
+    </thead>
+    <tbody id="linesBody"></tbody>
             </table>
           </div>
 
@@ -59,78 +69,80 @@ require_once 'app/views/layouts/nav.php';
 </div>
 
 <script>
-  const materials = [];
+  // Biến tiện dụng và hàm rút gọn
   const $ = (s) => document.querySelector(s);
 
-  const requestData = {
-    "PYC-2025-001": {
-      status: "approved",
-      supplier: "Công ty Vải Việt Nam",
-      items: [
-        { name: "Vải cotton trắng", quantity: 100, unit: "Mét", category: "Vải" },
-        { name: "Chỉ may trắng", quantity: 50, unit: "Cuộn", category: "Chỉ" }
-      ]
-    },
-    "PYC-2025-002": { status: "pending" },
-    "PYC-2025-003": { status: "rejected" }
-  };
+  // === KHI CHỌN PHIẾU YÊU CẦU ĐÃ DUYỆT ===
+  async function loadFromRequest(maYCNK) {
+  if (!maYCNK) return;
+  const res = await fetch(`index.php?page=ajax-get-details-nhapkho&maYCNK=${maYCNK}`);
+  const data = await res.json();
+  const tbody = document.getElementById('linesBody');
+  tbody.innerHTML = '';
 
-  // Khi chọn phiếu yêu cầu
-  function loadFromRequest(code) {
-    materials.length = 0;
-    $('#linesBody').innerHTML = '';
-    $('#supplier').value = '';
-
-    if (!code) return;
-
-    const req = requestData[code];
-    if (!req) return alert('Không tìm thấy dữ liệu phiếu này.');
-
-    if (req.status !== "approved") {
-      alert(`Phiếu ${code} chưa được duyệt, không thể lập phiếu nhập.`);
-      $('#requestRef').value = "";
-      return;
-    }
-
-    $('#supplier').value = req.supplier;
-    req.items.forEach(item => materials.push(item));
-    renderLines();
-  }
-
-  // Hiển thị danh sách NVL
-  function renderLines() {
-    const tbody = $('#linesBody');
-    tbody.innerHTML = '';
-    materials.forEach((m) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${m.name}</td>
-        <td>${m.quantity}</td>
-        <td>${m.unit}</td>
-        <td>${m.category}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // Gửi form
-  document.getElementById('materialForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (materials.length === 0) return alert('Vui lòng chọn ít nhất 1 nguyên vật liệu.');
-
-    const payload = {
-      date: new Date().toLocaleDateString('vi-VN'),
-      supplier: $('#supplier').value,
-      notes: $('#notes').value,
-      items: materials,
-    };
-    console.log('Phiếu nhập kho:', payload);
-    alert('✅ Phiếu nhập kho đã được lưu thành công!');
-    e.target.reset();
-    materials.length = 0;
-    renderLines();
+  data.forEach(row => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${row.tenNVL}</td>
+        <td>${row.soLuongYeuCau}</td>
+        <td>${row.soLuongTonKho}</td>
+        <td>${row.soLuongCanNhap}</td>
+        <td>${row.donViTinh ?? '-'}</td>
+        <td>${row.loaiNVL ?? '-'}</td>
+      </tr>`;
   });
+
+  // ✅ Tự động gán dữ liệu cần nhập cho khi lưu phiếu
+  window.selectedItems = data.map(r => ({
+    maNVL: parseInt(r.maNVL),
+    soLuong: parseInt(r.soLuongCanNhap) || 0
+  }));
+}
+
+
+  // === GỬI FORM LƯU PHIẾU NHẬP ===
+ document.getElementById('materialForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  if (!window.selectedItems || window.selectedItems.length === 0) {
+    alert('⚠️ Không có dữ liệu cần nhập!');
+    return;
+  }
+
+  const items = window.selectedItems.filter(i => i.soLuong > 0);
+  if (items.length === 0) {
+    alert('⚠️ Tất cả NVL đều không cần nhập (đủ tồn kho)!');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('maYCNK', document.getElementById('requestRef').value);
+  formData.append('nhaCungCap', document.getElementById('supplier').value.trim());
+  formData.append('items', JSON.stringify(items));
+
+  try {
+    const res = await fetch('index.php?page=luu-phieu-nhap-nvl', {
+      method: 'POST',
+      body: formData
+    });
+    const text = await res.text();
+
+    // Chạy script trả về (alert + redirect)
+    if (text.includes('<script')) {
+      const temp = document.createElement('div');
+      temp.innerHTML = text;
+      temp.querySelectorAll('script').forEach(s => eval(s.innerText));
+    } else {
+      document.body.innerHTML = text;
+    }
+  } catch (err) {
+    console.error('❌ Lỗi khi gửi dữ liệu:', err);
+    alert('Đã xảy ra lỗi khi lưu phiếu nhập!');
+  }
+});
+
 </script>
+
 
 <style>
 .container {

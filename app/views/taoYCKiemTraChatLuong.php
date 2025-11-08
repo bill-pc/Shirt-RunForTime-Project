@@ -1,101 +1,108 @@
-
 <?php
 require_once __DIR__ . '/layouts/header.php';
 require_once __DIR__ . '/layouts/nav.php';
 ?>
 <div class="main-layout-wrapper">
   <?php require_once __DIR__ . '/layouts/sidebar.php'; ?>
-  
-  <main class="main-content">
+
+  <main class="main-content" style="padding: 30px;">
     <div class="container">
-    
-        <h1>Tạo Yêu Cầu Kiểm Tra Chất Lượng</h1>
-   
-
-      <div class="main-content-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <!-- Form bên trái -->
-        <div class="form-section" style="border: 2px solid #000; border-radius: 8px; padding: 25px; background: #fff;">
-          <h2 style="border-bottom: 2px solid #000; padding-bottom: 8px;">Thông Tin Yêu Cầu</h2>
-          <form id="qualityCheckForm">
-            <div class="form-group">
-              <label>Khởi tạo từ <span style="color:red">*</span></label>
-              <select id="dataSource" required>
-                <option value="plan" selected>Từ Kế hoạch sản xuất</option>
-                <option value="manual">Nhập tay</option>
-              </select>
-            </div>
-
-            <div class="form-group" id="planPicker">
-              <label for="planCode">Mã Kế Hoạch <span style="color:red">*</span></label>
-              <select id="planCode" required>
-                <option value="">-- Chọn kế hoạch --</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="productCode">Mã Sản Phẩm <span style="color:red">*</span></label>
-              <select id="productCode" required></select>
-            </div>
-
-            <div class="form-group">
-              <label for="quantity">Số Lượng <span style="color:red">*</span></label>
-              <input type="number" id="quantity" min="1" placeholder="Nhập số lượng" required>
-            </div>
-
-            <div class="form-group">
-              <label for="workshop">Xưởng/Chuyền yêu cầu <span style="color:red">*</span></label>
-              <select id="workshop" required></select>
-            </div>
-
-            <div class="form-group">
-              <label for="requestTime">Thời Gian Yêu Cầu <span style="color:red">*</span></label>
-              <input type="datetime-local" id="requestTime" required>
-            </div>
-
-            <div class="form-group">
-              <label for="notes">Ghi Chú</label>
-              <input type="text" id="notes" placeholder="Nhập ghi chú (tùy chọn)">
-            </div>
-
-            <div class="button-group" style="display:flex;gap:10px;margin-top:20px;">
-              <button type="submit" class="btn" style="flex:1;padding:10px;border:2px solid #000;background:#fff;font-weight:600;cursor:pointer;">Nhập</button>
-              <button type="reset" class="btn" style="flex:1;padding:10px;border:2px solid #000;background:#fff;font-weight:600;cursor:pointer;">Xóa</button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Bên phải -->
-        <div class="form-section" style="border: 2px solid #000; border-radius: 8px; padding: 25px; background: #fff;">
-          <h2 style="border-bottom: 2px solid #000; padding-bottom: 8px;">Thông Tin Hệ Thống</h2>
-          <p>Trạng thái QC: <strong>Sẵn sàng tiếp nhận yêu cầu</strong></p>
-          <p>Yêu cầu hôm nay: <strong>12 yêu cầu</strong></p>
-          <p>Chờ xử lý: <strong>5 yêu cầu</strong></p>
-          <p>Thời gian xử lý trung bình: <strong>2–3 giờ</strong></p>
-        </div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        
+        <h1 style="font-size:26px; color:#1d3557; font-weight:700; margin:0;">
+          Tạo Yêu Cầu Kiểm Tra Chất Lượng
+        </h1>
       </div>
 
-      <!-- Bảng lịch sử -->
-      <div class="history-section" style="border: 2px solid #000; border-radius: 8px; padding: 25px; background: #fff; margin-top:20px;">
-        <h2 style="border-bottom: 2px solid #000; padding-bottom: 8px;">Lịch Sử Yêu Cầu</h2>
-        <table class="history-table" style="width:100%;border-collapse:collapse;">
-          <thead>
+      <!-- Form chọn kế hoạch -->
+      <form action="index.php?page=tao-yeu-cau-kiem-tra-chat-luong-create" method="POST"
+            style="display:flex; align-items:center; gap:15px; margin-bottom:25px; flex-wrap:wrap;">
+        <label for="planCode" style="font-weight:600;">Chọn kế hoạch sản xuất:</label>
+        <select name="planCode" id="planCode" required
+                style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:200px;">
+          <option value="">-- Chọn kế hoạch --</option>
+          <?php foreach ($plans as $p): ?>
+            <option value="<?= $p['maKHSX'] ?>"><?= htmlspecialchars($p['tenKHSX']) ?></option>
+          <?php endforeach; ?>
+        </select>
+
+        <input type="hidden" name="tenNguoiLap"
+               value="<?= $_SESSION['user']['tenNhanVien'] ?? 'Hệ thống' ?>">
+
+        <button type="submit"
+                style="background:#1d3557; color:white; padding:10px 18px; border:none; border-radius:8px;
+                       font-weight:600; cursor:pointer; transition:0.3s;">
+          Tạo phiếu kiểm tra chất lượng
+        </button>
+      </form>
+
+      <!-- Bảng danh sách NVL -->
+      <section style="background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:20px;">
+        <h2 style="font-size:20px; color:#1d3557; font-weight:600; margin-bottom:15px;">
+          Danh sách Nguyên Vật Liệu thuộc kế hoạch
+        </h2>
+        <table id="materialsTable"
+               style="width:100%; border-collapse:collapse; font-size:15px; text-align:center;">
+          <thead style="background:#457b9d; color:white;">
             <tr>
-              <th style="border:1px solid #000;padding:8px;background:#f2f2f2;">Mã Yêu Cầu</th>
-              <th style="border:1px solid #000;padding:8px;background:#f2f2f2;">Mã Sản Phẩm</th>
-              <th style="border:1px solid #000;padding:8px;background:#f2f2f2;">Số Lượng</th>
-              <th style="border:1px solid #000;padding:8px;background:#f2f2f2;">Thời Gian</th>
-              <th style="border:1px solid #000;padding:8px;background:#f2f2f2;">Trạng Thái</th>
+              <th style="padding:10px;">Mã NVL</th>
+              <th style="padding:10px;">Tên NVL</th>
+              <th style="padding:10px;">Xưởng</th>
+              <th style="padding:10px;">Số lượng cần kiểm tra</th>
             </tr>
           </thead>
           <tbody>
+            <tr><td colspan="4" style="padding:12px; color:#666;">Chưa chọn kế hoạch...</td></tr>
           </tbody>
         </table>
-      </div>
+      </section>
     </div>
   </main>
 </div>
+
+<!-- ========== STYLE ========== -->
 <style>
-  
-<?php include './public/css/phieu-nhap.css'; ?>
+#materialsTable tbody tr:hover {
+  background-color: #f1f8ff;
+  transition: 0.2s;
+}
+#materialsTable td, #materialsTable th {
+  border-bottom: 1px solid #ddd;
+}
 </style>
+
+<!-- ========== SCRIPT ========== -->
+<script>
+document.getElementById('planCode').addEventListener('change', function() {
+  const maKHSX = this.value;
+  const tbody = document.querySelector('#materialsTable tbody');
+  tbody.innerHTML = `<tr><td colspan="4" style="padding:12px; color:#666;">Đang tải dữ liệu...</td></tr>`;
+  if (!maKHSX) {
+    tbody.innerHTML = `<tr><td colspan="4" style="padding:12px; color:#666;">Chưa chọn kế hoạch...</td></tr>`;
+    return;
+  }
+
+  fetch(`app/controllers/api.php?action=getMaterials&maKHSX=${maKHSX}`)
+
+    .then(res => res.json())
+    .then(data => {
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="padding:12px; color:#888;">Không có NVL nào trong kế hoạch này.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.map(row => `
+        <tr>
+          <td>${row.maNVL}</td>
+          <td style="text-align:left; padding-left:15px;">${row.tenNVL}</td>
+          <td>${row.tenXuong}</td>
+          <td>${row.soLuong}</td>
+        </tr>`).join('');
+    })
+    .catch(err => {
+      tbody.innerHTML = `<tr><td colspan="4" style="padding:12px; color:red;">Lỗi tải dữ liệu!</td></tr>`;
+      console.error(err);
+    });
+});
+</script>
+
 <?php require_once __DIR__ . '/layouts/footer.php'; ?>
