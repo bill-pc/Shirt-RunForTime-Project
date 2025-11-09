@@ -108,13 +108,14 @@ require_once 'app/views/layouts/nav.php';
             <!-- Nút xuất CSV -->
             <div>
                 <form id="formExport" method="GET" action="index.php">
-            <input type="hidden" name="page" value="xuatcsv-thongkenvl">
-            <input type="hidden" id="csv_start_date" name="start_date" value="">
-            <input type="hidden" id="csv_end_date" name="end_date" value="">
-            <input type="hidden" id="csv_tenNVL" name="tenNVL" value="">
-            <input type="hidden" id="csv_loai" name="loai" value="">
-            <button type="submit" class="btn btn-success">📄 Xuất CSV</button>
-            </form>
+    <input type="hidden" name="page" value="thongke-nvl-xuatcsv">
+    <input type="hidden" id="csv_start_date" name="start_date" value="">
+    <input type="hidden" id="csv_end_date" name="end_date" value="">
+    <input type="hidden" id="csv_tenNVL" name="tenNVL" value="">
+    <input type="hidden" id="csv_loai" name="loai" value="">
+    <button type="submit" class="btn btn-success">📄 Xuất CSV</button>
+</form>
+
             </div>
 
 
@@ -253,6 +254,23 @@ document.addEventListener('click', (e) => {
     }
 });
 
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const exportForm = document.getElementById("formExport");
+    const btnExport = exportForm.querySelector("button[type='submit']");
+
+    btnExport.addEventListener("click", function(e) {
+        // Lấy giá trị hiện tại trên form lọc
+        document.getElementById("csv_start_date").value = document.querySelector("input[name='start_date']").value;
+        document.getElementById("csv_end_date").value = document.querySelector("input[name='end_date']").value;
+        document.getElementById("csv_tenNVL").value = document.querySelector("input[name='tenNVL']").value;
+        
+        // Nếu có radio lọc loại báo cáo
+        const checkedRadio = document.querySelector("input[name='loai']:checked");
+        document.getElementById("csv_loai").value = checkedRadio ? checkedRadio.value : '';
+    });
+});
 </script>
 
 <?php require_once 'app/views/layouts/footer.php'; ?>

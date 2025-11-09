@@ -21,6 +21,7 @@ class BaoCaoSuCoModel {
         $stmt->close();
 
         return $result;
-    }
+}
+
 }
 ?>

@@ -121,7 +121,3 @@ if (!empty($_SESSION['user']['maND'])) {
         }
     }
 }
-<<<<<<< HEAD
-=======
-?>
->>>>>>> quoc

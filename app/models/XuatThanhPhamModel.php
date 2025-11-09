@@ -6,15 +6,20 @@ class XuatThanhPhamModel {
 
     public function __construct() {
         $db = new KetNoi();
-        $this->conn = $db->connect(); // mysqli connection
+        $this->conn = $db->connect();
     }
 
     // 🔹 Lấy danh sách đơn hàng chưa xuất kho
     public function getDonHangChuaXuat() {
-    $sql = "SELECT dh.maDonHang, dh.tenDonHang, sp.tenSanPham, sp.soLuongTon, dh.soLuong
-            FROM donhangsanxuat dh
-            JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
-            WHERE dh.trangThai != 'Đã xuất kho'";
+        $sql = "SELECT 
+                    dh.maDonHang, 
+                    dh.tenDonHang, 
+                    sp.tenSanPham, 
+                    sp.soLuongTon, 
+                    dh.soLuongSanXuat
+                FROM donhangsanxuat dh
+                JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
+                WHERE dh.trangThai != 'Đã xuất kho'";
 
         $result = $this->conn->query($sql);
         $data = [];
@@ -44,7 +49,7 @@ class XuatThanhPhamModel {
         $stmt->close();
 
         if (!$sanPham) return false;
-        if ($sanPham['soLuongTon'] < $soLuongXuat) return "Không đủ hàng tồn";
+        if ($sanPham['soLuongTon'] < $soLuongXuat) return "Không đủ hàng tồn trong kho";
 
         // 2️⃣ Giảm số lượng tồn kho sản phẩm
         $stmt = $this->conn->prepare("

@@ -28,31 +28,42 @@ class ThongKeNVLController {
         require_once 'app/views/thongkekhonvl.php';
     }
 
-   public function xuatCSV() {
-    // Lấy tham số lọc từ form
+    public function xuatCSV() {
+    // Nhận tham số lọc từ form xuất CSV (ẩn trong view)
     $start_date = $_GET['start_date'] ?? '';
     $end_date = $_GET['end_date'] ?? '';
     $tenNVL = $_GET['tenNVL'] ?? '';
     $loai = $_GET['loai'] ?? '';
 
-    require_once 'app/models/ThongKeNVLModel.php';
-    $model = new ThongKeNVLModel();
-    $data = $model->layThongKeKhoNVL($start_date, $end_date, $tenNVL, $loai);
+    // Nếu thiếu ngày, báo lỗi nhẹ
+    if (empty($start_date) || empty($end_date)) {
+        die('⚠️ Vui lòng chọn khoảng thời gian trước khi xuất CSV.');
+    }
 
-    // Tên file CSV
-    $filename = "thongke_nvl_" . date('Ymd_His') . ".csv";
+    // Lấy dữ liệu thống kê theo bộ lọc đang hiển thị
+    $data = $this->model->layThongKeKhoNVL($start_date, $end_date, $tenNVL, $loai);
 
-    // Header xuất file
+    // Tên file CSV có ngày giờ
+    $filename = "ThongKe_KhoNVL_" . date('Ymd_His') . ".csv";
+
+    // Header để tải file CSV
     header("Content-Type: text/csv; charset=UTF-8");
     header("Content-Disposition: attachment; filename=\"$filename\"");
-    echo "\xEF\xBB\xBF"; // BOM UTF-8 để tránh lỗi tiếng Việt
+    echo "\xEF\xBB\xBF"; // BOM UTF-8 để Excel đọc đúng tiếng Việt
 
     $output = fopen("php://output", "w");
 
     // Ghi tiêu đề cột
-    fputcsv($output, ["Mã NVL", "Tên NVL", "Đơn vị tính", "Tổng nhập", "Tổng xuất", "Tồn kho"]);
+    fputcsv($output, [
+        "Mã NVL",
+        "Tên nguyên vật liệu",
+        "Đơn vị tính",
+        "Tổng nhập (trong kỳ)",
+        "Tổng xuất (trong kỳ)",
+        "Tồn kho hiện tại"
+    ]);
 
-    // Ghi dữ liệu thống kê
+    // Ghi dữ liệu từng dòng
     foreach ($data as $row) {
         fputcsv($output, [
             $row['maNVL'],

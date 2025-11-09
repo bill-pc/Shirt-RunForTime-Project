@@ -208,7 +208,7 @@ case 'thongke-khonvl':
     $c->index();
     break;
 
-case 'xuatcsv-thongkenvl':
+case 'thongke-nvl-xuatcsv':
     require_once 'app/controllers/ThongKeNVLController.php';
     $controller = new ThongKeNVLController();
     $controller->xuatCSV();
