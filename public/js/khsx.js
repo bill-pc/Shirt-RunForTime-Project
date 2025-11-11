@@ -68,16 +68,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 3. Gắn sự kiện cho ô tìm kiếm
     if (searchBox) {
         searchBox.addEventListener("input", function() {
             fetchResults(this.value); 
         });
     }
 
-    // 4. Tải 5 đơn hàng mặc định khi vào trang
     if (resultsBody) { 
-        fetchResults(''); // Gọi với query rỗng
+        fetchResults(''); 
     }
 
 
