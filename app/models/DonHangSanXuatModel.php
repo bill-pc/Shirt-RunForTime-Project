@@ -4,11 +4,9 @@ require_once 'ketNoi.php';
 class DonHangSanXuatModel
 {
     private $conn;
-
-    public function __construct()
-    {
-
-        $this->conn = (new Database())->connect();
+    public function __construct() {
+        // Giả sử tệp ketNoi.php định nghĩa class Database với hàm connect()
+        $this->conn = (new KetNoi())->connect();
     }
 
     public function getAllDonHang()
@@ -21,7 +19,7 @@ class DonHangSanXuatModel
 
     public function timKiemDonHang($keyWord)
     {
-        $sql = 'SELECT dh.maDonHang, dh.tenDonHang, dh.ngayGiao
+        $sql = 'SELECT dh.maDonHang, dh.tenDonHang, dh.ngayGiao, dh.trangThai
                 FROM donhangsanxuat dh
                 WHERE dh.maDonHang LIKE ? or dh.tenDonHang LIKE ?';
         $query = $this->conn->prepare($sql);

@@ -7,10 +7,10 @@ class KeHoachSanXuatModel
     // Dùng khoảng trắng thường để thụt lề
     private $conn;
 
-    public function __construct()
+    public function __construct($db_connection)
     {
-        // Giả sử tệp ketNoi.php định nghĩa class Database với hàm connect()
-        $this->conn = (new Database())->connect();
+        // Nhận kết nối từ Controller, không tự tạo
+        $this->conn = $db_connection;
     }
 
     /* === SỬA HÀM NÀY ĐỂ LỌC KHSX ĐÃ YÊU CẦU NVL === */
@@ -35,21 +35,6 @@ class KeHoachSanXuatModel
         $result = $this->conn->query($sql);
         if (!$result) {
             error_log("Lỗi truy vấn KHSX chưa yêu cầu NVL (chi tiết): " . $this->conn->error);
-            return [];
-        }
-        return $result->fetch_all(MYSQLI_ASSOC);
-    }
-    /* === KẾT THÚC SỬA === */
-    public function getAllPlansAdmin()
-    {
-        $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianBatDau, kh.trangThai, nd.hoTen AS tenNguoiLap
-                FROM kehoachsanxuat kh
-                JOIN nguoidung nd ON kh.maND = nd.maND
-                ORDER BY kh.maKHSX DESC";
-
-        $result = $this->conn->query($sql);
-        if (!$result) {
-            error_log("Lỗi truy vấn tất cả KHSX cho admin: " . $this->conn->error);
             return [];
         }
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -87,7 +72,7 @@ class KeHoachSanXuatModel
         return $data;
     }
 
-    // Hàm getMaterialsForPlan đã lấy loaiNVL rồi, cần thêm donViTinh
+    // Hàm getMaterialsForPlan đã lấy loaiNVL rồi, cầnthêm  donViTinh
     public function getMaterialsForPlan($maKHSX)
     {
         $sql = "SELECT
@@ -124,27 +109,85 @@ class KeHoachSanXuatModel
         $stmt->close();
         return $data;
     }
+    public function getAllPlansForNhapKho()
+    {
+        $sql = "SELECT maKHSX, tenKHSX, thoiGianBatDau, thoiGianKetThuc, trangThai
+            FROM kehoachsanxuat
+            WHERE trangThai = 'Đã duyệt'";
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            die('❌ Lỗi prepare: ' . $this->conn->error);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+    public function getAll()
+    {
+        $sql = "SELECT * FROM kehoachsanxuat ORDER BY maKHSX DESC";
+        $stmt = $this->conn->prepare($sql);
+
+        $data = [];
+        if ($stmt && $stmt->num_rows > 0) {
+            while ($row = $stmt->fetch()) {
+                $data[] = $row;
+            }
+        }
+        return $data;
+    }
 
     public function createKHSX($data)
     {
-        $sql = "INSERT INTO kehoachsanxuat (tenKHSX, thoiGianBatDau, thoiGianKetThuc, maND, trangThai) 
-                VALUES (:tenKHSX, :thoiGianBatDau, :thoiGianKetThuc, :maND, :trangThai)";
+        $sql = "INSERT INTO kehoachsanxuat (tenKHSX, maDHSX, thoiGianBatDau, thoiGianKetThuc, trangThai, maND)
+            VALUES (?, ?, ?, ?, 'Chờ duyệt', ?)";
+
         $stmt = $this->conn->prepare($sql);
 
-        try {
-            $stmt->execute([
-                'tenKHSX' => $data['tenKHSX'],
-                'thoiGianBatDau' => $data['thoiGianBatDau'],
-                'thoiGianKetThuc' => $data['thoiGianKetThuc'],
-                'maND' => $data['maND'],
-                'trangThai' => 'Chờ duyệt'
-            ]);
+        // Kiểm tra lỗi Prepare (nếu SQL sai)
+        if ($stmt === false) {
+            // Ném lỗi nếu SQL có vấn đề
+            throw new Exception("Lỗi SQL Prepare: " . $this->conn->error);
+        }
+
+        $stmt->bind_param(
+            "sissi",
+            $data['tenKHSX'],
+            $data['maDHSX'],
+            $data['thoiGianBatDau'],
+            $data['thoiGianKetThuc'],
+            $data['maND']
+        );
+
+        // THÊM KIỂM TRA EXECUTE()
+        if ($stmt->execute()) {
+            // Nếu execute thành công, trả về ID
             return $this->conn->insert_id;
-        } catch (PDOException $e) {
-            error_log("Lỗi tạo KHSX: " . $e->getMessage());
-            return null;
+        } else {
+
+            throw new Exception("Lỗi SQL Execute: " . $stmt->error);
         }
     }
+    public function createChiTietKHSX($data)
+    {
+        $sql = "INSERT INTO chitietkehoachsanxuat (maKHSX, maXuong, maSanPham, maNVL, soLuongNVL)
+                VALUES (?, ?, ?, ?, ?)";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param(
+            "iiiii",
+            $data['maKHSX'],
+            $data['maXuong'],
+            $data['maSanPham'],
+            $data['maNVL'],
+            $data['soLuongNVL']
+        );
+
+        return $stmt->execute();
+    }
+
 
     public function getDHSXbyDateRange($ngayBatDau, $ngayKetThuc)
     {
