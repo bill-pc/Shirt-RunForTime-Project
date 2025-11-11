@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Mï¿½y ch?: 127.0.0.1
--- Th?i gian ?ï¿½ t?o: Th10 31, 2025 lï¿½c 06:52 AM
--- Phiï¿½n b?n mï¿½y ph?c v?: 10.4.32-MariaDB
--- Phiï¿½n b?n PHP: 8.0.30
+-- Máy ch?: 127.0.0.1
+-- Th?i gian ?ã t?o: Th10 31, 2025 lúc 06:52 AM
+-- Phiên b?n máy ph?c v?: 10.4.32-MariaDB
+-- Phiên b?n PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `baocaoloi`
+-- C?u trúc b?ng cho b?ng `baocaoloi`
 --
 
 CREATE TABLE `baocaoloi` (
@@ -40,7 +40,7 @@ CREATE TABLE `baocaoloi` (
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `calamviec`
+-- C?u trúc b?ng cho b?ng `calamviec`
 --
 
 CREATE TABLE `calamviec` (
@@ -53,7 +53,7 @@ CREATE TABLE `calamviec` (
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `chitietkehoachsanxuat`
+-- C?u trúc b?ng cho b?ng `chitietkehoachsanxuat`
 --
 
 CREATE TABLE `chitietkehoachsanxuat` (
@@ -73,12 +73,12 @@ CREATE TABLE `chitietkehoachsanxuat` (
 
 INSERT INTO `chitietkehoachsanxuat` (`maCTKHSX`, `maKHSX`, `maGNTP`, `maXuong`, `maNVL`, `tenNVL`, `loaiNVL`, `soLuongNVL`) VALUES
 (2, 1, 1, 1, 1, 'V?i cotton lo?i 1', 'V?i', 20),
-(3, 1, 1, 2, 2, 'Nï¿½t ï¿½o tr?n', 'Ph? ki?n', 200);
+(3, 1, 1, 2, 2, 'Nút áo tr?n', 'Ph? ki?n', 200);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `chitietphieuxuatnvl`
+-- C?u trúc b?ng cho b?ng `chitietphieuxuatnvl`
 --
 
 CREATE TABLE `chitietphieuxuatnvl` (
@@ -97,12 +97,12 @@ CREATE TABLE `chitietphieuxuatnvl` (
 
 INSERT INTO `chitietphieuxuatnvl` (`maCTPX`, `maNVL`, `tenNVL`, `soLuong`, `maPhieu`, `maXuong`, `ghiChu`) VALUES
 (6, 1, 'V?i cotton', 20, 8, 1, ''),
-(7, 2, 'Nï¿½t ï¿½o', 200, 8, 2, '');
+(7, 2, 'Nút áo', 200, 8, 2, '');
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `chitietphieuyeucaukiemtrachatluong`
+-- C?u trúc b?ng cho b?ng `chitietphieuyeucaukiemtrachatluong`
 --
 
 CREATE TABLE `chitietphieuyeucaukiemtrachatluong` (
@@ -116,7 +116,7 @@ CREATE TABLE `chitietphieuyeucaukiemtrachatluong` (
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `chitiet_phieuyeucaucapnvl`
+-- C?u trúc b?ng cho b?ng `chitiet_phieuyeucaucapnvl`
 --
 
 CREATE TABLE `chitiet_phieuyeucaucapnvl` (
@@ -135,12 +135,12 @@ CREATE TABLE `chitiet_phieuyeucaucapnvl` (
 
 INSERT INTO `chitiet_phieuyeucaucapnvl` (`maCTPhieuYCCC`, `tenNVL`, `nhaCungCap`, `soLuong`, `donViTinh`, `maYCCC`, `maNVL`) VALUES
 (34, 'V?i cotton', NULL, 20, 'T?m', 23, 1),
-(35, 'Nï¿½t ï¿½o', NULL, 200, 'Cï¿½i', 23, 2);
+(35, 'Nút áo', NULL, 200, 'Cái', 23, 2);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `chitiet_phieuyeucaunhapkhonvl`
+-- C?u trúc b?ng cho b?ng `chitiet_phieuyeucaunhapkhonvl`
 --
 
 CREATE TABLE `chitiet_phieuyeucaunhapkhonvl` (
@@ -158,12 +158,12 @@ CREATE TABLE `chitiet_phieuyeucaunhapkhonvl` (
 --
 
 INSERT INTO `chitiet_phieuyeucaunhapkhonvl` (`maChiTiet_YCNK`, `maYCNK`, `maNVL`, `tenNVL`, `soLuong`, `donViTinh`, `nhaCungCap`) VALUES
-(1, 2, 2, 'Nï¿½t ï¿½o', 200, 'Cï¿½i', 'Minh Thai');
+(1, 2, 2, 'Nút áo', 200, 'Cái', 'Minh Thai');
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `congviec`
+-- C?u trúc b?ng cho b?ng `congviec`
 --
 
 CREATE TABLE `congviec` (
@@ -179,7 +179,7 @@ CREATE TABLE `congviec` (
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `donhangsanxuat`
+-- C?u trúc b?ng cho b?ng `donhangsanxuat`
 --
 
 CREATE TABLE `donhangsanxuat` (
@@ -197,13 +197,13 @@ CREATE TABLE `donhangsanxuat` (
 --
 
 INSERT INTO `donhangsanxuat` (`maDonHang`, `tenDonHang`, `donVi`, `diaChiNhan`, `trangThai`, `ngayGiao`, `maSanPham`) VALUES
-(1, ' DHSX1', 'Cai', 'Nguyen Oanh', '?ï¿½ xu?t kho', '2025-10-31', 1),
-(2, 'DHSX2', 'Cï¿½i', 'ABC', '1', '2025-10-31', 1);
+(1, ' DHSX1', 'Cai', 'Nguyen Oanh', '?ã xu?t kho', '2025-10-31', 1),
+(2, 'DHSX2', 'Cái', 'ABC', '1', '2025-10-31', 1);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `ghinhanthanhphamtheongay`
+-- C?u trúc b?ng cho b?ng `ghinhanthanhphamtheongay`
 --
 
 CREATE TABLE `ghinhanthanhphamtheongay` (
@@ -224,7 +224,7 @@ INSERT INTO `ghinhanthanhphamtheongay` (`maGhiNhan`, `maNhanVien`, `maSanPham`, 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `kehoachsanxuat`
+-- C?u trúc b?ng cho b?ng `kehoachsanxuat`
 --
 
 CREATE TABLE `kehoachsanxuat` (
@@ -242,14 +242,14 @@ CREATE TABLE `kehoachsanxuat` (
 --
 
 INSERT INTO `kehoachsanxuat` (`maKHSX`, `tenKHSX`,`maDHSX`, `thoiGianBatDau`, `thoiGianKetThuc`, `trangThai`, `maND`) VALUES
-(1, 'KHSX1',1, '2025-10-01', '2025-10-31', '?ï¿½ duy?t', 1),
+(1, 'KHSX1',1, '2025-10-01', '2025-10-31', '?ã duy?t', 1),
 (2, 'KHSX2',2, '2025-10-09', '2025-10-31', 'Ch? duy?t', 1),
-(3, 'KHSX3',1, '2025-10-01', '2025-11-06', '?ï¿½ duy?t', 1);
+(3, 'KHSX3',1, '2025-10-01', '2025-11-06', '?ã duy?t', 1);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `kho`
+-- C?u trúc b?ng cho b?ng `kho`
 --
 
 CREATE TABLE `kho` (
@@ -263,13 +263,13 @@ CREATE TABLE `kho` (
 --
 
 INSERT INTO `kho` (`maKho`, `tenKho`, `diaChi`) VALUES
-(1, 'Kho Nguyï¿½n V?t Li?u', NULL),
-(2, 'Kho Thï¿½nh Ph?m', NULL);
+(1, 'Kho Nguyên V?t Li?u', NULL),
+(2, 'Kho Thành Ph?m', NULL);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `nguoidung`
+-- C?u trúc b?ng cho b?ng `nguoidung`
 --
 
 CREATE TABLE `nguoidung` (
@@ -289,16 +289,16 @@ CREATE TABLE `nguoidung` (
 --
 
 INSERT INTO `nguoidung` (`maND`, `hoTen`, `chucVu`, `phongBan`, `soDienThoai`, `email`, `diaChi`, `maTK`, `trangThai`) VALUES
-(1, 'TranKienQuoc', 'Giï¿½m ??c', '', '0346512104', 'trandjvjdSVds', 'sgarghsrdgsfdr', 1, 1),
-(6, 'Nguy?n V?n An', 'Tr??ng phï¿½ng', 'QLNVL', '0901234567', 'an.nguyen@company.com', '123 Vï¿½ V?n T?n, Q.3, TP.HCM', 2, 1),
-(7, 'Tr?n Th? Bï¿½nh', 'Nhï¿½n viï¿½n', 'X??ng may', '0987654321', 'binh.tran@company.com', '456 Lï¿½ L?i, Q.1, TP.HCM', 3, 1),
-(8, 'Lï¿½ Minh C??ng', 'K? thu?t viï¿½n', 'X??ng c?t', '0912345678', 'cuong.le@company.com', '789 Nguy?n Trï¿½i, Q.5, TP.HCM', 4, 1),
-(10, 'Ph?mTh? Dung', 'Nhï¿½n viï¿½n', 'X??ng may', NULL, 'dung.pham@company.com', NULL, 5, 0);
+(1, 'TranKienQuoc', 'Giám ??c', '', '0346512104', 'trandjvjdSVds', 'sgarghsrdgsfdr', 1, 1),
+(6, 'Nguy?n V?n An', 'Tr??ng phòng', 'QLNVL', '0901234567', 'an.nguyen@company.com', '123 Võ V?n T?n, Q.3, TP.HCM', 2, 1),
+(7, 'Tr?n Th? Bình', 'Nhân viên', 'X??ng may', '0987654321', 'binh.tran@company.com', '456 Lê L?i, Q.1, TP.HCM', 3, 1),
+(8, 'Lê Minh C??ng', 'K? thu?t viên', 'X??ng c?t', '0912345678', 'cuong.le@company.com', '789 Nguy?n Trãi, Q.5, TP.HCM', 4, 1),
+(10, 'Ph?mTh? Dung', 'Nhân viên', 'X??ng may', NULL, 'dung.pham@company.com', NULL, 5, 0);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `nvl`
+-- C?u trúc b?ng cho b?ng `nvl`
 --
 
 CREATE TABLE `nvl` (
@@ -317,15 +317,15 @@ CREATE TABLE `nvl` (
 
 INSERT INTO `nvl` (`maNVL`, `tenNVL`, `loaiNVL`, `soLuongTonKho`, `donViTinh`, `moTa`, `maKho`) VALUES
 (1, 'V?i cotton', 'V?i', 100, 'T?m', '2m x 3m', NULL),
-(2, 'Nï¿½t ï¿½o', 'Ph? ki?n', 1000, 'Cï¿½i', 'Nï¿½t ï¿½o tr?ng', NULL),
-(3, 'Ch? may ?en', 'Ph? ki?n', 500, 'Cu?n', 'Ch? may mï¿½u tr?ng', 1),
-(4, 'Nï¿½t ï¿½o', 'Ph? ki?n', 200, 'Cï¿½i', 'Nï¿½t ï¿½o mï¿½u ?en', 1),
+(2, 'Nút áo', 'Ph? ki?n', 1000, 'Cái', 'Nút áo tr?ng', NULL),
+(3, 'Ch? may ?en', 'Ph? ki?n', 500, 'Cu?n', 'Ch? may màu tr?ng', 1),
+(4, 'Nút áo', 'Ph? ki?n', 200, 'Cái', 'Nút áo màu ?en', 1),
 (5, 'V?i cotton', 'V?i', 300, 'T?m', 'V?i cotton tr?ng', 1);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `phieunhapnvl`
+-- C?u trúc b?ng cho b?ng `phieunhapnvl`
 --
 
 CREATE TABLE `phieunhapnvl` (
@@ -344,13 +344,13 @@ CREATE TABLE `phieunhapnvl` (
 --
 
 INSERT INTO `phieunhapnvl` (`maPNVL`, `tenPNVL`, `nguoiLap`, `nhaCungCap`, `ngayNhap`, `maYCNK`, `maNVL`, `soLuongNhap`) VALUES
-(1, 'Phi?u nh?p nguyï¿½n v?t li?u', 'ï¿½ng a', 'abc', '2025-10-30', 1, 1, 0),
+(1, 'Phi?u nh?p nguyên v?t li?u', 'ông a', 'abc', '2025-10-30', 1, 1, 0),
 (6, 'phieu nhap kho', 'avd', ' sdsd', '2025-10-23', 2, 1, 20);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `phieuxuatnvl`
+-- C?u trúc b?ng cho b?ng `phieuxuatnvl`
 --
 
 CREATE TABLE `phieuxuatnvl` (
@@ -372,7 +372,7 @@ INSERT INTO `phieuxuatnvl` (`maPhieu`, `tenPhieu`, `tenNguoiLap`, `ngayLap`, `ma
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `phieuxuatthanhpham`
+-- C?u trúc b?ng cho b?ng `phieuxuatthanhpham`
 --
 
 CREATE TABLE `phieuxuatthanhpham` (
@@ -394,7 +394,7 @@ INSERT INTO `phieuxuatthanhpham` (`maPhieuXuat`, `maDonHang`, `maSanPham`, `soLu
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `phieuyeucaucungcapnvl`
+-- C?u trúc b?ng cho b?ng `phieuyeucaucungcapnvl`
 --
 
 CREATE TABLE `phieuyeucaucungcapnvl` (
@@ -413,12 +413,12 @@ CREATE TABLE `phieuyeucaucungcapnvl` (
 --
 
 INSERT INTO `phieuyeucaucungcapnvl` (`maYCCC`, `ngayLap`, `trangThai`, `tenNguoiLap`, `maND`, `maKHSX`, `tenPhieu`, `ghiChu`) VALUES
-(23, '2025-10-31', '?ang xu?t NVL', 'TranKienQuoc', 1, 1, 'Yï¿½u c?u NVL cho KHSX1', '');
+(23, '2025-10-31', '?ang xu?t NVL', 'TranKienQuoc', 1, 1, 'Yêu c?u NVL cho KHSX1', '');
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `phieuyeucaukiemtrachatluong`
+-- C?u trúc b?ng cho b?ng `phieuyeucaukiemtrachatluong`
 --
 
 CREATE TABLE `phieuyeucaukiemtrachatluong` (
@@ -433,7 +433,7 @@ CREATE TABLE `phieuyeucaukiemtrachatluong` (
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `phieuyeucaunhapkhonvl`
+-- C?u trúc b?ng cho b?ng `phieuyeucaunhapkhonvl`
 --
 
 CREATE TABLE `phieuyeucaunhapkhonvl` (
@@ -456,7 +456,7 @@ INSERT INTO `phieuyeucaunhapkhonvl` (`maYCNK`, `maNVL`, `donViTinh`, `ngayLap`, 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `san_pham`
+-- C?u trúc b?ng cho b?ng `san_pham`
 --
 
 CREATE TABLE `san_pham` (
@@ -475,12 +475,12 @@ CREATE TABLE `san_pham` (
 --
 
 INSERT INTO `san_pham` (`maSanPham`, `tenSanPham`, `loaiSanPham`, `soLuongTon`, `donVi`, `moTa`, `trangThaiSanPham`, `maKho`) VALUES
-(1, 'ï¿½o s? mi tr?ng', 'ï¿½o', 5, 'Cï¿½i', 'ï¿½o s? mi tr?ng cï¿½ thï¿½u hoa cï¿½c', 1, NULL);
+(1, 'Áo s? mi tr?ng', 'Áo', 5, 'Cái', 'Áo s? mi tr?ng có thêu hoa cúc', 1, NULL);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `taikhoan`
+-- C?u trúc b?ng cho b?ng `taikhoan`
 --
 
 CREATE TABLE `taikhoan` (
@@ -499,12 +499,12 @@ INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
 (2, 'nguyenvanan', '827ccb0eea8a706c4c34a16891f84e7b', 'Ho?t ??ng'),
 (3, 'tranthibinh', '827ccb0eea8a706c4c34a16891f84e7b', 'Ho?t ??ng'),
 (4, 'leminhcuong', '0ec6e061798a1a86d9afdbdb2475529d', 'Ho?t ??ng'),
-(5, 'phamthidung', '827ccb0eea8a706c4c34a16891f84e7b', 'khï¿½ng ho?t ??ng');
+(5, 'phamthidung', '827ccb0eea8a706c4c34a16891f84e7b', 'không ho?t ??ng');
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `thietbi`
+-- C?u trúc b?ng cho b?ng `thietbi`
 --
 
 CREATE TABLE `thietbi` (
@@ -520,13 +520,13 @@ CREATE TABLE `thietbi` (
 --
 
 INSERT INTO `thietbi` (`maThietBi`, `tenThietBi`, `viTri`, `trangThai`, `maXuong`) VALUES
-(7, 'Mï¿½y ï¿½p nhi?t', '2', '?ang ho?t ??ng', 1),
-(8, 'Mï¿½y c?t v?i', '2', '?ang ho?t ??ng', 1);
+(7, 'Máy ép nhi?t', '2', '?ang ho?t ??ng', 1),
+(8, 'Máy c?t v?i', '2', '?ang ho?t ??ng', 1);
 
 -- --------------------------------------------------------
 
 --
--- C?u trï¿½c b?ng cho b?ng `xuong`
+-- C?u trúc b?ng cho b?ng `xuong`
 --
 
 CREATE TABLE `xuong` (
@@ -543,7 +543,7 @@ INSERT INTO `xuong` (`maXuong`, `tenXuong`) VALUES
 (2, 'X??ng may');
 
 --
--- Ch? m?c cho cï¿½c b?ng ?ï¿½ ??
+-- Ch? m?c cho các b?ng ?ã ??
 --
 
 --
@@ -728,7 +728,7 @@ ALTER TABLE `xuong`
   ADD PRIMARY KEY (`maXuong`);
 
 --
--- AUTO_INCREMENT cho cï¿½c b?ng ?ï¿½ ??
+-- AUTO_INCREMENT cho các b?ng ?ã ??
 --
 
 --
@@ -864,11 +864,11 @@ ALTER TABLE `xuong`
   MODIFY `maXuong` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- Cï¿½c rï¿½ng bu?c cho cï¿½c b?ng ?ï¿½ ??
+-- Các ràng bu?c cho các b?ng ?ã ??
 --
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `baocaoloi`
+-- Các ràng bu?c cho b?ng `baocaoloi`
 --
 ALTER TABLE `baocaoloi`
   ADD CONSTRAINT `FK_BCLOI_THIETBI` FOREIGN KEY (`maThietBi`) REFERENCES `thietbi` (`maThietBi`);
@@ -876,11 +876,9 @@ ALTER TABLE `baocaoloi`
 --
 -- Cac rang buoc cho bang kehoachsanxuat 
 --
-ALTER TABLE `donhangsanxuat`
-  ADD CONSTRAINT `FK_KHSX_NGUOIDUNG` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`),
 	ADD CONSTRAINT `FK_KHSX_DONHANG` FOREIGN KEY (`maDHSX`) REFERENCES `donhangsanxuat`(`maDonHang`);
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `chitietkehoachsanxuat`
+-- Các ràng bu?c cho b?ng `chitietkehoachsanxuat`
 --
 ALTER TABLE `chitietkehoachsanxuat`
   ADD CONSTRAINT `FK_CTKHSX_GNTP` FOREIGN KEY (`maGNTP`) REFERENCES `ghinhanthanhphamtheongay` (`maGhiNhan`),
@@ -889,89 +887,92 @@ ALTER TABLE `chitietkehoachsanxuat`
   ADD CONSTRAINT `FK_CTKHSX_XUONG` FOREIGN KEY (`maXuong`) REFERENCES `xuong` (`maXuong`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `chitietphieuyeucaukiemtrachatluong`
+-- Các ràng bu?c cho b?ng `chitietphieuyeucaukiemtrachatluong`
 --
 ALTER TABLE `chitietphieuyeucaukiemtrachatluong`
   ADD CONSTRAINT `FK_CTPKT_PhieuYCKTCL` FOREIGN KEY (`maYC`) REFERENCES `phieuyeucaukiemtrachatluong` (`maYC`),
   ADD CONSTRAINT `FK_CTPKT_SanPham` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `congviec`
+-- Các ràng bu?c cho b?ng `congviec`
 --
 ALTER TABLE `congviec`
   ADD CONSTRAINT `fk_congviec_xuong` FOREIGN KEY (`maXuong`) REFERENCES `xuong` (`maXuong`),
   ADD CONSTRAINT `fk_kehoach_congviec` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `donhangsanxuat`
+-- Các ràng bu?c cho b?ng `donhangsanxuat`
 --
 ALTER TABLE `donhangsanxuat`
   ADD CONSTRAINT `FK_DONHANG_SANPHAM` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `ghinhanthanhphamtheongay`
+-- Các ràng bu?c cho b?ng `ghinhanthanhphamtheongay`
 --
 ALTER TABLE `ghinhanthanhphamtheongay`
   ADD CONSTRAINT `FK_GNTP_NGUOIDUNG` FOREIGN KEY (`maNhanVien`) REFERENCES `nguoidung` (`maND`),
   ADD CONSTRAINT `FK_GNTP_SANPHAM` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `kehoachsanxuat`
+-- Các ràng bu?c cho b?ng `kehoachsanxuat`
 --
+ALTER TABLE `kehoachsanxuat`
+  ADD CONSTRAINT `FK_KHSX_NGUOIDUNG` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`),
+  ADD CONSTRAINT `FK_KHSX_DONHANG` FOREIGN KEY (`maDHSX`) REFERENCES `donhangsanxuat`(`maDonHang`);
 
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `nguoidung`
+-- Các ràng bu?c cho b?ng `nguoidung`
 --
 ALTER TABLE `nguoidung`
   ADD CONSTRAINT `FK_NGUOIDUNG_TAIKHOAN` FOREIGN KEY (`maTK`) REFERENCES `taikhoan` (`maTK`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `nvl`
+-- Các ràng bu?c cho b?ng `nvl`
 --
 ALTER TABLE `nvl`
   ADD CONSTRAINT `fk_nvl_kho` FOREIGN KEY (`maKho`) REFERENCES `kho` (`maKho`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `phieunhapnvl`
+-- Các ràng bu?c cho b?ng `phieunhapnvl`
 --
 ALTER TABLE `phieunhapnvl`
   ADD CONSTRAINT `fk_phieunhapnvl_nvl` FOREIGN KEY (`maNVL`) REFERENCES `nvl` (`maNVL`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `phieuxuatthanhpham`
+-- Các ràng bu?c cho b?ng `phieuxuatthanhpham`
 --
 ALTER TABLE `phieuxuatthanhpham`
   ADD CONSTRAINT `phieuxuatthanhpham_ibfk_1` FOREIGN KEY (`maDonHang`) REFERENCES `donhangsanxuat` (`maDonHang`),
   ADD CONSTRAINT `phieuxuatthanhpham_ibfk_2` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `phieuyeucaucungcapnvl`
+-- Các ràng bu?c cho b?ng `phieuyeucaucungcapnvl`
 --
 ALTER TABLE `phieuyeucaucungcapnvl`
   ADD CONSTRAINT `FK_PhieuYeuCauCungCapNVL_KHSX` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`),
   ADD CONSTRAINT `FK_PhieuYeuCauCungCapNVL_NguoiDung` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `phieuyeucaukiemtrachatluong`
+-- Các ràng bu?c cho b?ng `phieuyeucaukiemtrachatluong`
 --
 ALTER TABLE `phieuyeucaukiemtrachatluong`
   ADD CONSTRAINT `FK_PhieuYCKTCL_SanPham` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `phieuyeucaunhapkhonvl`
+-- Các ràng bu?c cho b?ng `phieuyeucaunhapkhonvl`
 --
 ALTER TABLE `phieuyeucaunhapkhonvl`
   ADD CONSTRAINT `FK_YCNKNVL_NVL` FOREIGN KEY (`maNVL`) REFERENCES `nvl` (`maNVL`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `san_pham`
+-- Các ràng bu?c cho b?ng `san_pham`
 --
 ALTER TABLE `san_pham`
   ADD CONSTRAINT `fk_sanpham_kho` FOREIGN KEY (`maKho`) REFERENCES `kho` (`maKho`);
 
 --
--- Cï¿½c rï¿½ng bu?c cho b?ng `thietbi`
+-- Các ràng bu?c cho b?ng `thietbi`
 --
 ALTER TABLE `thietbi`
   ADD CONSTRAINT `fk_thietbi_xuong` FOREIGN KEY (`maXuong`) REFERENCES `xuong` (`maXuong`) ON UPDATE CASCADE;
