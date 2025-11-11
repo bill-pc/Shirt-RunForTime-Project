@@ -1,8 +1,15 @@
 <?php
 // app/controllers/KHSXController.php
+require_once 'app/models/DonHangSanXuatModel.php';
+require_once 'app/models/KeHoachSanXuatModel.php';
+require_once 'app/models/XuongModel.php';
+require_once 'app/models/NVLModel.php';
+require_once 'app/models/GhiNhanThanhPhamModel.php';
+require_once 'app/models/SanPhamModel.php';
 
 
-class KHSXController extends Controller
+
+class KHSXController
 {
     private $conn;
     private $keHoachModel;
@@ -12,26 +19,16 @@ class KHSXController extends Controller
     private $ghiNhanTPModel;
     private $sanPhamModel;
 
-
-    public $searchKeyWord = '';
-
-
-
-    public function __construct() {
-        // 1. Tạo kết nối CSDL MỘT LẦN DUY NHẤT
+    public function __construct()
+    {
         $ketNoi = new KetNoi();
-        $this->conn = $ketNoi->getConnection();
-
-        // 2. KHỞI TẠO MODEL BẰNG TAY
-        // Thay vì dùng this->model(), hãy dùng "new" và truyền kết nối ($this->conn)
-        
-        // (Lưu ý: Các file Model này phải được require_once trong index.php)
-        $this->donHangModel = new DonHangSanXuatModel($this->conn);
-        $this->keHoachModel = new KeHoachSanXuatModel($this->conn);
-        $this->xuongModel = new XuongModel($this->conn);
-        $this->nvlModel = new NVLModel($this->conn);
-        $this->ghiNhanTPModel = new GhiNhanThanhPhamModel($this->conn);
-        $this->sanPhamModel = new SanPhamModel($this->conn);
+        $this->conn = $ketNoi->connect();
+        $this->keHoachModel = new KeHoachSanxuatModel($this->conn);
+        $this->donHangModel = new DonHangSanXuatModel();
+        $this->xuongModel = new XuongModel();
+        $this->nvlModel = new NVLModel();
+        $this->ghiNhanTPModel = new GhiNhanThanhPhamModel();
+        $this->sanPhamModel = new SanPhamModel();
     }
 
     public function create()
@@ -39,7 +36,7 @@ class KHSXController extends Controller
         $data = [
             'pageTitle' => 'Lập Kế hoạch Sản xuất'
         ];
-        $this->view('lapKHSX', $data);
+        include __DIR__ . '/../views/lapKHSX.php';
     }
 
     public function ajaxTimKiem()
@@ -87,6 +84,11 @@ class KHSXController extends Controller
             $ngayKetThuc = $_POST['ngay_ket_thuc'];
             $maNguoiLap = 1; // Giả sử ID người lập = 1 (bạn sẽ thay bằng Session)
 
+            // (SỬA LẠI) Kiểm tra dữ liệu cơ bản
+            if (empty($maDonHang) || empty($ngayBatDau) || empty($ngayKetThuc)) {
+                throw new Exception("Lỗi: Thiếu thông tin Đơn hàng hoặc Ngày bắt đầu/kết thúc.");
+            }
+
             $dataKHSX = [
                 'tenKHSX' => 'KHSX cho ĐH ' . $maDonHang, // Tên tự động
                 'maDHSX' => $maDonHang,
@@ -94,55 +96,91 @@ class KHSXController extends Controller
                 'thoiGianKetThuc' => $ngayKetThuc,
                 'maND' => $maNguoiLap
             ];
+
+            // 2. TẠO KẾ HOẠCH CHA
             $maKHSX_moi = $this->keHoachModel->createKHSX($dataKHSX);
 
             if (!$maKHSX_moi) {
+                // Lỗi này sẽ được ném ra từ Model nếu SQL thất bại
+                // (Dựa trên code Model chúng ta đã sửa trước đó)
                 throw new Exception("Lỗi: Không thể tạo Kế hoạch sản xuất chính.");
             }
 
-            $xuongCatData = $_POST['xuong_cat'];
-            $maSP_Cat = $xuongCatData['maSanPham'];
-            foreach ($xuongCatData['nvl_id'] as $index => $maNVL) {
-                $soLuongNVL = $xuongCatData['nvl_soLuong'][$index];
+            // 3. TẠO CHI TIẾT CHO XƯỞNG CẮT (maXuong = 1)
+            // (SỬA LẠI) Thêm kiểm tra 'isset' và 'is_array'
+            if (isset($_POST['xuong_cat']) && is_array($_POST['xuong_cat'])) {
+                $xuongCatData = $_POST['xuong_cat'];
 
-                $dataChiTiet = [
-                    'maKHSX' => $maKHSX_moi,
-                    'maXuong' => 1, // Giả sử Xưởng Cắt có ID = 1
-                    'maSanPham' => $maSP_Cat,
-                    'maNVL' => $maNVL,
-                    'soLuongNVL' => $soLuongNVL
-                ];
-                $this->keHoachModel->createChiTietKHSX($dataChiTiet);
-            }
+                // Chỉ lặp nếu có sản phẩm và mảng nvl_id tồn tại
+                if (!empty($xuongCatData['maSanPham']) && isset($xuongCatData['nvl_id']) && is_array($xuongCatData['nvl_id'])) {
+                    $maSP_Cat = $xuongCatData['maSanPham'];
+
+                    foreach ($xuongCatData['nvl_id'] as $index => $maNVL) {
+                        // Đảm bảo có số lượng tương ứng
+                        if (isset($xuongCatData['nvl_soLuong'][$index])) {
+                            $soLuongNVL = $xuongCatData['nvl_soLuong'][$index];
+
+                            $dataChiTiet = [
+                                'maKHSX' => $maKHSX_moi,
+                                'maXuong' => 1, // Giả sử Xưởng Cắt có ID = 1
+                                'maSanPham' => $maSP_Cat,
+                                'maNVL' => $maNVL,
+                                'soLuongNVL' => $soLuongNVL
+                            ];
+                            // Thêm kiểm tra lỗi khi chèn chi tiết
+                            if (!$this->keHoachModel->createChiTietKHSX($dataChiTiet)) {
+                                throw new Exception("Lỗi: Không thể lưu chi tiết Xưởng Cắt.");
+                            }
+                        }
+                    }
+                }
+            } // Kết thúc kiểm tra Xưởng Cắt
 
             // 4. TẠO CHI TIẾT CHO XƯỞNG MAY (maXuong = 2)
-            $xuongMayData = $_POST['xuong_may'];
-            $maSP_May = $xuongMayData['maSanPham'];
-            // Lặp qua mảng NVL của Xưởng May
-            foreach ($xuongMayData['nvl_id'] as $index => $maNVL) {
-                $soLuongNVL = $xuongMayData['nvl_soLuong'][$index];
+            // (SỬA LẠI) Thêm kiểm tra 'isset' và 'is_array'
+            if (isset($_POST['xuong_may']) && is_array($_POST['xuong_may'])) {
+                $xuongMayData = $_POST['xuong_may'];
 
-                $dataChiTiet = [
-                    'maKHSX' => $maKHSX_moi,
-                    'maXuong' => 2, // Giả sử Xưởng May có ID = 2
-                    'maSanPham' => $maSP_May,
-                    'maNVL' => $maNVL,
-                    'soLuongNVL' => $soLuongNVL
-                ];
-                $this->keHoachModel->createChiTietKHSX($dataChiTiet);
-            }
+                // Chỉ lặp nếu có sản phẩm và mảng nvl_id tồn tại
+                if (!empty($xuongMayData['maSanPham']) && isset($xuongMayData['nvl_id']) && is_array($xuongMayData['nvl_id'])) {
+                    $maSP_May = $xuongMayData['maSanPham'];
 
-                // 5. HOÀN TẤT
-                // Nếu không có lỗi, lưu tất cả thay đổi vào CSDL
+                    foreach ($xuongMayData['nvl_id'] as $index => $maNVL) {
+                        if (isset($xuongMayData['nvl_soLuong'][$index])) {
+                            $soLuongNVL = $xuongMayData['nvl_soLuong'][$index];
+
+                            $dataChiTiet = [
+                                'maKHSX' => $maKHSX_moi,
+                                'maXuong' => 2, // Giả sử Xưởng May có ID = 2
+                                'maSanPham' => $maSP_May,
+                                'maNVL' => $maNVL,
+                                'soLuongNVL' => $soLuongNVL
+                            ];
+                            // Thêm kiểm tra lỗi khi chèn chi tiết
+                            if (!$this->keHoachModel->createChiTietKHSX($dataChiTiet)) {
+                                throw new Exception("Lỗi: Không thể lưu chi tiết Xưởng May.");
+                            }
+                        }
+                    }
+                }
+            } // Kết thúc kiểm tra Xưởng May
+
+            // 5. HOÀN TẤT
+            // Nếu không có lỗi, lưu tất cả thay đổi vào CSDL
             $this->conn->commit();
-
-            // Chuyển hướng về trang chủ (hoặc trang danh sách KHSX)
-            header('Location: index.php?page=lap-ke-hoach');
-            exit; 
+            echo "<script>
+                alert('Lập kế hoạch sản xuất thành công!');
+                window.location.href = 'index.php?page=lap-khsx';
+            </script>";
+            exit;
         } catch (Exception $e) {
             // Nếu có lỗi, hủy bỏ tất cả thay đổi
-            $this->conn->rollback();
-            echo "Đã xảy ra lỗi. Vui lòng thử lại: " . $e->getMessage();
+            $errorMessage = addslashes($e->getMessage());
+            echo "<script>
+                alert('Đã xảy ra lỗi. Vui lòng thử lại: {$errorMessage}');
+                window.location.href = 'index.php?page=lap-khsx';
+            </script>";
+            exit;
         }
     }
 
