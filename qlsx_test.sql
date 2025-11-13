@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 09, 2025 lúc 10:53 AM
+-- Thời gian đã tạo: Th10 13, 2025 lúc 06:15 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.0.30
+-- Phiên bản PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -55,10 +55,18 @@ INSERT INTO `baocaoloi` (`maBaoCao`, `tenBaoCao`, `loaiLoi`, `hinhAnh`, `thoiGia
 
 CREATE TABLE `calamviec` (
   `maCa` varchar(10) NOT NULL,
-  `tenCa` varchar(10) NOT NULL,
-  `gioBatDau` datetime NOT NULL,
-  `gioKetThuc` datetime NOT NULL
+  `gioBatDau` time NOT NULL,
+  `gioKetThuc` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `calamviec`
+--
+
+INSERT INTO `calamviec` (`maCa`, `gioBatDau`, `gioKetThuc`) VALUES
+('CA_CHIEU', '13:00:00', '17:30:00'),
+('CA_SANG', '07:30:00', '11:30:00'),
+('CA_TOI', '18:00:00', '22:00:00');
 
 -- --------------------------------------------------------
 
@@ -135,6 +143,40 @@ CREATE TABLE `chitietphieuyeucaukiemtrachatluong` (
 INSERT INTO `chitietphieuyeucaukiemtrachatluong` (`maCTPKT`, `tenSanPham`, `maSanPham`, `soLuong`, `maYC`) VALUES
 (1, 'Vải cotton loại 1', 1, 20, 1),
 (2, 'Nút áo trơn', 1, 200, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `chitiet_lichlamviec`
+--
+
+CREATE TABLE `chitiet_lichlamviec` (
+  `maLichLam` int(11) NOT NULL,
+  `maND` char(10) NOT NULL,
+  `ngayLam` date NOT NULL,
+  `maCa` char(10) NOT NULL,
+  `maXuong` char(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `chitiet_lichlamviec`
+--
+
+INSERT INTO `chitiet_lichlamviec` (`maLichLam`, `maND`, `ngayLam`, `maCa`, `maXuong`) VALUES
+(1, '1', '2025-11-14', 'CA_SANG', '1'),
+(2, '1', '2025-11-14', 'CA_CHIEU', '1'),
+(3, '1', '2025-11-15', 'CA_SANG', '1'),
+(4, '1', '2025-11-15', 'CA_CHIEU', '1'),
+(5, '1', '2025-11-16', 'CA_SANG', '1'),
+(6, '1', '2025-11-16', 'CA_CHIEU', '1'),
+(7, '1', '2025-11-16', 'CA_TOI', '1'),
+(8, '1', '2025-11-17', 'CA_SANG', '1'),
+(9, '1', '2025-11-17', 'CA_CHIEU', '1'),
+(10, '1', '2025-11-18', 'CA_SANG', '1'),
+(11, '1', '2025-11-18', 'CA_CHIEU', '1'),
+(12, '1', '2025-11-19', 'CA_SANG', '1'),
+(13, '1', '2025-11-19', 'CA_CHIEU', '1'),
+(14, '1', '2025-11-19', 'CA_TOI', '1');
 
 -- --------------------------------------------------------
 
@@ -232,7 +274,8 @@ CREATE TABLE `donhangsanxuat` (
 INSERT INTO `donhangsanxuat` (`maDonHang`, `tenDonHang`, `tenSanPham`, `soLuongSanXuat`, `donVi`, `diaChiNhan`, `trangThai`, `ngayGiao`, `maSanPham`) VALUES
 (1, ' DHSX1', 'Áo sơ mi hoa cúc', 2000, 'Cai', 'Nguyen Oanh', 'Đã xuất kho', '2025-10-31', 1),
 (2, 'DHSX2', 'Áo sơ mi xanh dương', 1000, 'Cái', 'ABC', 'Đang thực hiện', '2025-10-31', 2),
-(3, 'DHSX4', 'Áo sơ mi tay ngắn', 3500, 'Cái', 'Nguyễn Văn Bảo', 'Chờ duyệt', '2025-11-28', 3);
+(3, 'DHSX4', 'Áo sơ mi tay ngắn', 3500, 'Cái', 'Nguyễn Văn Bảo', 'Chờ duyệt', '2025-11-28', 3),
+(5, 'PX2025-44 - SL: 234', '', 0, 'Cái', 'Nội bộ', 'Chờ duyệt', '2025-11-21', 3);
 
 -- --------------------------------------------------------
 
@@ -635,6 +678,22 @@ ALTER TABLE `baocaoloi`
   ADD KEY `FK_BCLOI_NGUOIDUNG` (`maND`);
 
 --
+-- Chỉ mục cho bảng `calamviec`
+--
+ALTER TABLE `calamviec`
+  ADD PRIMARY KEY (`maCa`);
+
+--
+-- Chỉ mục cho bảng `chitiet_lichlamviec`
+--
+ALTER TABLE `chitiet_lichlamviec`
+  ADD PRIMARY KEY (`maLichLam`),
+  ADD UNIQUE KEY `maNguoiDung` (`maND`,`ngayLam`,`maCa`),
+  ADD KEY `idx_nv_ngay` (`maND`,`ngayLam`),
+  ADD KEY `maCa` (`maCa`),
+  ADD KEY `maXuong` (`maXuong`);
+
+--
 -- Chỉ mục cho bảng `donhangsanxuat`
 --
 ALTER TABLE `donhangsanxuat`
@@ -678,10 +737,16 @@ ALTER TABLE `baocaoloi`
   MODIFY `maBaoCao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
+-- AUTO_INCREMENT cho bảng `chitiet_lichlamviec`
+--
+ALTER TABLE `chitiet_lichlamviec`
+  MODIFY `maLichLam` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT cho bảng `donhangsanxuat`
 --
 ALTER TABLE `donhangsanxuat`
-  MODIFY `maDonHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `maDonHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT cho bảng `kho`
