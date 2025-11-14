@@ -148,10 +148,10 @@ switch ($page) {
         $controller->index();
         break;
 
-    case 'xoa-congviec':
+    case 'chitietkhxs':
         require_once './app/controllers/CongViecController.php';
-        $controller = new CongViecController();
-        $controller->delete();
+        $c = new CongViecController();
+        $c->detail();
         break;
     // ✅ Trang hiển thị lịch làm việc
     // case 'lichlamviec':
@@ -227,7 +227,17 @@ case 'thongke-nvl-xuatcsv':
         $controller = new XuatThanhPhamController();
         $controller->xuat();
         break;
+// ===== Thống kê sản phẩm (bắt cả 2 tên route) =====
+    case 'thongke_sanpham':
+    case 'thongke':
+        require_once __DIR__ . '/app/controllers/ThongKeKhoTPController.php';
+        (new ThongKeKhoTPController())->index();
+        break;
 
+    case 'export_thongke':
+        require_once __DIR__ . '/app/controllers/ThongKeKhoTPController.php';
+        (new ThongKeKhoTPController())->export();
+        break;
     // TẠO YÊU CẦU
     case 'tao-yeu-cau-nhap-kho':
     case 'tao-yeu-cau-nhap-nguyen-vat-lieu':

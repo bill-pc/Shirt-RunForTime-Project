@@ -1,76 +1,79 @@
 <?php
-require_once 'ketNoi.php'; // Đảm bảo trùng tên file bạn đang dùng
+require_once __DIR__ . '/ketnoi.php';
 
 class CongViecModel {
     private $conn;
 
     public function __construct() {
-        $database = new KetNoi();
-        $this->conn = $database->connect(); // Kết nối mysqli
+        $database = new KetNoi(); // ✅ Tên class bạn đang dùng
+        $this->conn = $database->connect();
     }
 
-    // ✅ Lấy tất cả công việc
-    public function getAll() {
-        $sql = "SELECT * FROM congviec ORDER BY maCongViec DESC";
-        $result = $this->conn->query($sql);
+    // ✅ Lấy danh sách kế hoạch sản xuất đã duyệt
+    public function getApprovedPlans() {
+        $sql = "SELECT 
+                    maKHSX, 
+                    tenKHSX, 
+                    thoiGianBatDau, 
+                    thoiGianKetThuc
+                FROM kehoachsanxuat
+                WHERE trangThai = 'Đã duyệt'
+                ORDER BY maKHSX DESC";
 
-        $data = [];
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $data[] = $row;
-            }
-        }
-        return $data;
-    }
-
-    // ✅ Lấy 1 công việc theo mã
-    public function getById($maCongViec) {
-        $sql = "SELECT * FROM congviec WHERE maCongViec = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $maCongViec);
         $stmt->execute();
+
+        $result = $stmt->get_result();
+        $plans = [];
+        while ($row = $result->fetch_assoc()) {
+            $plans[] = $row;
+        }
+
+        return $plans;
+    }
+
+    // ✅ Lấy chi tiết kế hoạch theo ID
+    public function getPlanById($id) {
+        $sql = "SELECT 
+                    maKHSX, 
+                    tenKHSX, 
+                    thoiGianBatDau, 
+                    thoiGianKetThuc
+                FROM kehoachsanxuat
+                WHERE maKHSX = ?";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
         $result = $stmt->get_result();
         return $result->fetch_assoc();
     }
 
-    // ✅ Thêm công việc mới
-    public function insert($data) {
-        $sql = "INSERT INTO congviec (tieuDe, moTa, trangThai, ngayHetHan)
-                VALUES (?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param(
-            "ssss",
-            $data['tieuDe'],
-            $data['moTa'],
-            $data['trangThai'],
-            $data['ngayHetHan']
-        );
-        return $stmt->execute();
-    }
+    // ✅ Lấy danh sách công việc theo kế hoạch
+    public function getTasksByPlanId($maKHSX) {
+        $sql = "SELECT 
+                    cv.tieuDe,
+                    cv.moTa,
+                    x.tenXuong,
+                    cv.trangThai,
+                    cv.ngayHetHan
+                FROM congviec cv
+                JOIN kehoachsanxuat ct ON cv.maKHSX = ct.maKHSX
+                JOIN xuong x ON cv.maXuong = x.maXuong
+                WHERE ct.maKHSX = ?";
 
-    // ✅ Cập nhật công việc
-    public function update($data) {
-        $sql = "UPDATE congviec 
-                SET tieuDe = ?, moTa = ?, trangThai = ?, ngayHetHan = ?
-                WHERE maCongViec = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param(
-            "ssssi",
-            $data['tieuDe'],
-            $data['moTa'],
-            $data['trangThai'],
-            $data['ngayHetHan'],
-            $data['maCongViec']
-        );
-        return $stmt->execute();
-    }
+        $stmt->bind_param("i", $maKHSX);
+        $stmt->execute();
 
-    // ✅ Xóa công việc
-    public function delete($maCongViec) {
-        $sql = "DELETE FROM congviec WHERE maCongViec = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $maCongViec);
-        return $stmt->execute();
+        $result = $stmt->get_result();
+        $tasks = [];
+        while ($row = $result->fetch_assoc()) {
+            $tasks[] = $row;
+        }
+
+        return $tasks;
     }
 }
 ?>

@@ -37,7 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "Tạo đơn hàng sản xuất": "index.php?page=tao-don-hang-san-xuat",
         "Nhập kho thành phẩm": "index.php?page=nhap-kho-tp-da-check-qc",
         "Xem lịch làm việc": "index.php?page=xem-lich-lam-viec",
-        "Lập kế hoạch sản xuất": "index.php?page=lap-ke-hoach"
+        "Lập kế hoạch sản xuất": "index.php?page=lap-ke-hoach",
+        "Thống kê kho thành phẩm": "index.php?page=thongke",
     };
 
     function populateSidebar(sectionKey) {
