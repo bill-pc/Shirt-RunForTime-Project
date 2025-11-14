@@ -89,7 +89,7 @@ if (!empty($_SESSION['user']['maND'])) {
             // Xử lý upload hình ảnh (nếu có)
             $hinhAnh = null;
             if (!empty($_FILES['hinh_anh']['name'])) {
-                $targetDir = "uploads/";
+                $targetDir = "uploads/img/";
                 if (!file_exists($targetDir)) {
                     mkdir($targetDir, 0777, true);
                 }

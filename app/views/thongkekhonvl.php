@@ -77,11 +77,7 @@ require_once 'app/views/layouts/nav.php';
                     </div>
                 </div>
 
-                <div style="margin-bottom:20px;">
-                    <label>Loại báo cáo:</label><br>
-                    <input type="radio" name="loai_baocao" value="nhap" required> Nhập
-                    <input type="radio" name="loai_baocao" value="xuat"> Xuất
-                </div>
+                
 
                 <div style="text-align:center;">
                     <button type="submit" class="btn btn-primary">Thống kê</button>
@@ -128,46 +124,6 @@ document.getElementById('formThongKe').addEventListener('submit', async function
     e.preventDefault();
 
     const formData = new FormData(this);
-    // đem form POST về cùng route để controller trả JSON
-    const res = await fetch('index.php?page=thongke-khonvl', {
-        method: 'POST',
-        body: formData
-    });
-
-    // nếu server trả lỗi hoặc không phải JSON, xử lý an toàn
-    let data = [];
-    try {
-        data = await res.json();
-    } catch (err) {
-        console.error('Lỗi khi parse JSON:', err);
-        const tbody = document.querySelector('#tableKho tbody');
-        tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">Lỗi server, kiểm tra log.</td></tr>`;
-        return;
-    }
-
-    const tbody = document.querySelector('#tableKho tbody');
-    tbody.innerHTML = '';
-
-    if (Array.isArray(data) && data.length > 0) {
-        data.forEach(row => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${row.maNVL}</td>
-                <td>${row.tenNVL}</td>
-                <td>${row.donViTinh}</td>
-                <td>${row.tongNhap}</td>
-                <td>${row.tongXuat}</td>
-                <td>${row.tonKho}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } else {
-        tbody.innerHTML = `<tr><td colspan="6" style="color:gray;text-align:center;">Không có dữ liệu để hiển thị</td></tr>`;
-    }
-    document.getElementById('formThongKe').addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const formData = new FormData(this);
     const res = await fetch('index.php?page=thongke-khonvl', {
         method: 'POST',
         body: formData
@@ -203,15 +159,12 @@ document.getElementById('formThongKe').addEventListener('submit', async function
         tbody.innerHTML = `<tr><td colspan="6" style="color:gray;text-align:center;">Không có dữ liệu để hiển thị</td></tr>`;
     }
 
-    // 👉 Cập nhật hidden input trong form xuất CSV
+    // Cập nhật dữ liệu ẩn cho form xuất CSV
     document.getElementById('csv_start_date').value = document.getElementById('start_date').value;
     document.getElementById('csv_end_date').value = document.getElementById('end_date').value;
-    document.getElementById('csv_tenNVL').value = document.getElementById('tenNVL').value;
-    const loai = document.querySelector('input[name="loai_baocao"]:checked');
-    document.getElementById('csv_loai').value = loai ? loai.value : '';
+    document.getElementById('csv_tenNVL').value = document.getElementById('inputTenNVL').value;
 });
 
-});
 // --- Gợi ý tên NVL khi nhập ---
 const inputNVL = document.getElementById('inputTenNVL');
 const suggestBox = document.getElementById('suggestionsNVL');
@@ -253,24 +206,5 @@ document.addEventListener('click', (e) => {
         suggestBox.style.display = 'none';
     }
 });
-
 </script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const exportForm = document.getElementById("formExport");
-    const btnExport = exportForm.querySelector("button[type='submit']");
-
-    btnExport.addEventListener("click", function(e) {
-        // Lấy giá trị hiện tại trên form lọc
-        document.getElementById("csv_start_date").value = document.querySelector("input[name='start_date']").value;
-        document.getElementById("csv_end_date").value = document.querySelector("input[name='end_date']").value;
-        document.getElementById("csv_tenNVL").value = document.querySelector("input[name='tenNVL']").value;
-        
-        // Nếu có radio lọc loại báo cáo
-        const checkedRadio = document.querySelector("input[name='loai']:checked");
-        document.getElementById("csv_loai").value = checkedRadio ? checkedRadio.value : '';
-    });
-});
-</script>
-
 <?php require_once 'app/views/layouts/footer.php'; ?>
