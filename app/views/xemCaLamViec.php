@@ -164,9 +164,10 @@ require_once 'app/views/layouts/nav.php';
                     <p>Bạn có <strong><?= $tomTat['tongSoCa'] ?? 0 ?> ca làm việc</strong> trong tuần này.</p>
                     <?php if (!empty($tomTat['caGanNhat'])): ?>
                         <p>Ca gần nhất: <strong>
+                            <?= htmlspecialchars($tomTat['caGanNhat']['thu']) ?>, 
                             Ngày <?= htmlspecialchars($tomTat['caGanNhat']['ngay']) ?>, 
                             <?= htmlspecialchars($tomTat['caGanNhat']['caLam']) ?> 
-                            <?= htmlspecialchars($tomTat['caGanNhat']['thoiGian']) ?>
+                            (<?= htmlspecialchars($tomTat['caGanNhat']['thoiGian']) ?>)
                         </strong></p>
                     <?php else: ?>
                         <p>Ca gần nhất: <strong>Chưa có ca làm việc</strong></p>
@@ -183,20 +184,18 @@ require_once 'app/views/layouts/nav.php';
                         <thead>
                             <tr>
                                 <th>Ngày</th>
+                                <th>Thứ</th>
                                 <th>Ca Làm</th>
                                 <th>Thời Gian</th>
-                                <th>Công Việc</th>
-                                <th>Địa Điểm</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($lichLamViec as $ca): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($ca['ngay']) ?></td>
+                                    <td><?= htmlspecialchars($ca['thu']) ?></td>
                                     <td><?= htmlspecialchars($ca['caLam']) ?></td>
                                     <td><?= htmlspecialchars($ca['thoiGian']) ?></td>
-                                    <td><?= htmlspecialchars($ca['congViec']) ?></td>
-                                    <td><?= htmlspecialchars($ca['diaDiem']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
