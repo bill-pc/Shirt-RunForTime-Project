@@ -221,16 +221,65 @@ require_once 'layouts/nav.php';
                 background-color: #c82333;
             }
 
+            .filter-group {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 10px;
+                align-items: center;
+                background: #f8f9fa;
+                padding: 10px;
+                border-radius: 6px;
+            }
 
+            .filter-group label {
+                font-weight: 600;
+                margin-bottom: 0;
+            }
+
+            .filter-group input,
+            .filter-group select {
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            /* CSS cho bảng KHSX mới */
+            .khsx-list-container {
+                margin-top: 30px;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+            }
+
+            .khsx-list-container h3 {
+                text-align: center;
+                color: #085da7;
+                margin-bottom: 15px;
+            }
         </style>
         <div class="kehoach-form-container">
             <h2><?php echo $pageTitle ?? 'Lập kế hoạch sản xuất'; ?></h2>
             <hr>
+
             <div class="form-group">
                 <label for="search-box">Tìm kiếm Đơn hàng (theo Tên hoặc Mã):</label>
                 <input type="text" id="search-box" placeholder="Nhập mã hoặc tên đơn hàng...">
             </div>
 
+            <div class="filter-group">
+                <label for="filter-ngayGiao">Ngày giao:</label>
+                <input type="date" id="filter-ngayGiao">
+
+                <label for="filter-trangThai">Trạng thái:</label>
+                <select id="filter-trangThai">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="Chờ duyệt">Chờ duyệt</option>
+                    <option value="Đang thực hiện">Đang thực hiện</option>
+                    <option value="Đã xuất kho">Đã xuất kho</option>
+                </select>
+
+                <button id="btn-clear-filters" class="btn-secondary">Xóa lọc</button>
+            </div>
             <table class="table-results">
                 <thead>
                     <tr>
@@ -242,9 +291,40 @@ require_once 'layouts/nav.php';
                     </tr>
                 </thead>
                 <tbody id="results-table-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="khsx-list-container">
+            <h3>Danh sách Kế hoạch sản xuất đã lập</h3>
+            <table class="table-results">
+                <thead>
                     <tr>
-                        <td colspan="4" style="text-align: center;">Đang tải danh sách...</td>
+                        <th>Tên Kế hoạch</th>
+                        <th>Mã Đơn hàng</th>
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
+                        <th>Trạng thái</th>
+                        <th>Người lập</th>
                     </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($danhSachKHSX)): ?>
+                        <?php foreach ($danhSachKHSX as $khsx): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($khsx['tenKHSX']) ?></td>
+                                <td><?= htmlspecialchars($khsx['maDonHang']) ?></td>
+                                <td><?= htmlspecialchars($khsx['thoiGianBatDau']) ?></td>
+                                <td><?= htmlspecialchars($khsx['thoiGianKetThuc']) ?></td>
+                                <td><?= htmlspecialchars($khsx['trangThai']) ?></td>
+                                <td><?= htmlspecialchars($khsx['tenNguoiLap']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Chưa có kế hoạch sản xuất nào được lập.</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
