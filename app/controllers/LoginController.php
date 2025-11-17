@@ -21,9 +21,10 @@ class LoginController {
         $conn = $db->connect();
 
         $sql = "SELECT tk.*, nd.hoTen 
-                FROM taikhoan tk 
-                LEFT JOIN nguoidung nd ON tk.maTK = nd.maTK 
-                WHERE tenDangNhap = ? and nd.trangThai=1";
+        FROM taikhoan tk 
+        LEFT JOIN nguoidung nd ON tk.maTK = nd.maTK 
+        WHERE tk.tenDangNhap = ? AND (nd.trangThai = 1 OR nd.trangThai IS NULL)
+        ";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -31,22 +32,23 @@ class LoginController {
 
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
+            
 
-            // So sánh mật khẩu (hỗ trợ plain và hash)
-            if ($user['matKhau'] === $password || password_verify($password, $user['matKhau'])) {
+            // So sánh mật khẩu bằng MD5
+            if (md5($password) === $user['matKhau']) {
+
                 $_SESSION['user'] = [
                     'maTK' => $user['maTK'],
                     'tenDangNhap' => $user['tenDangNhap'],
                     'hoTen' => $user['hoTen'] ?? ''
                 ];
 
-                // Chuyển hướng chính xác bằng PHP header (session vẫn giữ)
                 header("Location: index.php?page=home");
                 exit;
             }
         }
 
-        // Nếu sai tài khoản hoặc mật khẩu
+        // Sai tài khoản hoặc mật khẩu
         header("Location: index.php?page=login&error=1");
         exit;
     }

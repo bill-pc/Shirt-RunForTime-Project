@@ -28,6 +28,13 @@ class PheDuyetController
 
         if (!is_array($danhSachYeuCau))
             $danhSachYeuCau = [];
+        // echo "<h1>Kiểm tra dữ liệu...</h1>";
+        // echo "<p>Loại phiếu đang xem: <strong>" . htmlspecialchars($type) . "</strong></p>";
+        // echo "<p>Kết quả từ Model (danhSachYeuCau):</p>";
+        // echo "<pre>";
+        // print_r($danhSachYeuCau); // In dữ liệu ra
+        // echo "</pre>";
+        // die();
 
         require 'app/views/pheDuyetYeuCau.php';
 
