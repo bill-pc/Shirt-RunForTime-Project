@@ -14,7 +14,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const confirmModal = document.getElementById("confirm-exit-modal");
     const btnStay = document.getElementById("confirm-exit-no");
     const btnExit = document.getElementById("confirm-exit-yes");
-
+    // BỘ LỌC MỚI
+    const filterNgayGiao = document.getElementById("filter-ngayGiao");
+    const filterTrangThai = document.getElementById("filter-trangThai");
+    const btnClearFilters = document.getElementById("btn-clear-filters");
     // (MỚI) Biến toàn cục để lưu dữ liệu NVL và Sản Phẩm
     // Giúp không phải gọi AJAX mỗi khi nhấn "Thêm NVL"
     let globalData = {
@@ -26,12 +29,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- LOGIC TÌM KIẾM VÀ TẢI BẢNG ---
 
     // 1. Hàm gọi AJAX (Tìm kiếm hoặc tải mặc định)
-    function fetchResults(query) {
+    function fetchResults(query, ngayGiao, trangThai) {
         resultsBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Đang tải...</td></tr>';
 
-        // Gọi Endpoint 1 (AJAX)
-        // (Controller sẽ tự quyết định nên tìm kiếm hay lấy 5 cái mặc định)
-        fetch(`index.php?page=ajax-tim-kiem&query=${query}`)
+        // Thêm bộ lọc vào URL
+        const url = `index.php?page=ajax-tim-kiem&query=${query}&ngayGiao=${ngayGiao}&trangThai=${trangThai}`;
+
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 buildTable(data); // Xây dựng bảng kết quả
@@ -68,14 +72,35 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+
+
+
+    // --- Gắn sự kiện cho các bộ lọc ---
     if (searchBox) {
-        searchBox.addEventListener("input", function() {
-            fetchResults(this.value); 
+        // Tìm kiếm khi gõ
+        searchBox.addEventListener("input", triggerSearch);
+    }
+    if (filterNgayGiao) {
+        // Lọc khi đổi ngày
+        filterNgayGiao.addEventListener("change", triggerSearch);
+    }
+    if (filterTrangThai) {
+        // Lọc khi đổi trạng thái
+        filterTrangThai.addEventListener("change", triggerSearch);
+    }
+    if (btnClearFilters) {
+        // Nút xóa lọc
+        btnClearFilters.addEventListener("click", function () {
+            searchBox.value = '';
+            filterNgayGiao.value = '';
+            filterTrangThai.value = '';
+            triggerSearch(); // Tải lại danh sách
         });
     }
 
-    if (resultsBody) { 
-        fetchResults(''); 
+    // Tải kết quả mặc định khi vào trang
+    if (resultsBody) {
+        triggerSearch(); // Gọi hàm tổng hợp
     }
 
 
@@ -83,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 5. Hàm gọi AJAX để lấy TOÀN BỘ dữ liệu cho Modal
     function openOrderModal(id) {
-        
+
         // SỬA LỖI URL: Phải là 'ajax-get-modal-data'
         fetch(`index.php?page=ajax-get-modal-data&id=${id}`)
             .then(response => response.json())
@@ -95,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert("Không thể tải chi tiết đơn hàng.");
                     return;
                 }
-                
+
                 // (SỬA LỖI) Lưu dữ liệu vào biến toàn cục
                 globalData.danhSachNVL = data.danhSachNVL || [];
                 globalData.danhSachSanPham = data.danhSachSanPham || [];
@@ -122,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // 5d. Dọn dẹp form cũ (Xóa các danh sách NVL đã thêm)
                 document.getElementById("xuong-cat-nvl-list").innerHTML = '';
                 document.getElementById("xuong-may-nvl-list").innerHTML = '';
-                
+
                 // 5e. Điền dropdown Sản Phẩm cho cả 2 xưởng
                 const productSelects = document.querySelectorAll(".product-select");
                 productSelects.forEach(select => {
@@ -131,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         select.innerHTML += `<option value="${sp.maSanPham}">${sp.tenSanPham}</option>`;
                     });
                     // Tự động chọn sản phẩm của đơn hàng
-                    select.value = donHang.maSanPham; 
+                    select.value = donHang.maSanPham;
                 });
 
                 // 5f. Tự động thêm 1 dòng NVL cho mỗi xưởng
@@ -161,24 +186,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 7. Gắn sự kiện Đóng Modal (và logic Hộp xác nhận)
     if (closeModalBtn) {
-        closeModalBtn.addEventListener("click", function() {
+        closeModalBtn.addEventListener("click", function () {
             confirmModal.classList.add("show");
         });
     }
     if (modal) {
-        modal.addEventListener("click", function(e) {
-            if (e.target === modal) { 
+        modal.addEventListener("click", function (e) {
+            if (e.target === modal) {
                 confirmModal.classList.add("show");
             }
         });
     }
     if (btnStay) {
-        btnStay.addEventListener("click", function() {
+        btnStay.addEventListener("click", function () {
             confirmModal.classList.remove("show");
         });
     }
     if (btnExit) {
-        btnExit.addEventListener("click", function() {
+        btnExit.addEventListener("click", function () {
             confirmModal.classList.remove("show");
             modal.classList.remove("show");
         });
@@ -215,7 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 10. Gắn sự kiện click chung cho các nút THÊM / XÓA (bên trong modal)
     if (modal) {
-        modal.addEventListener('click', function(e) {
+        modal.addEventListener('click', function (e) {
             // Nếu click nút "+ Thêm NVL"
             if (e.target && e.target.classList.contains('btn-add-nvl')) {
                 const targetListId = e.target.dataset.target;
@@ -228,6 +253,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 e.target.closest('.nvl-row').remove();
             }
         });
+    }
+
+    function triggerSearch() {
+        const query = searchBox.value;
+        const ngayGiao = filterNgayGiao.value;
+        const trangThai = filterTrangThai.value;
+        fetchResults(query, ngayGiao, trangThai);
     }
 
 }); 
