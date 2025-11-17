@@ -284,18 +284,21 @@ switch ($page) {
         $controller->edit(); // ✅ hiển thị form sửa 1 nhân viên (có id)
         break;
     case 'lap-khsx':
+        require_once './app/models/ketNoi.php';
         require_once './app/controllers/KHSXController.php';
         $controller = new KHSXController();
         $controller->create();
         break;
 
     case 'ajax-tim-kiem':
+        require_once './app/models/ketNoi.php';
         require_once './app/controllers/KHSXController.php';
         $controller = new KHSXController();
         $controller->ajaxTimKiem();
         break;
 
     case 'ajax-get-modal-data':
+        require_once './app/models/ketNoi.php';
         require_once './app/controllers/KHSXController.php';
         $controller = new KHSXController();
         $controller->ajaxGetModalData();
@@ -303,10 +306,43 @@ switch ($page) {
     case 'luu-ke-hoach':
         require_once './app/controllers/KHSXController.php';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once './app/models/ketNoi.php';
             $controller = new KHSXController();
             $controller->store();
         }
+    case 'ghi-nhan-tp':
+        require_once './app/controllers/GhiNhanTPController.php';
+        $controller = new GhiNhanThanhPhamController();
+        $controller->index();
         break;
+
+    case 'luu-ghi-nhan-tp':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once './app/controllers/GhiNhanTPController.php';
+            $controller = new GhiNhanThanhPhamController();
+            $controller->luu();
+        } else {
+            header('Location: index.php?page=ghi-nhan-tp');
+            exit;
+        }
+        break;
+    case 'bao-cao-tong-hop':
+        require_once 'app/models/BaoCaoTongHopModel.php';
+        require_once 'app/controllers/BaoCaoTongHopController.php';
+        $controller = new BaoCaoTongHopController();
+        $controller->index();
+        break;
+    case 'ajax-get-report-details':
+        require_once 'app/models/BaoCaoTongHopModel.php';
+        require_once 'app/controllers/BaoCaoTongHopController.php';
+        $controller = new BaoCaoTongHopController();
+        $controller->ajaxGetDetails();
+        break;
+    case 'lap-bao-cao': // Giữ lại route cũ (nếu có)
+        // Hoặc redirect sang route mới
+        header('Location: index.php?page=bao-cao-tong-hop');
+        exit;
+
     default:
         echo "404 - Trang không tồn tại!";
         break;
