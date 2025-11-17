@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 13, 2025 lúc 06:15 PM
+-- Thời gian đã tạo: Th10 17, 2025 lúc 10:48 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -45,7 +45,12 @@ CREATE TABLE `baocaoloi` (
 INSERT INTO `baocaoloi` (`maBaoCao`, `tenBaoCao`, `loaiLoi`, `hinhAnh`, `thoiGian`, `moTa`, `maThietBi`, `maND`) VALUES
 (49, 'Báo cáo sự cố - Máy may hãng A - Nguyễn Văn An', 'phancung', NULL, '2025-11-08', '', 9, 6),
 (50, 'Báo cáo sự cố - Máy ép nhiệt - TranKienQuoc', 'phancung', NULL, '2025-11-08', '', 7, 1),
-(51, 'Báo cáo sự cố - Máy may D - TranKienQuoc', 'phancung', NULL, '2025-11-09', '', 10, 1);
+(51, 'Báo cáo sự cố - Máy may D - TranKienQuoc', 'phancung', NULL, '2025-11-09', '', 10, 1),
+(52, 'Báo cáo sự cố - Máy cắt vải - TranKienQuoc', 'phancung', NULL, '2025-11-09', '', 8, 1),
+(53, 'Báo cáo sự cố - Máy may hãng A - TranKienQuoc', 'phanmem', NULL, '2025-11-09', '', 9, 1),
+(54, 'Báo cáo sự cố - Máy ép nhiệt - TranKienQuoc', 'phanmem', 'uploads/img1763087644_hinh-nen-hoa-mau-don-1.jpg', '2025-11-14', '', 7, 1),
+(55, 'Báo cáo sự cố - Máy cắt vải - TranKienQuoc', 'khac', 'uploads/img/1763087805_z5274512085563_3acd4ad5b0faf289efc6542709efbac3.jpg', '2025-11-14', '', 8, 1),
+(56, 'Báo cáo sự cố - Máy ép nhiệt - TranKienQuoc', 'phancung', 'uploads/img/1763089681_TheSV.jpg', '2025-11-14', '', 7, 1);
 
 -- --------------------------------------------------------
 
@@ -55,6 +60,7 @@ INSERT INTO `baocaoloi` (`maBaoCao`, `tenBaoCao`, `loaiLoi`, `hinhAnh`, `thoiGia
 
 CREATE TABLE `calamviec` (
   `maCa` varchar(10) NOT NULL,
+  `tenCa` varchar(10) NOT NULL,
   `gioBatDau` time NOT NULL,
   `gioKetThuc` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -63,10 +69,10 @@ CREATE TABLE `calamviec` (
 -- Đang đổ dữ liệu cho bảng `calamviec`
 --
 
-INSERT INTO `calamviec` (`maCa`, `gioBatDau`, `gioKetThuc`) VALUES
-('CA_CHIEU', '13:00:00', '17:30:00'),
-('CA_SANG', '07:30:00', '11:30:00'),
-('CA_TOI', '18:00:00', '22:00:00');
+INSERT INTO `calamviec` (`maCa`, `tenCa`, `gioBatDau`, `gioKetThuc`) VALUES
+('CA_CHIEU', '', '13:00:00', '17:30:00'),
+('CA_SANG', '', '07:30:00', '11:30:00'),
+('CA_TOI', '', '18:00:00', '22:00:00');
 
 -- --------------------------------------------------------
 
@@ -114,14 +120,6 @@ CREATE TABLE `chitietphieuxuatnvl` (
   `ghiChu` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Đang đổ dữ liệu cho bảng `chitietphieuxuatnvl`
---
-
-INSERT INTO `chitietphieuxuatnvl` (`maCTPX`, `maNVL`, `tenNVL`, `soLuong`, `maPhieu`, `maXuong`, `ghiChu`) VALUES
-(16, 1, 'Vải cotton loại 1', 20, 13, 1, ''),
-(17, 2, 'Nút áo trơn', 200, 13, 2, '');
-
 -- --------------------------------------------------------
 
 --
@@ -135,14 +133,6 @@ CREATE TABLE `chitietphieuyeucaukiemtrachatluong` (
   `soLuong` int(11) NOT NULL DEFAULT 0,
   `maYC` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `chitietphieuyeucaukiemtrachatluong`
---
-
-INSERT INTO `chitietphieuyeucaukiemtrachatluong` (`maCTPKT`, `tenSanPham`, `maSanPham`, `soLuong`, `maYC`) VALUES
-(1, 'Vải cotton loại 1', 1, 20, 1),
-(2, 'Nút áo trơn', 1, 200, 1);
 
 -- --------------------------------------------------------
 
@@ -207,9 +197,8 @@ INSERT INTO `chitiet_phieuyeucaucapnvl` (`maCTPhieuYCCC`, `tenNVL`, `nhaCungCap`
 (41, 'Chỉ may đen', NULL, 300, 'Cuộn', 26, 3),
 (42, 'Vải cotton', NULL, 20, 'Tấm', 27, 1),
 (43, 'Nút áo', NULL, 200, 'Cái', 27, 2),
-(44, 'Vải cotton', NULL, 120, 'Tấm', 28, 1),
-(45, 'Chỉ may đen', NULL, 230, 'Cuộn', 28, 3),
-(46, 'Nút áo', NULL, 340, 'Cái', 28, 2);
+(44, 'Vải cotton', NULL, 300, 'Tấm', 28, 1),
+(45, 'Chỉ may đen', NULL, 300, 'Cuộn', 28, 3);
 
 -- --------------------------------------------------------
 
@@ -221,17 +210,20 @@ CREATE TABLE `chitiet_phieuyeucaunhapkhonvl` (
   `maChiTiet_YCNK` int(11) NOT NULL,
   `maYCNK` int(11) NOT NULL,
   `maNVL` int(11) NOT NULL,
+  `tenNVL` varchar(255) DEFAULT NULL,
   `soLuong` int(11) DEFAULT NULL,
-  `soLuongTonKho` int(11) DEFAULT NULL,
-  `soLuongCanNhap` int(11) DEFAULT NULL
+  `donViTinh` varchar(50) DEFAULT NULL,
+  `nhaCungCap` varchar(200) NOT NULL,
+  `soLuongTonKho` int(11) NOT NULL,
+  `soLuongCanNhap` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `chitiet_phieuyeucaunhapkhonvl`
 --
 
-INSERT INTO `chitiet_phieuyeucaunhapkhonvl` (`maChiTiet_YCNK`, `maYCNK`, `maNVL`, `soLuong`, `soLuongTonKho`, `soLuongCanNhap`) VALUES
-(6, 0, 1, 20, 10, 10);
+INSERT INTO `chitiet_phieuyeucaunhapkhonvl` (`maChiTiet_YCNK`, `maYCNK`, `maNVL`, `tenNVL`, `soLuong`, `donViTinh`, `nhaCungCap`, `soLuongTonKho`, `soLuongCanNhap`) VALUES
+(1, 2, 2, 'Nút áo', 200, 'Cái', 'Minh Thai', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -273,9 +265,8 @@ CREATE TABLE `donhangsanxuat` (
 
 INSERT INTO `donhangsanxuat` (`maDonHang`, `tenDonHang`, `tenSanPham`, `soLuongSanXuat`, `donVi`, `diaChiNhan`, `trangThai`, `ngayGiao`, `maSanPham`) VALUES
 (1, ' DHSX1', 'Áo sơ mi hoa cúc', 2000, 'Cai', 'Nguyen Oanh', 'Đã xuất kho', '2025-10-31', 1),
-(2, 'DHSX2', 'Áo sơ mi xanh dương', 1000, 'Cái', 'ABC', 'Đang thực hiện', '2025-10-31', 2),
-(3, 'DHSX4', 'Áo sơ mi tay ngắn', 3500, 'Cái', 'Nguyễn Văn Bảo', 'Chờ duyệt', '2025-11-28', 3),
-(5, 'PX2025-44 - SL: 234', '', 0, 'Cái', 'Nội bộ', 'Chờ duyệt', '2025-11-21', 3);
+(2, 'DHSX2', 'Áo sơ mi xanh dương', 1000, 'Cái', 'ABC', 'Đã xuất kho', '2025-10-31', 2),
+(3, 'DHSX4', 'Áo sơ mi tay ngắn', 3500, 'Cái', 'Nguyễn Văn Bảo', 'Chờ duyệt', '2025-11-28', 3);
 
 -- --------------------------------------------------------
 
@@ -316,10 +307,18 @@ CREATE TABLE `kehoachsanxuat` (
   `maDonHang` int(11) NOT NULL,
   `thoiGianBatDau` date NOT NULL,
   `thoiGianKetThuc` date NOT NULL,
-  `ghiChu` text DEFAULT NULL,
   `trangThai` varchar(50) NOT NULL DEFAULT 'Chờ duyệt',
   `maND` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `kehoachsanxuat`
+--
+
+INSERT INTO `kehoachsanxuat` (`maKHSX`, `tenKHSX`, `maDonHang`, `thoiGianBatDau`, `thoiGianKetThuc`, `trangThai`, `maND`) VALUES
+(1, 'KHSX1', 1, '2025-10-01', '2025-10-31', 'Đã duyệt', 1),
+(2, 'KHSX2', 2, '2025-10-09', '2025-10-31', 'Đã duyệt', 1),
+(3, 'KHSX3', 3, '2025-10-01', '2025-11-06', 'Đã duyệt', 1);
 
 -- --------------------------------------------------------
 
@@ -362,7 +361,8 @@ CREATE TABLE `lichsupheduyet` (
 
 INSERT INTO `lichsupheduyet` (`id`, `maKHSX`, `hanhDong`, `ghiChu`, `nguoiThucHien`, `thoiGian`) VALUES
 (1, 1, 'Đã duyệt', '', 'TranKienQuoc', '2025-11-08 14:13:17'),
-(2, 2, 'Từ chối', '', 'TranKienQuoc', '2025-11-08 14:13:42');
+(2, 2, 'Từ chối', '', 'TranKienQuoc', '2025-11-08 14:13:42'),
+(3, 1, 'Đã duyệt', '', 'TranKienQuoc', '2025-11-14 09:49:26');
 
 -- --------------------------------------------------------
 
@@ -391,13 +391,7 @@ INSERT INTO `nguoidung` (`maND`, `hoTen`, `chucVu`, `phongBan`, `soDienThoai`, `
 (6, 'Nguyễn Văn B', 'Trưởng phòng', 'QLNVL', '0901234567', 'an.nguyen@company.com', '123 Võ Văn Tần, Q.3, TP.HCM', 2, 1),
 (7, 'Trần Thị Bình', 'Nhân viên', 'Xưởng may', '0987654321', 'binh.tran@company.com', '456 Lê Lợi, Q.1, TP.HCM', 3, 1),
 (8, 'Lê Minh Cường', 'Kỹ thuật viên', 'Xưởng cắt', '0912345678', 'cuong.le@company.com', '789 Nguyễn Trãi, Q.5, TP.HCM', 4, 1),
-(10, 'PhạmThị Dung', 'Nhân viên', 'Xưởng may', NULL, 'dung.pham@company.com', NULL, 5, 0),
-(11, 'Mai Van Vu', 'Nhân viên xưởng May', '', '0345675125', '122232@gmail.com', '58 Nguyen Oanh', 6, 0),
-(12, 'Mai Van Vu', 'Nhân viên xưởng Cắt', '', '03657458971', 'trankienquoc122102004@gmail.com', 'Quang Trung', 7, 0),
-(13, 'Mai Van Vu', 'Nhân viên xưởng Cắt', '', '1231333333', 'quannguyen2002619@gmail.com', '581 Nguyen Oanh g', 8, 0),
-(14, 'Mai Van Vu', 'Nhân viên xưởng Cắt', '', '1234567890', '123333@gmail.com', '581 Nguyen Oanh', 9, 0),
-(15, 'Mai Van Vu', 'Nhân viên xưởng Cắt', '', '12222222222', '1232221@gmail.com', '581 Nguyen Oanh', 10, 0),
-(16, 'Mai vu 12', 'Nhân viên xưởng Cắt', '', '12345678956', 'abc@gmail.com', '58 Nguyen Oanh', 11, 0);
+(15, 'Mai Van Vu', 'Nhân viên xưởng Cắt', '', '12222222222', '1232221@gmail.com', '581 Nguyen Oanh', 10, 0);
 
 -- --------------------------------------------------------
 
@@ -420,9 +414,12 @@ CREATE TABLE `nvl` (
 --
 
 INSERT INTO `nvl` (`maNVL`, `tenNVL`, `loaiNVL`, `soLuongTonKho`, `donViTinh`, `moTa`, `maKho`) VALUES
-(1, 'Vải cotton trắng', 'Vải', 300, 'Tấm', 'Vải cotton dùng may áo sơ mi trắng', 1),
-(2, 'Nút áo trắng', 'Phụ kiện', 1000, 'Cái', 'Nút áo nhựa trắng', 1),
-(3, 'Chỉ may trắng', 'Phụ kiện', 500, 'Cuộn', 'Chỉ may trắng dùng cho áo sơ mi', 1);
+(1, 'Vải cotton', 'Vải', 100, 'Tấm', '2m x 3m', NULL),
+(2, 'Nút áo', 'Phụ kiện', 1000, 'Cái', 'Nút áo trắng', NULL),
+(3, 'Chỉ may đen', 'Chỉ', 500, 'Cuộn', 'Chỉ may màu trắng', 1),
+(4, 'Nút áo', 'Phụ kiện', 200, 'Cái', 'Nút áo màu đen', 1),
+(5, 'Vải cotton', 'Vải', 300, 'Tấm', 'Vải cotton trắng', 1),
+(6, 'Chỉ may trắng', 'Chỉ', 3000, 'Cuộn', 'Chỉ may màu trắng, mỏng', 1);
 
 -- --------------------------------------------------------
 
@@ -447,8 +444,7 @@ CREATE TABLE `phieunhapnvl` (
 
 INSERT INTO `phieunhapnvl` (`maPNVL`, `tenPNVL`, `nguoiLap`, `nhaCungCap`, `ngayNhap`, `maYCNK`, `maNVL`, `soLuongNhap`) VALUES
 (1, 'Phiếu nhập nguyên vật liệu', 'ông a', 'abc', '2025-10-30', 1, 1, 0),
-(6, 'phieu nhap kho', 'avd', ' sdsd', '2025-10-23', 2, 1, 20),
-(7, 'Phiếu nhập nguyên vật liệu', 'TranKienQuoc', 'kt', '2025-11-08', 0, 1, 10);
+(6, 'phieu nhap kho', 'avd', ' sdsd', '2025-10-23', 2, 1, 20);
 
 -- --------------------------------------------------------
 
@@ -464,13 +460,6 @@ CREATE TABLE `phieuxuatnvl` (
   `maND` int(11) NOT NULL,
   `maYCCC` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `phieuxuatnvl`
---
-
-INSERT INTO `phieuxuatnvl` (`maPhieu`, `tenPhieu`, `tenNguoiLap`, `ngayLap`, `maND`, `maYCCC`) VALUES
-(13, 'Xuất NVL KHSX1', 'TranKienQuoc', '2025-11-06', 1, 27);
 
 -- --------------------------------------------------------
 
@@ -517,8 +506,8 @@ CREATE TABLE `phieuyeucaucungcapnvl` (
 --
 
 INSERT INTO `phieuyeucaucungcapnvl` (`maYCCC`, `ngayLap`, `trangThai`, `tenNguoiLap`, `maND`, `maKHSX`, `tenPhieu`, `ghiChu`) VALUES
-(27, '2025-11-05', 'Đang xuất NVL', 'TranKienQuoc', 1, 1, 'Yêu cầu NVL cho KHSX1', ''),
-(28, '2025-11-06', 'Đã duyệt', 'TranKienQuoc', 1, 3, 'Yêu cầu NVL cho KHSX3', '');
+(27, '2025-11-05', 'Đã duyệt', 'TranKienQuoc', 1, 1, 'Yêu cầu NVL cho KHSX1', ''),
+(28, '2025-11-14', 'Đã duyệt', 'TranKienQuoc', 1, 2, 'Yêu cầu NVL cho KHSX2', '');
 
 -- --------------------------------------------------------
 
@@ -530,7 +519,6 @@ CREATE TABLE `phieuyeucaukiemtrachatluong` (
   `maYC` int(11) NOT NULL,
   `tenSanPham` varchar(100) NOT NULL,
   `maSanPham` int(11) NOT NULL,
-  `maKHSX` int(11) DEFAULT NULL,
   `soLuong` int(11) NOT NULL DEFAULT 0,
   `trangThaiPhieu` varchar(100) NOT NULL,
   `tenNguoiLap` varchar(100) NOT NULL
@@ -540,8 +528,8 @@ CREATE TABLE `phieuyeucaukiemtrachatluong` (
 -- Đang đổ dữ liệu cho bảng `phieuyeucaukiemtrachatluong`
 --
 
-INSERT INTO `phieuyeucaukiemtrachatluong` (`maYC`, `tenSanPham`, `maSanPham`, `maKHSX`, `soLuong`, `trangThaiPhieu`, `tenNguoiLap`) VALUES
-(1, 'Vải cotton loại 1', 1, 1, 220, 'Chờ kiểm tra', 'Hệ thống');
+INSERT INTO `phieuyeucaukiemtrachatluong` (`maYC`, `tenSanPham`, `maSanPham`, `soLuong`, `trangThaiPhieu`, `tenNguoiLap`) VALUES
+(1, 'htsherr', 3, 400, 'Chờ duyệt', 'vsses');
 
 -- --------------------------------------------------------
 
@@ -550,21 +538,21 @@ INSERT INTO `phieuyeucaukiemtrachatluong` (`maYC`, `tenSanPham`, `maSanPham`, `m
 --
 
 CREATE TABLE `phieuyeucaunhapkhonvl` (
-  `maYCNK` varchar(50) NOT NULL,
-  `maKHSX` int(11) DEFAULT NULL,
+  `maYCNK` int(11) NOT NULL,
+  `donViTinh` varchar(50) DEFAULT NULL,
   `ngayLap` date NOT NULL,
   `nhaCungCap` varchar(100) DEFAULT NULL,
-  `ghiChu` text DEFAULT NULL,
-  `trangThai` varchar(255) DEFAULT NULL,
-  `tenNguoiLap` varchar(100) NOT NULL
+  `trangThai` varchar(50) NOT NULL DEFAULT 'Chờ duyệt',
+  `tenNguoiLap` varchar(100) NOT NULL,
+  `maKHSX` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `phieuyeucaunhapkhonvl`
 --
 
-INSERT INTO `phieuyeucaunhapkhonvl` (`maYCNK`, `maKHSX`, `ngayLap`, `nhaCungCap`, `ghiChu`, `trangThai`, `tenNguoiLap`) VALUES
-('YCNK251108083745', 1, '2025-11-08', 'NCC001', '', 'Đã nhập kho', '');
+INSERT INTO `phieuyeucaunhapkhonvl` (`maYCNK`, `donViTinh`, `ngayLap`, `nhaCungCap`, `trangThai`, `tenNguoiLap`, `maKHSX`) VALUES
+(1, 'Cái', '2025-11-11', NULL, 'Chờ duyệt', 'zsgSDG', 1);
 
 -- --------------------------------------------------------
 
@@ -610,7 +598,7 @@ CREATE TABLE `taikhoan` (
 --
 
 INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
-(1, 'trankienquoc', '12345', 'Hoạt động'),
+(1, 'trankienquoc', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
 (2, 'nguyenvanan', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
 (3, 'tranthibinh', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
 (4, 'leminhcuong', '0ec6e061798a1a86d9afdbdb2475529d', 'Hoạt động'),
@@ -620,7 +608,8 @@ INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
 (8, 'quannguyen2002619', '$2y$10$aZ9Sxi5dp0pjzEnUprxtm.0kVrpRxKgxAbUlmyNr9mioxPZNmB.4.', 'không hoạt động'),
 (9, '123333', '$2y$10$xLj2YZBkxMHwuFjxzH0vmutPse/sKDiZ2kOk.fYZ0zgbIahFoMt66', 'không hoạt động'),
 (10, '1232221', '$2y$10$.QyQpjQWp3shgDbFMxqjn.zbzs7gAHhf/L10kS5jBO36Wuh.bQCa.', 'không hoạt động'),
-(11, 'abc', '$2y$10$/d9jbV7WT4yYuJhyFhv6BONaMEfqkxqHN1RBnKsM600HwwrJ7Z.oO', 'không hoạt động');
+(11, 'abc', '$2y$10$/d9jbV7WT4yYuJhyFhv6BONaMEfqkxqHN1RBnKsM600HwwrJ7Z.oO', 'Hoạt động'),
+(12, 'QKT', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động');
 
 -- --------------------------------------------------------
 
@@ -642,9 +631,7 @@ CREATE TABLE `thietbi` (
 
 INSERT INTO `thietbi` (`maThietBi`, `tenThietBi`, `viTri`, `trangThai`, `maXuong`) VALUES
 (7, 'Máy ép nhiệt', '2', 'Đang hoạt động', 1),
-(8, 'Máy cắt vải', '2', 'Đang hoạt động', 1),
-(9, 'Máy may hãng A', '5', 'Đang hoạt động', 2),
-(10, 'Máy may D', '6', 'Đang hoạt động', 2);
+(8, 'Máy cắt vải', '2', 'Đang hoạt động', 1);
 
 -- --------------------------------------------------------
 
@@ -684,14 +671,55 @@ ALTER TABLE `calamviec`
   ADD PRIMARY KEY (`maCa`);
 
 --
--- Chỉ mục cho bảng `chitiet_lichlamviec`
+-- Chỉ mục cho bảng `chitietkehoachsanxuat`
 --
-ALTER TABLE `chitiet_lichlamviec`
-  ADD PRIMARY KEY (`maLichLam`),
-  ADD UNIQUE KEY `maNguoiDung` (`maND`,`ngayLam`,`maCa`),
-  ADD KEY `idx_nv_ngay` (`maND`,`ngayLam`),
-  ADD KEY `maCa` (`maCa`),
-  ADD KEY `maXuong` (`maXuong`);
+ALTER TABLE `chitietkehoachsanxuat`
+  ADD PRIMARY KEY (`maCTKHSX`),
+  ADD KEY `FK_CTKHSX_KHSX` (`maKHSX`),
+  ADD KEY `FK_CTKHSX_GNTP` (`maGNTP`),
+  ADD KEY `FK_CTKHSX_XUONG` (`maXuong`),
+  ADD KEY `FK_CTKHSX_NVL` (`maNVL`);
+
+--
+-- Chỉ mục cho bảng `chitietphieuxuatnvl`
+--
+ALTER TABLE `chitietphieuxuatnvl`
+  ADD PRIMARY KEY (`maCTPX`),
+  ADD KEY `FK_ChiTietPhieuXuatNVL_NVL` (`maNVL`),
+  ADD KEY `FK_ChiTietPhieuXuatNVL_Xuong` (`maXuong`),
+  ADD KEY `FK_ChiTietPhieuXuatNVL_Phieu` (`maPhieu`);
+
+--
+-- Chỉ mục cho bảng `chitietphieuyeucaukiemtrachatluong`
+--
+ALTER TABLE `chitietphieuyeucaukiemtrachatluong`
+  ADD PRIMARY KEY (`maCTPKT`),
+  ADD KEY `FK_CTPKT_SanPham` (`maSanPham`),
+  ADD KEY `FK_CTPKT_PhieuYCKTCL` (`maYC`);
+
+--
+-- Chỉ mục cho bảng `chitiet_phieuyeucaucapnvl`
+--
+ALTER TABLE `chitiet_phieuyeucaucapnvl`
+  ADD PRIMARY KEY (`maCTPhieuYCCC`),
+  ADD KEY `FK_ChiTiet_Phieu` (`maYCCC`),
+  ADD KEY `FK_ChiTiet_NVL` (`maNVL`);
+
+--
+-- Chỉ mục cho bảng `chitiet_phieuyeucaunhapkhonvl`
+--
+ALTER TABLE `chitiet_phieuyeucaunhapkhonvl`
+  ADD PRIMARY KEY (`maChiTiet_YCNK`),
+  ADD KEY `maYCNK` (`maYCNK`),
+  ADD KEY `maNVL` (`maNVL`);
+
+--
+-- Chỉ mục cho bảng `congviec`
+--
+ALTER TABLE `congviec`
+  ADD PRIMARY KEY (`maCongViec`),
+  ADD KEY `fk_kehoach_congviec` (`maKHSX`),
+  ADD KEY `fk_congviec_xuong` (`maXuong`);
 
 --
 -- Chỉ mục cho bảng `donhangsanxuat`
@@ -701,10 +729,41 @@ ALTER TABLE `donhangsanxuat`
   ADD KEY `FK_DONHANG_SANPHAM` (`maSanPham`);
 
 --
+-- Chỉ mục cho bảng `ghinhanthanhphamtheongay`
+--
+ALTER TABLE `ghinhanthanhphamtheongay`
+  ADD PRIMARY KEY (`maGhiNhan`),
+  ADD KEY `FK_GNTP_NGUOIDUNG` (`maNhanVien`),
+  ADD KEY `FK_GNTP_SANPHAM` (`maSanPham`),
+  ADD KEY `fk_ghinhanthanhphamtheongay_khsx` (`maKHSX`);
+
+--
+-- Chỉ mục cho bảng `kehoachsanxuat`
+--
+ALTER TABLE `kehoachsanxuat`
+  ADD PRIMARY KEY (`maKHSX`),
+  ADD KEY `FK_KHSX_NGUOIDUNG` (`maND`),
+  ADD KEY `FK_KeHoachSanXuat_DonHangSanXuat` (`maDonHang`);
+
+--
 -- Chỉ mục cho bảng `kho`
 --
 ALTER TABLE `kho`
   ADD PRIMARY KEY (`maKho`);
+
+--
+-- Chỉ mục cho bảng `lichsupheduyet`
+--
+ALTER TABLE `lichsupheduyet`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `maKHSX` (`maKHSX`);
+
+--
+-- Chỉ mục cho bảng `nguoidung`
+--
+ALTER TABLE `nguoidung`
+  ADD PRIMARY KEY (`maND`),
+  ADD KEY `FK_NGUOIDUNG_TAIKHOAN` (`maTK`);
 
 --
 -- Chỉ mục cho bảng `nvl`
@@ -712,6 +771,66 @@ ALTER TABLE `kho`
 ALTER TABLE `nvl`
   ADD PRIMARY KEY (`maNVL`),
   ADD KEY `fk_nvl_kho` (`maKho`);
+
+--
+-- Chỉ mục cho bảng `phieunhapnvl`
+--
+ALTER TABLE `phieunhapnvl`
+  ADD PRIMARY KEY (`maPNVL`),
+  ADD UNIQUE KEY `phieuyeucaunhapkhonvl` (`maYCNK`),
+  ADD KEY `fk_phieunhapnvl_nvl` (`maNVL`);
+
+--
+-- Chỉ mục cho bảng `phieuxuatnvl`
+--
+ALTER TABLE `phieuxuatnvl`
+  ADD PRIMARY KEY (`maPhieu`),
+  ADD KEY `FK_PhieuXuatNVL_NguoiDung` (`maND`),
+  ADD KEY `fk_phieuxuat_yccc` (`maYCCC`);
+
+--
+-- Chỉ mục cho bảng `phieuxuatthanhpham`
+--
+ALTER TABLE `phieuxuatthanhpham`
+  ADD PRIMARY KEY (`maPhieuXuat`),
+  ADD KEY `maDonHang` (`maDonHang`),
+  ADD KEY `maSanPham` (`maSanPham`);
+
+--
+-- Chỉ mục cho bảng `phieuyeucaucungcapnvl`
+--
+ALTER TABLE `phieuyeucaucungcapnvl`
+  ADD PRIMARY KEY (`maYCCC`),
+  ADD KEY `FK_PhieuYeuCauCungCapNVL_NguoiDung` (`maND`),
+  ADD KEY `FK_PhieuYeuCauCungCapNVL_KHSX` (`maKHSX`);
+
+--
+-- Chỉ mục cho bảng `phieuyeucaukiemtrachatluong`
+--
+ALTER TABLE `phieuyeucaukiemtrachatluong`
+  ADD PRIMARY KEY (`maYC`),
+  ADD KEY `FK_PhieuYCKTCL_SanPham` (`maSanPham`);
+
+--
+-- Chỉ mục cho bảng `phieuyeucaunhapkhonvl`
+--
+ALTER TABLE `phieuyeucaunhapkhonvl`
+  ADD PRIMARY KEY (`maYCNK`),
+  ADD KEY `FK_YCNK_KHSX` (`maKHSX`);
+
+--
+-- Chỉ mục cho bảng `san_pham`
+--
+ALTER TABLE `san_pham`
+  ADD PRIMARY KEY (`maSanPham`),
+  ADD KEY `fk_sanpham_kho` (`maKho`);
+
+--
+-- Chỉ mục cho bảng `taikhoan`
+--
+ALTER TABLE `taikhoan`
+  ADD PRIMARY KEY (`maTK`),
+  ADD UNIQUE KEY `tenDangNhap` (`tenDangNhap`);
 
 --
 -- Chỉ mục cho bảng `thietbi`
@@ -734,19 +853,61 @@ ALTER TABLE `xuong`
 -- AUTO_INCREMENT cho bảng `baocaoloi`
 --
 ALTER TABLE `baocaoloi`
-  MODIFY `maBaoCao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `maBaoCao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
--- AUTO_INCREMENT cho bảng `chitiet_lichlamviec`
+-- AUTO_INCREMENT cho bảng `chitietkehoachsanxuat`
 --
-ALTER TABLE `chitiet_lichlamviec`
-  MODIFY `maLichLam` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+ALTER TABLE `chitietkehoachsanxuat`
+  MODIFY `maCTKHSX` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT cho bảng `chitietphieuxuatnvl`
+--
+ALTER TABLE `chitietphieuxuatnvl`
+  MODIFY `maCTPX` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT cho bảng `chitietphieuyeucaukiemtrachatluong`
+--
+ALTER TABLE `chitietphieuyeucaukiemtrachatluong`
+  MODIFY `maCTPKT` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `chitiet_phieuyeucaucapnvl`
+--
+ALTER TABLE `chitiet_phieuyeucaucapnvl`
+  MODIFY `maCTPhieuYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+
+--
+-- AUTO_INCREMENT cho bảng `chitiet_phieuyeucaunhapkhonvl`
+--
+ALTER TABLE `chitiet_phieuyeucaunhapkhonvl`
+  MODIFY `maChiTiet_YCNK` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT cho bảng `congviec`
+--
+ALTER TABLE `congviec`
+  MODIFY `maCongViec` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT cho bảng `donhangsanxuat`
 --
 ALTER TABLE `donhangsanxuat`
-  MODIFY `maDonHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `maDonHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT cho bảng `ghinhanthanhphamtheongay`
+--
+ALTER TABLE `ghinhanthanhphamtheongay`
+  MODIFY `maGhiNhan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT cho bảng `kehoachsanxuat`
+--
+ALTER TABLE `kehoachsanxuat`
+  MODIFY `maKHSX` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT cho bảng `kho`
@@ -755,16 +916,70 @@ ALTER TABLE `kho`
   MODIFY `maKho` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT cho bảng `lichsupheduyet`
+--
+ALTER TABLE `lichsupheduyet`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT cho bảng `nguoidung`
+--
+ALTER TABLE `nguoidung`
+  MODIFY `maND` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
 -- AUTO_INCREMENT cho bảng `nvl`
 --
 ALTER TABLE `nvl`
-  MODIFY `maNVL` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `maNVL` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT cho bảng `phieunhapnvl`
+--
+ALTER TABLE `phieunhapnvl`
+  MODIFY `maPNVL` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT cho bảng `phieuxuatnvl`
+--
+ALTER TABLE `phieuxuatnvl`
+  MODIFY `maPhieu` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT cho bảng `phieuxuatthanhpham`
+--
+ALTER TABLE `phieuxuatthanhpham`
+  MODIFY `maPhieuXuat` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT cho bảng `phieuyeucaucungcapnvl`
+--
+ALTER TABLE `phieuyeucaucungcapnvl`
+  MODIFY `maYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT cho bảng `phieuyeucaukiemtrachatluong`
+--
+ALTER TABLE `phieuyeucaukiemtrachatluong`
+  MODIFY `maYC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT cho bảng `san_pham`
+--
+ALTER TABLE `san_pham`
+  MODIFY `maSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT cho bảng `taikhoan`
+--
+ALTER TABLE `taikhoan`
+  MODIFY `maTK` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT cho bảng `thietbi`
 --
 ALTER TABLE `thietbi`
-  MODIFY `maThietBi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `maThietBi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT cho bảng `xuong`
@@ -777,10 +992,110 @@ ALTER TABLE `xuong`
 --
 
 --
+-- Các ràng buộc cho bảng `chitietkehoachsanxuat`
+--
+ALTER TABLE `chitietkehoachsanxuat`
+  ADD CONSTRAINT `FK_CTKHSX_GNTP` FOREIGN KEY (`maGNTP`) REFERENCES `ghinhanthanhphamtheongay` (`maGhiNhan`),
+  ADD CONSTRAINT `FK_CTKHSX_KHSX` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`),
+  ADD CONSTRAINT `FK_CTKHSX_NVL` FOREIGN KEY (`maNVL`) REFERENCES `nvl` (`maNVL`),
+  ADD CONSTRAINT `FK_CTKHSX_XUONG` FOREIGN KEY (`maXuong`) REFERENCES `xuong` (`maXuong`);
+
+--
+-- Các ràng buộc cho bảng `chitietphieuxuatnvl`
+--
+ALTER TABLE `chitietphieuxuatnvl`
+  ADD CONSTRAINT `FK_ChiTietPhieuXuatNVL_Phieu` FOREIGN KEY (`maPhieu`) REFERENCES `phieuxuatnvl` (`maPhieu`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `chitietphieuyeucaukiemtrachatluong`
+--
+ALTER TABLE `chitietphieuyeucaukiemtrachatluong`
+  ADD CONSTRAINT `FK_CTPKT_PhieuYCKTCL` FOREIGN KEY (`maYC`) REFERENCES `phieuyeucaukiemtrachatluong` (`maYC`),
+  ADD CONSTRAINT `FK_CTPKT_SanPham` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
+
+--
+-- Các ràng buộc cho bảng `congviec`
+--
+ALTER TABLE `congviec`
+  ADD CONSTRAINT `fk_congviec_xuong` FOREIGN KEY (`maXuong`) REFERENCES `xuong` (`maXuong`),
+  ADD CONSTRAINT `fk_kehoach_congviec` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`);
+
+--
+-- Các ràng buộc cho bảng `donhangsanxuat`
+--
+ALTER TABLE `donhangsanxuat`
+  ADD CONSTRAINT `FK_DONHANG_SANPHAM` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
+
+--
+-- Các ràng buộc cho bảng `ghinhanthanhphamtheongay`
+--
+ALTER TABLE `ghinhanthanhphamtheongay`
+  ADD CONSTRAINT `FK_GNTP_NGUOIDUNG` FOREIGN KEY (`maNhanVien`) REFERENCES `nguoidung` (`maND`),
+  ADD CONSTRAINT `FK_GNTP_SANPHAM` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`),
+  ADD CONSTRAINT `fk_ghinhanthanhphamtheongay_khsx` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`);
+
+--
+-- Các ràng buộc cho bảng `kehoachsanxuat`
+--
+ALTER TABLE `kehoachsanxuat`
+  ADD CONSTRAINT `FK_KHSX_NGUOIDUNG` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`),
+  ADD CONSTRAINT `FK_KeHoachSanXuat_DonHangSanXuat` FOREIGN KEY (`maDonHang`) REFERENCES `donhangsanxuat` (`maDonHang`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `lichsupheduyet`
+--
+ALTER TABLE `lichsupheduyet`
+  ADD CONSTRAINT `lichsupheduyet_ibfk_1` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`);
+
+--
+-- Các ràng buộc cho bảng `nguoidung`
+--
+ALTER TABLE `nguoidung`
+  ADD CONSTRAINT `FK_NGUOIDUNG_TAIKHOAN` FOREIGN KEY (`maTK`) REFERENCES `taikhoan` (`maTK`);
+
+--
 -- Các ràng buộc cho bảng `nvl`
 --
 ALTER TABLE `nvl`
   ADD CONSTRAINT `fk_nvl_kho` FOREIGN KEY (`maKho`) REFERENCES `kho` (`maKho`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `phieunhapnvl`
+--
+ALTER TABLE `phieunhapnvl`
+  ADD CONSTRAINT `fk_phieunhapnvl_nvl` FOREIGN KEY (`maNVL`) REFERENCES `nvl` (`maNVL`);
+
+--
+-- Các ràng buộc cho bảng `phieuxuatthanhpham`
+--
+ALTER TABLE `phieuxuatthanhpham`
+  ADD CONSTRAINT `phieuxuatthanhpham_ibfk_1` FOREIGN KEY (`maDonHang`) REFERENCES `donhangsanxuat` (`maDonHang`),
+  ADD CONSTRAINT `phieuxuatthanhpham_ibfk_2` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
+
+--
+-- Các ràng buộc cho bảng `phieuyeucaucungcapnvl`
+--
+ALTER TABLE `phieuyeucaucungcapnvl`
+  ADD CONSTRAINT `FK_PhieuYeuCauCungCapNVL_KHSX` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`),
+  ADD CONSTRAINT `FK_PhieuYeuCauCungCapNVL_NguoiDung` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`);
+
+--
+-- Các ràng buộc cho bảng `phieuyeucaukiemtrachatluong`
+--
+ALTER TABLE `phieuyeucaukiemtrachatluong`
+  ADD CONSTRAINT `FK_PhieuYCKTCL_SanPham` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
+
+--
+-- Các ràng buộc cho bảng `phieuyeucaunhapkhonvl`
+--
+ALTER TABLE `phieuyeucaunhapkhonvl`
+  ADD CONSTRAINT `FK_YCNK_KHSX` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`);
+
+--
+-- Các ràng buộc cho bảng `san_pham`
+--
+ALTER TABLE `san_pham`
+  ADD CONSTRAINT `fk_sanpham_kho` FOREIGN KEY (`maKho`) REFERENCES `kho` (`maKho`);
 
 --
 -- Các ràng buộc cho bảng `thietbi`
