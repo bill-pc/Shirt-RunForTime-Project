@@ -87,6 +87,7 @@ public function getAllNhapKho() {
         $sql = "
             SELECT 
                 y.maYCCC,
+                 y.tenPhieu,
                 y.tenNguoiLap,
                 y.ngayLap,
                 y.trangThai,

@@ -14,13 +14,30 @@ class KeHoachSanXuatModel
     }
 
     /* === SỬA HÀM NÀY ĐỂ LỌC KHSX ĐÃ YÊU CẦU NVL === */
-    public function getAllPlans()
+   public function getAllPlans()
     {
-        $sql = "SELECT maKHSX, tenKHSX, thoiGianBatDau, thoiGianKetThuc, trangThai
-                FROM kehoachsanxuat
-                ORDER BY thoiGianBatDau DESC";
+        $sql = "SELECT
+                    kh.maKHSX,
+                    kh.tenKHSX,
+                    kh.thoiGianBatDau,
+                    kh.thoiGianKetThuc,      -- <-- THÊM CỘT NÀY
+                    nd.hoTen AS tenNguoiTao  -- <-- THÊM CỘT NÀY (lấy từ bảng nguoidung)
+                FROM
+                    kehoachsanxuat kh
+                LEFT JOIN                       -- Giữ LEFT JOIN để lọc KHSX chưa có phiếu
+                    phieuyeucaucungcapnvl pyc ON kh.maKHSX = pyc.maKHSX
+                JOIN                            -- Thêm JOIN để lấy tên người tạo
+                    nguoidung nd ON kh.maND = nd.maND
+                WHERE
+                    kh.trangThai = 'Đã duyệt'
+                    AND pyc.maYCCC IS NULL";
+
         $result = $this->conn->query($sql);
-        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        if (!$result) {
+            error_log("Lỗi truy vấn KHSX chưa yêu cầu NVL (chi tiết): " . $this->conn->error);
+            return [];
+        }
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     public function getPlanById($maKHSX)
@@ -42,21 +59,37 @@ class KeHoachSanXuatModel
     // Hàm getMaterialsForPlan đã lấy loaiNVL rồi, cầnthêm  donViTinh
     public function getMaterialsForPlan($maKHSX)
     {
-        $sql = "SELECT 
-                    c.maNVL,
-                    c.tenNVL,
-                    c.soLuongNVL AS soLuongCan,
-                    n.soLuongTonKho,
-                    n.donViTinh
-                FROM chitietkehoachsanxuat c
-                LEFT JOIN nvl n ON c.maNVL = n.maNVL
-                WHERE c.maKHSX = ?";
-
+        $sql = "SELECT
+                    ct.maNVL,
+                    nvl.tenNVL,
+                    nvl.loaiNVL,
+                    nvl.donViTinh, -- <-- THÊM CỘT NÀY TỪ BẢNG NVL
+                    ct.soLuongNVL
+                FROM
+                    chitietkehoachsanxuat ct
+                JOIN
+                    NVL nvl ON ct.maNVL = nvl.maNVL
+                WHERE
+                    ct.maKHSX = ?";
+        // ... (phần còn lại của hàm giữ nguyên) ...
         $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("Lỗi chuẩn bị truy vấn NVL cho KHSX: " . $this->conn->error);
+            return [];
+        }
         $stmt->bind_param("i", $maKHSX);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            error_log("Lỗi thực thi truy vấn NVL cho KHSX: " . $stmt->error);
+            $stmt->close();
+            return [];
+        }
         $result = $stmt->get_result();
-        $data = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        if (!$result) {
+            error_log("Lỗi lấy kết quả NVL cho KHSX: " . $stmt->error);
+            $stmt->close();
+            return [];
+        }
+        $data = $result->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
         return $data;
     }
