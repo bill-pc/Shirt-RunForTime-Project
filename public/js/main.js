@@ -11,14 +11,15 @@ document.addEventListener("DOMContentLoaded", function () {
         xuong: ["Xem công việc", "Theo dõi tiến độ", "Yêu cầu cung cấp NVL", "Yêu cầu kiểm tra chất lượng"],
         qc: ["Cập nhật thành phẩm", "Báo cáo chất lượng"],
         khoTP: ["Nhập kho thành phẩm", "Xuất kho thành phẩm", "Thống kê kho thành phẩm"],
-        congnhan: ["Ca làm việc", "Báo cáo sự cố"]
+        congnhan: ["Lịch làm việc", "Báo cáo sự cố"]
     };
 
     const linkMap = {
         "Xem công việc": "index.php?page=xem-cong-viec",
-        "Theo dõi tiến độ": "index.php?page=theo-doi-tien-do",
+        "Theo dõi tiến độ": "index.php?page=ghi-nhan-tp",
+        "Báo cáo tổng hợp": "index.php?page=bao-cao-tong-hop",
         "Yêu cầu cung cấp NVL": "index.php?page=tao-yeu-cau-nvl",
-        "Ca làm việc": "index.php?page=calamviec",
+        "Lịch làm việc": "index.php?page=lichlamviec",
         "Báo cáo sự cố": "index.php?page=baocaosuco",
         "Xem công việc": "index.php?page=xemcongviec",
         "Thêm nhân viên": "index.php?page=themnhanvien",
@@ -34,11 +35,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "Yêu cầu kiểm tra chất lượng": "index.php?page=tao-yeu-cau-kiem-tra-chat-luong",
         "Phê duyệt kế hoạch sản xuất": "index.php?page=phe-duyet-ke-hoach-sx",
         "Sửa nhân viên": "index.php?page=suanhanvien",
-        "Tạo đơn hàng sản xuất": "index.php?page=tao-don-hang-san-xuat",
-        "Nhập kho thành phẩm": "index.php?page=nhap-kho-tp-da-check-qc",
-        "Xem lịch làm việc": "index.php?page=xem-lich-lam-viec",
-        "Lập kế hoạch sản xuất": "index.php?page=lap-ke-hoach",
-        "Thống kê kho thành phẩm": "index.php?page=thongke",
+        "Lập kế hoạch sản xuất": "index.php?page=lap-khsx"
+        
     };
 
     function populateSidebar(sectionKey) {
