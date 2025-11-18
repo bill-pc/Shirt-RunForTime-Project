@@ -62,55 +62,16 @@ require_once 'layouts/nav.php';
 
                 justify-content: center;
                 align-items: center;
+
             }
 
             .modal-overlay.show {
                 display: flex;
             }
 
-            .modal-content {
-                background-color: #fff;
-                padding: 20px;
-                border-radius: 5px;
-                width: 500px;
-                max-width: 90%;
-                position: relative;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
-            }
 
-            .close-btn {
-                position: absolute;
-                top: 10px;
-                right: 15px;
-                font-size: 24px;
-                font-weight: bold;
-                border: none;
-                background: none;
-                cursor: pointer;
-            }
 
-            .modal-overlay {
-                display: none;
-                /* Ẩn ban đầu */
-                position: fixed;
-                /* Che phủ toàn màn hình */
-                z-index: 1000;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.6);
-                /* Lớp mờ đậm hơn */
-
-                /* Căn giữa nội dung */
-                justify-content: center;
-                align-items: center;
-            }
-
-            .modal-overlay.show {
-                display: flex;
-                /* Hiện modal */
-            }
+            /* --- CSS CHO MODAL POP-UP CHÍNH --- */
 
             .modal-content {
                 background-color: #fff;
@@ -121,11 +82,9 @@ require_once 'layouts/nav.php';
                 position: relative;
                 box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
                 max-height: 90vh;
-                /* Giới hạn chiều cao */
                 overflow-y: auto;
-                /* Thêm thanh cuộn nếu form quá dài */
-
             }
+
 
             /* Nút 'X' để đóng */
             .close-btn {
@@ -145,7 +104,6 @@ require_once 'layouts/nav.php';
                 color: #000;
             }
 
-            /* Định dạng chung cho các nhóm form */
             .modal-content .form-group {
                 margin-bottom: 15px;
             }
@@ -157,14 +115,36 @@ require_once 'layouts/nav.php';
                 color: #333;
             }
 
-            /* Dữ liệu chỉ đọc (tên đơn hàng, v.v.) */
             .modal-content .form-group b {
                 font-size: 1.1em;
                 color: #0056b3;
-                /* Màu xanh cho nổi bật */
             }
 
-            /* Các ô input và select */
+            .modal-content .form-group.inline-group {
+                display: flex;
+                align-items: baseline;
+                /* Căn chỉnh theo dòng chữ */
+                margin-bottom: 12px;
+                /* Giảm khoảng cách giữa các dòng */
+            }
+
+            .modal-content .form-group.inline-group label {
+                display: inline;
+                /* Sửa từ 'block' thành 'inline' */
+                margin-bottom: 0;
+                /* Xóa khoảng cách dưới */
+                margin-right: 8px;
+                /* Thêm khoảng cách bên phải */
+                font-weight: 600;
+                color: #333;
+            }
+
+            .modal-content .form-group.inline-group b {
+                font-size: 1.1em;
+                color: #0056b3;
+                /* Màu xanh */
+            }
+
             .modal-content input[type="date"],
             .modal-content input[type="number"],
             .modal-content select {
@@ -173,7 +153,6 @@ require_once 'layouts/nav.php';
                 border: 1px solid #ccc;
                 border-radius: 4px;
                 box-sizing: border-box;
-                /* Quan trọng để padding không làm vỡ layout */
                 font-size: 1em;
             }
 
@@ -241,15 +220,66 @@ require_once 'layouts/nav.php';
             .btn-danger:hover {
                 background-color: #c82333;
             }
+
+            .filter-group {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 10px;
+                align-items: center;
+                background: #f8f9fa;
+                padding: 10px;
+                border-radius: 6px;
+            }
+
+            .filter-group label {
+                font-weight: 600;
+                margin-bottom: 0;
+            }
+
+            .filter-group input,
+            .filter-group select {
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            /* CSS cho bảng KHSX mới */
+            .khsx-list-container {
+                margin-top: 30px;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+            }
+
+            .khsx-list-container h3 {
+                text-align: center;
+                color: #085da7;
+                margin-bottom: 15px;
+            }
         </style>
         <div class="kehoach-form-container">
             <h2><?php echo $pageTitle ?? 'Lập kế hoạch sản xuất'; ?></h2>
             <hr>
+
             <div class="form-group">
                 <label for="search-box">Tìm kiếm Đơn hàng (theo Tên hoặc Mã):</label>
                 <input type="text" id="search-box" placeholder="Nhập mã hoặc tên đơn hàng...">
             </div>
 
+            <div class="filter-group">
+                <label for="filter-ngayGiao">Ngày giao:</label>
+                <input type="date" id="filter-ngayGiao">
+
+                <label for="filter-trangThai">Trạng thái:</label>
+                <select id="filter-trangThai">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="Chờ duyệt">Chờ duyệt</option>
+                    <option value="Đang thực hiện">Đang thực hiện</option>
+                    <option value="Đã xuất kho">Đã xuất kho</option>
+                </select>
+
+                <button id="btn-clear-filters" class="btn-secondary">Xóa lọc</button>
+            </div>
             <table class="table-results">
                 <thead>
                     <tr>
@@ -261,9 +291,40 @@ require_once 'layouts/nav.php';
                     </tr>
                 </thead>
                 <tbody id="results-table-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="khsx-list-container">
+            <h3>Danh sách Kế hoạch sản xuất đã lập</h3>
+            <table class="table-results">
+                <thead>
                     <tr>
-                        <td colspan="4" style="text-align: center;">Đang tải danh sách...</td>
+                        <th>Tên Kế hoạch</th>
+                        <th>Mã Đơn hàng</th>
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
+                        <th>Trạng thái</th>
+                        <th>Người lập</th>
                     </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($danhSachKHSX)): ?>
+                        <?php foreach ($danhSachKHSX as $khsx): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($khsx['tenKHSX']) ?></td>
+                                <td><?= htmlspecialchars($khsx['maDonHang']) ?></td>
+                                <td><?= htmlspecialchars($khsx['thoiGianBatDau']) ?></td>
+                                <td><?= htmlspecialchars($khsx['thoiGianKetThuc']) ?></td>
+                                <td><?= htmlspecialchars($khsx['trangThai']) ?></td>
+                                <td><?= htmlspecialchars($khsx['tenNguoiLap']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Chưa có kế hoạch sản xuất nào được lập.</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -279,11 +340,11 @@ require_once 'layouts/nav.php';
         <form action="index.php?page=luu-ke-hoach" method="POST">
             <input type="hidden" id="modal-maDonHang" name="maDonHang">
 
-            <div class="form-group"><label>Mã Đơn Hàng:</label> <b id="modal-maDonHang-display"></b></div>
-            <div class="form-group"><label>Tên Đơn Hàng:</label> <b id="modal-tenDonHang"></b></div>
-            <div class="form-group"><label>Sản phẩm (Gốc):</label> <b id="modal-tenSanPham"></b></div>
-            <div class="form-group"><label>Đơn vị:</label> <b id="modal-donVi"></b></div>
-            <div class="form-group"><label>Ngày Giao:</label> <b id="modal-ngayGiao" style="color: red;"></b></div>
+            <div class="form-group inline-group"><label>Mã Đơn Hàng:</label> <b id="modal-maDonHang-display"></b></div>
+            <div class="form-group inline-group"><label>Tên Đơn Hàng:</label> <b id="modal-tenDonHang"></b></div>
+            <div class="form-group inline-group"><label>Sản phẩm (Gốc):</label> <b id="modal-tenSanPham"></b></div>
+            <div class="form-group inline-group"><label>Đơn vị:</label> <b id="modal-donVi"></b></div>
+            <div class="form-group inline-group"><label>Ngày Giao:</label> <b id="modal-ngayGiao" style="color: red;"></b></div>
 
             <div class="form-group">
                 <label>Sản lượng TB/ngày (tham khảo):</label>
@@ -314,8 +375,7 @@ require_once 'layouts/nav.php';
                     </div>
                     <div class="nvl-list-container">
                         <label>Nguyên vật liệu:</label>
-                        <div id="xuong-cat-nvl-list"></div> <button type="button" class="btn-add-nvl"
-                            data-target="xuong-cat-nvl-list">
+                        <div id="xuong-cat-nvl-list"></div> <button type="button" class="btn-add-nvl" data-target="xuong-cat-nvl-list">
                             + Thêm NVL
                         </button>
                     </div>
@@ -335,8 +395,7 @@ require_once 'layouts/nav.php';
                     </div>
                     <div class="nvl-list-container">
                         <label>Nguyên vật liệu:</label>
-                        <div id="xuong-may-nvl-list"></div> <button type="button" class="btn-add-nvl"
-                            data-target="xuong-may-nvl-list">
+                        <div id="xuong-may-nvl-list"></div> <button type="button" class="btn-add-nvl" data-target="xuong-may-nvl-list">
                             + Thêm NVL
                         </button>
                     </div>
@@ -360,6 +419,14 @@ require_once 'layouts/nav.php';
     </div>
 </div>
 
+<div id="success-modal" class="modal-overlay success-overlay">
+    <div class="modal-content success-box-content">
+        <h3>Lập kế hoạch thành công</h3>
+        <div class="success-buttons">
+            <button id="success-yes" class="btn btn-secondary">Đồng ý</button>
+        </div>
+    </div>
+</div>
 <?php
 require_once 'layouts/footer.php';
 ?>
