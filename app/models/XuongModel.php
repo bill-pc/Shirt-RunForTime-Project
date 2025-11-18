@@ -1,12 +1,9 @@
 <?php
 class XuongModel {
     private $conn;
-    public function __construct()
-    {
-
-        $database = new KetNoi();
-        $this->conn = $database->connect();
-        
+    public function __construct() {
+        // Giả sử tệp ketNoi.php định nghĩa class Database với hàm connect()
+        $this->conn = (new KetNoi())->connect();
     }
 
     public function getAllXuong() {
