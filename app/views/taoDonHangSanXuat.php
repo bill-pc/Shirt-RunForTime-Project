@@ -29,46 +29,31 @@ require_once 'app/views/layouts/nav.php';
                     <h3 style="color: #085da7; margin-bottom: 20px; font-size: 1.2em;">Thông Tin Đơn Hàng</h3>
 
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label for="maDonHang" class="required" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
-                            Mã Đơn Hàng 
+                        <label for="tenSanPham" class="required" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                            Sản Phẩm 
                         </label>
                         <input 
                             type="text" 
-                            id="maDonHang" 
-                            name="maDonHang" 
+                            id="tenSanPham" 
+                            name="tenSanPham" 
                             class="form-control" 
-                            placeholder="PX2025-01" 
+                            list="danhSachSanPham"
+                            placeholder="Nhập tên sản phẩm"
                             required
+                            autocomplete="off"
                             style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; transition: border-color 0.3s;"
                             onfocus="this.style.borderColor='#085da7'"
                             onblur="this.style.borderColor='#ddd'"
                         >
-
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label for="sanPham" class="required" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
-                            Sản Phẩm 
-                        </label>
-                        <select 
-                            id="sanPham" 
-                            name="sanPham" 
-                            class="form-control" 
-                            required
-                            style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; background-color: #fff; cursor: pointer; transition: border-color 0.3s;"
-                            onfocus="this.style.borderColor='#085da7'"
-                            onblur="this.style.borderColor='#ddd'"
-                        >
-                            <option value="">-- Chọn sản phẩm --</option>
+                        <datalist id="danhSachSanPham">
                             <?php if (!empty($danhSachSanPham)): ?>
                                 <?php foreach ($danhSachSanPham as $sp): ?>
-                                    <option value="<?= htmlspecialchars($sp['maSanPham']) ?>">
-                                        <?= htmlspecialchars($sp['tenSanPham']) ?> 
-                                        (<?= htmlspecialchars($sp['donVi'] ?? 'Cái') ?>)
-                                    </option>
+                                    <option value="<?= htmlspecialchars($sp['tenSanPham']) ?>"></option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-                        </select>
+                        </datalist>
+                        <input type="hidden" id="sanPhamId" name="sanPhamId">
+                        <small style="color: #6c757d; display: block; margin-top: 6px;">Bạn có thể nhập tên sản phẩm mới nếu chưa có trong hệ thống.</small>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
@@ -98,6 +83,24 @@ require_once 'app/views/layouts/nav.php';
                             id="ngayGiao" 
                             name="ngayGiao" 
                             class="form-control" 
+                            required
+                            min="<?= date('Y-m-d', strtotime('+1 day')) ?>"
+                            style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; transition: border-color 0.3s;"
+                            onfocus="this.style.borderColor='#085da7'"
+                            onblur="this.style.borderColor='#ddd'"
+                        >
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="diaChiNhan" class="required" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                            Địa Chỉ Nhận 
+                        </label>
+                        <input 
+                            type="text" 
+                            id="diaChiNhan" 
+                            name="diaChiNhan" 
+                            class="form-control" 
+                            placeholder="Nhập địa chỉ nhận hàng" 
                             required
                             style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; transition: border-color 0.3s;"
                             onfocus="this.style.borderColor='#085da7'"
@@ -153,37 +156,66 @@ require_once 'app/views/layouts/nav.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Đặt ngày hiện tại làm giá trị mặc định cho ngày giao
+    // ✅ SỬA: Đặt ngày mai làm giá trị mặc định cho ngày giao
     const ngayGiaoInput = document.getElementById('ngayGiao');
     if (ngayGiaoInput && !ngayGiaoInput.value) {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1); // Ngày mai
+        const year = tomorrow.getFullYear();
+        const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const day = String(tomorrow.getDate()).padStart(2, '0');
         ngayGiaoInput.value = `${year}-${month}-${day}`;
+    }
+
+    // Map dữ liệu sản phẩm để tự động nhận diện khi người dùng nhập
+    const danhSachSanPham = <?php echo json_encode($danhSachSanPham ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+    const tenSanPhamInput = document.getElementById('tenSanPham');
+    const sanPhamIdInput = document.getElementById('sanPhamId');
+
+    const dongBoSanPhamId = () => {
+        if (!tenSanPhamInput || !sanPhamIdInput) return;
+        const value = tenSanPhamInput.value.trim().toLowerCase();
+        const match = danhSachSanPham.find(sp => (sp.tenSanPham || '').toLowerCase() === value);
+        sanPhamIdInput.value = match ? match.maSanPham : '';
+    };
+
+    if (tenSanPhamInput) {
+        tenSanPhamInput.addEventListener('input', dongBoSanPhamId);
     }
 
     // Validate form trước khi submit
     const form = document.getElementById('formTaoDonHang');
     if (form) {
         form.addEventListener('submit', function(e) {
-            const maDonHang = document.getElementById('maDonHang').value.trim();
-            const sanPham = document.getElementById('sanPham').value;
+            const tenSanPham = tenSanPhamInput ? tenSanPhamInput.value.trim() : '';
             const soLuong = document.getElementById('soLuong').value;
             const ngayGiao = document.getElementById('ngayGiao').value;
+            const diaChiNhan = document.getElementById('diaChiNhan').value.trim();
 
-            if (!maDonHang || !sanPham || !soLuong || !ngayGiao) {
+            if (!tenSanPham || !soLuong || !ngayGiao || !diaChiNhan) {
                 e.preventDefault();
                 alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
                 return false;
             }
 
-            if (parseInt(soLuong) <= 0) {
+            if (parseInt(soLuong, 10) <= 0) {
                 e.preventDefault();
                 alert('Số lượng phải lớn hơn 0!');
                 return false;
             }
 
+            // ✅ THÊM: Kiểm tra ngày giao phải lớn hơn ngày hiện tại
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            const selectedDate = new Date(ngayGiao + 'T00:00:00'); // So sánh đầu ngày
+            if (selectedDate <= today) {
+                e.preventDefault();
+                alert('Ngày giao phải lớn hơn ngày hiện tại!');
+                return false;
+            }
+
+            dongBoSanPhamId();
             return true;
         });
     }

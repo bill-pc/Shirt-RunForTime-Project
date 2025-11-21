@@ -354,6 +354,23 @@ switch ($page) {
         header('Location: index.php?page=bao-cao-tong-hop');
         exit;
 
+    case 'tao-don-hang-san-xuat':
+        require_once 'app/controllers/TaoDonHangSanXuatController.php';
+        $controller = new TaoDonHangSanXuatController();
+        $controller->index();
+        break;
+
+    case 'luu-don-hang-san-xuat':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once 'app/controllers/TaoDonHangSanXuatController.php';
+            $controller = new TaoDonHangSanXuatController();
+            $controller->luu();
+        } else {
+            header('Location: index.php?page=tao-don-hang-san-xuat');
+            exit;
+        }
+        break;
+
     default:
         echo "404 - Trang không tồn tại!";
         break;

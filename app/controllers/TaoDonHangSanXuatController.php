@@ -29,14 +29,15 @@ class TaoDonHangSanXuatController {
         }
 
         // Validate dữ liệu
-        $maDonHang = isset($_POST['maDonHang']) ? trim($_POST['maDonHang']) : '';
-        $sanPham = isset($_POST['sanPham']) ? (int)$_POST['sanPham'] : 0;
+        $tenSanPham = isset($_POST['tenSanPham']) ? trim($_POST['tenSanPham']) : '';
+        $sanPhamId = isset($_POST['sanPhamId']) ? (int)$_POST['sanPhamId'] : 0;
         $soLuong = isset($_POST['soLuong']) ? (int)$_POST['soLuong'] : 0;
         $ngayGiao = isset($_POST['ngayGiao']) ? trim($_POST['ngayGiao']) : '';
+        $diaChiNhan = isset($_POST['diaChiNhan']) ? trim($_POST['diaChiNhan']) : '';
         $ghiChu = isset($_POST['ghiChu']) ? trim($_POST['ghiChu']) : '';
 
         // Kiểm tra dữ liệu bắt buộc
-        if (empty($maDonHang) || $sanPham <= 0 || $soLuong <= 0 || empty($ngayGiao)) {
+        if (empty($tenSanPham) || $soLuong <= 0 || empty($ngayGiao) || empty($diaChiNhan)) {
             header('Location: index.php?page=tao-don-hang-san-xuat&error=1&msg=' . urlencode('Vui lòng điền đầy đủ thông tin bắt buộc'));
             exit;
         }
@@ -48,12 +49,20 @@ class TaoDonHangSanXuatController {
             exit;
         }
 
+        // ✅ THÊM: Kiểm tra ngày giao phải lớn hơn ngày hiện tại
+        $todayTimestamp = time(); // Ngày hiện tại (bao gồm giờ)
+        if ($ngayGiaoTimestamp <= $todayTimestamp) {
+            header('Location: index.php?page=tao-don-hang-san-xuat&error=1&msg=' . urlencode('Ngày giao phải lớn hơn ngày hiện tại'));
+            exit;
+        }
+
         // Chuẩn bị dữ liệu
         $data = [
-            'maDonHang' => $maDonHang,
-            'sanPham' => $sanPham,
+            'tenSanPham' => $tenSanPham,
+            'sanPhamId' => $sanPhamId,
             'soLuong' => $soLuong,
             'ngayGiao' => date('Y-m-d', $ngayGiaoTimestamp),
+            'diaChiNhan' => $diaChiNhan,
             'ghiChu' => $ghiChu
         ];
 
@@ -72,4 +81,3 @@ class TaoDonHangSanXuatController {
     }
 }
 ?>
-

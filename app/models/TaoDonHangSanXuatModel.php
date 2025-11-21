@@ -28,43 +28,55 @@ class TaoDonHangSanXuatModel {
 
     /**
      * Lưu đơn hàng sản xuất mới
-     * @param array $data Dữ liệu từ form
+     * @param array $data Dữ liệu từ form (đã validate ở controller)
      * @return bool|int Trả về maDonHang nếu thành công, false nếu thất bại
      */
     public function luuDonHang($data) {
-        // Validate dữ liệu
-        $maDonHang = isset($data['maDonHang']) ? trim($data['maDonHang']) : '';
-        $maSanPham = isset($data['sanPham']) ? (int)$data['sanPham'] : 0;
-        $soLuong = isset($data['soLuong']) ? (int)$data['soLuong'] : 0;
-        $ngayGiao = isset($data['ngayGiao']) ? $data['ngayGiao'] : '';
-        $ghiChu = isset($data['ghiChu']) ? trim($data['ghiChu']) : '';
+        // ✅ BỎ validate lặp (controller đã làm): chỉ dùng dữ liệu đầu vào đã sạch
 
-        // Kiểm tra dữ liệu bắt buộc
-        if (empty($maDonHang) || $maSanPham <= 0 || $soLuong <= 0 || empty($ngayGiao)) {
-            error_log("Dữ liệu không hợp lệ khi lưu đơn hàng");
-            return false;
+        $tenSanPhamInput = trim($data['tenSanPham'] ?? '');
+        $maSanPhamInput = (int)($data['sanPhamId'] ?? 0);
+        $soLuong = (int)($data['soLuong'] ?? 0);
+        $ngayGiao = $data['ngayGiao'] ?? '';
+        $diaChiNhan = trim($data['diaChiNhan'] ?? '');
+        $ghiChu = trim($data['ghiChu'] ?? '');
+
+        // Lấy thông tin sản phẩm: ưu tiên theo ID, sau đó theo tên, cuối cùng tự thêm mới
+        $sanPham = null;
+        if ($maSanPhamInput > 0) {
+            $sanPham = $this->getSanPhamById($maSanPhamInput);
         }
 
-        // Lấy thông tin sản phẩm để lấy đơn vị
-        $sanPham = $this->getSanPhamById($maSanPham);
         if (!$sanPham) {
-            error_log("Không tìm thấy sản phẩm với mã: " . $maSanPham);
-            return false;
+            $sanPham = $this->getSanPhamByTen($tenSanPhamInput);
         }
 
-        // Tạo tên đơn hàng từ mã đơn hàng và số lượng
-        $tenDonHang = $maDonHang . ' - SL: ' . $soLuong;
-        
-        // Địa chỉ nhận mặc định (vì form không có, có thể thay đổi sau)
-        $diaChiNhan = 'Nội bộ';
-        
-        // Trạng thái mặc định
-        $trangThai = 'Chờ duyệt';
+        if (!$sanPham) {
+            $maSanPhamInput = $this->taoSanPhamMoi($tenSanPhamInput);
+            if (!$maSanPhamInput) {
+                error_log("Không thể tạo sản phẩm mới: " . $tenSanPhamInput);
+                return false;
+            }
+            $sanPham = [
+                'maSanPham' => $maSanPhamInput,
+                'tenSanPham' => $tenSanPhamInput,
+                'donVi' => 'Cái'
+            ];
+        }
 
-        // Chuẩn bị câu lệnh SQL
+        $maSanPham = (int)$sanPham['maSanPham'];
+        $tenSanPham = $sanPham['tenSanPham'] ?? $tenSanPhamInput;
+
+        // Trạng thái mặc định
+        $trangThai = 'Đang thực hiện';
+
+        // Tạo tên đơn hàng tạm thời (sẽ được cập nhật sau khi có mã đơn hàng)
+        $tenDonHangTam = 'DHSX_TEMP';
+
+        // Chuẩn bị câu lệnh SQL - thêm tenSanPham và soLuongSanXuat
         $sql = "INSERT INTO donhangsanxuat 
-                (tenDonHang, donVi, diaChiNhan, trangThai, ngayGiao, maSanPham) 
-                VALUES (?, ?, ?, ?, ?, ?)";
+                (tenDonHang, tenSanPham, soLuongSanXuat, donVi, diaChiNhan, trangThai, ngayGiao, maSanPham) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = $this->conn->prepare($sql);
         
@@ -75,8 +87,10 @@ class TaoDonHangSanXuatModel {
 
         $donVi = $sanPham['donVi'] ?? 'Cái';
         
-        $stmt->bind_param("sssssi", 
-            $tenDonHang, 
+        $stmt->bind_param("ssissssi", 
+            $tenDonHangTam, 
+            $tenSanPham,
+            $soLuong,
             $donVi, 
             $diaChiNhan, 
             $trangThai, 
@@ -93,15 +107,25 @@ class TaoDonHangSanXuatModel {
         $maDonHangMoi = $this->conn->insert_id;
         $stmt->close();
 
+        // Tạo tên đơn hàng tự động dựa trên mã đơn hàng tự động tăng
+        $tenDonHang = 'DHSX' . $maDonHangMoi;
+        
+        // Cập nhật tên đơn hàng
+        $sqlUpdate = "UPDATE donhangsanxuat SET tenDonHang = ? WHERE maDonHang = ?";
+        $stmtUpdate = $this->conn->prepare($sqlUpdate);
+        if ($stmtUpdate) {
+            $stmtUpdate->bind_param("si", $tenDonHang, $maDonHangMoi);
+            $stmtUpdate->execute();
+            $stmtUpdate->close();
+        }
+
         // Nếu có ghi chú, có thể lưu vào bảng khác hoặc thêm cột ghiChu vào bảng
         // Tạm thời bỏ qua vì bảng không có cột ghiChu
 
         return $maDonHangMoi;
     }
 
-    /**
-     * Lấy thông tin sản phẩm theo ID
-     */
+    // Các method private giữ nguyên...
     private function getSanPhamById($maSanPham) {
         $sql = "SELECT maSanPham, tenSanPham, donVi 
                 FROM san_pham 
@@ -127,9 +151,52 @@ class TaoDonHangSanXuatModel {
         return $sanPham;
     }
 
-    /**
-     * Kiểm tra mã đơn hàng đã tồn tại chưa
-     */
+    private function getSanPhamByTen($tenSanPham) {
+        $sql = "SELECT maSanPham, tenSanPham, donVi 
+                FROM san_pham 
+                WHERE LOWER(tenSanPham) = LOWER(?) 
+                LIMIT 1";
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param("s", $tenSanPham);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            return null;
+        }
+
+        $result = $stmt->get_result();
+        $sanPham = $result->fetch_assoc();
+        $stmt->close();
+
+        return $sanPham;
+    }
+
+    private function taoSanPhamMoi($tenSanPham) {
+        $sql = "INSERT INTO san_pham (tenSanPham, donVi, soLuongTon) VALUES (?, 'Cái', 0)";
+        $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            error_log("Không thể chuẩn bị câu lệnh tạo sản phẩm mới: " . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param("s", $tenSanPham);
+        if (!$stmt->execute()) {
+            error_log("Không thể tạo sản phẩm mới: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+
+        $maSanPhamMoi = $this->conn->insert_id;
+        $stmt->close();
+
+        return $maSanPhamMoi;
+    }
+
     public function kiemTraMaDonHangTonTai($maDonHang) {
         $sql = "SELECT COUNT(*) as count 
                 FROM donhangsanxuat 
@@ -152,4 +219,3 @@ class TaoDonHangSanXuatModel {
     }
 }
 ?>
-

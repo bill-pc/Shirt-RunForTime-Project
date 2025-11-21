@@ -36,8 +36,13 @@ document.addEventListener("DOMContentLoaded", function () {
         "Phê duyệt kế hoạch sản xuất": "index.php?page=phe-duyet-ke-hoach-sx",
         "Sửa nhân viên": "index.php?page=suanhanvien",
         "Lập kế hoạch sản xuất": "index.php?page=lap-khsx",
+<<<<<<< HEAD
         "Thống kê kho thành phẩm": "index.php?page=thongke",
         "Báo cáo chất lượng": "index.php?page=baocao-chatluong"
+=======
+        "Tạo đơn hàng sản xuất": "index.php?page=tao-don-hang-san-xuat"
+        
+>>>>>>> 7d28bf5 (create order)
     };
 
     function populateSidebar(sectionKey) {
