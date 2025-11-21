@@ -14,6 +14,10 @@ table { width: 100%; border-collapse: collapse; background: #fff; }
 th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
 th { background: #eef4ff; font-weight: 600; }
 .no-data { text-align: center; color: #666; margin-top: 15px; }
+.export-box {
+    margin-top: 15px;
+    text-align: right; /* ĐẨY NÚT SANG PHẢI */
+}
 </style>
 
 <div class="main-layout-wrapper">
@@ -21,20 +25,9 @@ th { background: #eef4ff; font-weight: 600; }
     <main class="main-content">
         <div class="title">Thống kê kho thành phẩm</div>
 
-        <!-- Bộ lọc -->
-        <form method="GET" class="filter-box">
-            <input type="hidden" name="page" value="thongke_sanpham">
-            <label>Từ ngày:</label>
-            <input type="date" name="from" value="<?= htmlspecialchars($_GET['from'] ?? '') ?>">
-            <label>Đến ngày:</label>
-            <input type="date" name="to" value="<?= htmlspecialchars($_GET['to'] ?? '') ?>">
-            <button class="btn btn-blue" type="submit">Lọc</button>
-
-            <a class="btn btn-green"
-               href="index.php?page=export_thongke&from=<?= urlencode($_GET['from'] ?? '') ?>&to=<?= urlencode($_GET['to'] ?? '') ?>">
-               Xuất báo cáo
-            </a>
-        </form>
+        
+            
+       
 
         <!-- Bảng -->
         <div class="table-box">
@@ -50,7 +43,7 @@ th { background: #eef4ff; font-weight: 600; }
                             <th>Đơn vị</th>
                             <th>Số lượng tồn</th>
                             <th>Số lượng xuất</th>
-                            <th>Ngày xuất</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -62,15 +55,24 @@ th { background: #eef4ff; font-weight: 600; }
                                 <td><?= htmlspecialchars($row['donVi'] ?? '') ?></td>
                                 <td><?= htmlspecialchars($row['soLuongTon'] ?? '') ?></td>
                                 <td><?= htmlspecialchars($row['soLuongXuat'] ?? '0') ?></td>
-                                <td><?= htmlspecialchars($row['ngayXuatHienThi'] ?? '') ?></td>
+                                
 
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                
             <?php endif; ?>
         </div>
+        <div class="export-box">
+    <a class="btn btn-green"
+       href="index.php?page=export_thongke&from=<?= urlencode($_GET['from'] ?? '') ?>&to=<?= urlencode($_GET['to'] ?? '') ?>">
+       Xuất báo cáo
+    </a>
+</div>
+
     </main>
+    
 </div>
 
 <?php require 'app/views/layouts/footer.php'; ?>

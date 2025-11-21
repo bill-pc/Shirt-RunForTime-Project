@@ -35,8 +35,9 @@ document.addEventListener("DOMContentLoaded", function () {
         "Yêu cầu kiểm tra chất lượng": "index.php?page=tao-yeu-cau-kiem-tra-chat-luong",
         "Phê duyệt kế hoạch sản xuất": "index.php?page=phe-duyet-ke-hoach-sx",
         "Sửa nhân viên": "index.php?page=suanhanvien",
-        "Lập kế hoạch sản xuất": "index.php?page=lap-khsx"
-        
+        "Lập kế hoạch sản xuất": "index.php?page=lap-khsx",
+        "Thống kê kho thành phẩm": "index.php?page=thongke",
+        "Báo cáo chất lượng": "index.php?page=baocao-chatluong"
     };
 
     function populateSidebar(sectionKey) {
