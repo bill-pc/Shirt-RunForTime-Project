@@ -19,7 +19,7 @@ class XuatThanhPhamModel {
                     dh.soLuongSanXuat
                 FROM donhangsanxuat dh
                 JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
-                WHERE dh.trangThai != 'Đã xuất kho'";
+                WHERE dh.trangThai = 'Đang thực hiện'";
 
         $result = $this->conn->query($sql);
         $data = [];
