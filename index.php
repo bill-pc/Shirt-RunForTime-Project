@@ -362,7 +362,7 @@ switch ($page) {
 
     case 'luu-don-hang-san-xuat':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once 'app/controllers/TaoDonHangSanXuatController.php';
+            require_once 'app/controllers/TaoDonHangSanXuatController.php'; 
             $controller = new TaoDonHangSanXuatController();
             $controller->luu();
         } else {
