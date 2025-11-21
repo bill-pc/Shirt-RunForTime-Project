@@ -6,8 +6,26 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Import AuthMiddleware để kiểm tra quyền
+require_once 'app/middleware/AuthMiddleware.php';
+
 // Lấy tham số ?page= từ URL
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+$allowed_ajax = [
+    'ajax-get-plan-detail',
+    'ajax-get-approval-history',
+    'phe-duyet-ke-hoach-sx-process',
+    'ajax-tim-kiem',
+    'ajax-get-modal-data',
+    'ajax-get-report-details',
+    'ajax-get-details-nhapkho',
+    'luu-phieu-nhap-nvl'
+];
+
+// Tắt display_errors cho AJAX requests để không làm hỏng JSON
+if (in_array($page, $allowed_ajax)) {
+    ini_set('display_errors', 0);
+}
 
 // ---------------------------
 // Login / Logout
@@ -38,11 +56,39 @@ if ($page === 'login' || $page === 'login-process' || $page === 'logout') {
 }
 
 // ---------------------------
-// Kiểm tra session trước các trang khác
+// Kiểm tra đăng nhập và phân quyền
 // ---------------------------
 if (!isset($_SESSION['user']) && $page !== 'home') {
     header("Location: index.php?page=login");
     exit;
+}
+
+// Kiểm tra quyền truy cập (trừ trang home và login)
+if ($page !== 'home' && $page !== 'login') {
+    if (!AuthMiddleware::checkPermission($page)) {
+        // Người dùng không có quyền truy cập
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <title>Không có quyền</title>
+            <style>
+                body { font-family: Arial; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f5f5f5; }
+                .error-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
+                .error-box h1 { color: #dc3545; margin-bottom: 20px; }
+                .error-box p { color: #666; margin-bottom: 30px; }
+                .error-box a { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            <div class='error-box'>
+                <h1>⛔ Không có quyền truy cập</h1>
+                <p>Vai trò <strong>" . htmlspecialchars($_SESSION['user']['vaiTro'] ?? 'Không xác định') . "</strong> không được phép truy cập trang này.</p>
+                <a href='index.php?page=home'>← Về trang chủ</a>
+            </div>
+        </body>
+        </html>";
+        exit;
+    }
 }
 
 // ---------------------------
@@ -55,10 +101,12 @@ switch ($page) {
         $controller->index();
         break;
 
-
-
     case 'lichlamviec':
-        include './app/views/lichlamviec.php';
+    case 'calamviec':
+    case 'xem-lich-lam-viec':
+        require_once 'app/controllers/XemCaLamViecController.php';
+        $controller = new XemLichLamViecController();
+        $controller->index();
         break;
 
     case 'tao-yeu-cau-nvl':
@@ -244,6 +292,17 @@ switch ($page) {
         $controller = new NhapKhoNVLController();
         $controller->index();
         break;
+
+    case 'ajax-get-details-nhapkho':
+        require_once './app/controllers/NhapKhoNVLController.php';
+        (new NhapKhoNVLController())->ajaxGetDetails();
+        break;
+
+    case 'luu-phieu-nhap-nvl':
+        require_once './app/controllers/NhapKhoNVLController.php';
+        (new NhapKhoNVLController())->luuPhieu();
+        break;
+
     case 'tao-yeu-cau-kiem-tra-chat-luong':
         require_once './app/controllers/YeuCauKiemTraChatLuongController.php';
         $controller = new YeuCauKiemTraChatLuongController();
@@ -258,15 +317,24 @@ switch ($page) {
 
     case 'phe-duyet-ke-hoach-sx':
         require_once './app/controllers/PheDuyetKeHoachSXController.php';
-        $controller = new PheDuyetKeHoachSXController();
-        $controller->index();
+        (new PheDuyetKeHoachSXController())->index();
         break;
 
     case 'phe-duyet-ke-hoach-sx-process':
         require_once './app/controllers/PheDuyetKeHoachSXController.php';
-        $controller = new PheDuyetKeHoachSXController();
-        $controller->duyetKeHoach();
+        (new PheDuyetKeHoachSXController())->duyetKeHoach();
         break;
+    case 'ajax-get-plan-detail':
+        require_once './app/controllers/PheDuyetKeHoachSXController.php';
+        (new PheDuyetKeHoachSXController())->ajaxGetPlanDetail();
+        break;
+
+    case 'ajax-get-approval-history':
+        require_once './app/controllers/PheDuyetKeHoachSXController.php';
+        (new PheDuyetKeHoachSXController())->ajaxGetApprovalHistory();
+        break;
+
+
     case 'capnhatnv':
         require_once './app/controllers/SuaNhanVienController.php';
         $controller = new SuaNhanVienController();
@@ -338,11 +406,19 @@ switch ($page) {
         $controller = new BaoCaoTongHopController();
         $controller->ajaxGetDetails();
         break;
-    case 'lap-bao-cao': // Giữ lại route cũ (nếu có)
-        // Hoặc redirect sang route mới
+    case 'lap-bao-cao': 
         header('Location: index.php?page=bao-cao-tong-hop');
         exit;
 
+    case 'bao-cao-chat-luong': 
+        require_once 'app/controllers/QCController.php';
+        (new QCController())->index();
+        break;
+
+    case 'qc-update': 
+        require_once 'app/controllers/QCController.php';
+        (new QCController())->update();
+        break;
     default:
         echo "404 - Trang không tồn tại!";
         break;
