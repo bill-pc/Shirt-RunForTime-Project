@@ -226,9 +226,10 @@ require_once 'app/views/layouts/nav.php';
                                 <i class="fa fa-eye" style="color:blue;"></i>
                             </a>
 
-                            <a href="suanhanvien.php?id=<?= $nv['maND'] ?>" class="btn-action edit" title="Sửa">
+                            <a href="index.php?page=suathongtinnv&id=<?= $nv['maND'] ?>" class="btn-action edit" title="Sửa">
                                 <i class="fas fa-pen"></i>
                             </a>
+
                             
                             <button class="btn btn-delete" onclick="showDeleteModal('<?= $nv['maND'] ?>')">Xóa</button>
                         </td>

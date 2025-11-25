@@ -124,7 +124,6 @@ require_once 'app/views/layouts/nav.php';
                         <th>Sản phẩm</th>
                         <th>Tồn kho</th>
                         <th>Số lượng xuất</th>
-                        <th>Ghi chú</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
@@ -136,95 +135,28 @@ require_once 'app/views/layouts/nav.php';
                         <td><?= htmlspecialchars($dh['tenSanPham']) ?></td>
                         <td><?= htmlspecialchars($dh['soLuongTon']) ?></td>
                         <td>
-                            <input 
-    type="number" 
-    id="soLuong<?= $dh['maDonHang'] ?>" 
-    min="1" 
-    max="<?= htmlspecialchars($dh['soLuongTon']) ?>" 
-    value="<?= htmlspecialchars($dh['soLuongSanXuat']) ?>" 
->
-
-
+                            <input type="number" id="soLuong<?= $dh['maDonHang'] ?>" 
+                            min="1" 
+                            max="<?= htmlspecialchars($dh['soLuongTon']) ?>" 
+                            value="<?= htmlspecialchars($dh['soLuongSanXuat']) ?>" 
+                        >
                         </td>
-                        <td>
+                        <!-- <td>
                             <input type="text" id="ghiChu<?= $dh['maDonHang'] ?>">
-                        </td>
+                        </td> -->
                         <td>
-                            <button class="btn btn-export" onclick="showExportModal('<?= $dh['maDonHang'] ?>')">Xuất</button>
+                            <a href="index.php?page=xuatthanhpham_chitiet&id=<?= $dh['maDonHang'] ?>" 
+                            class="btn btn-export" style="background:#3b82f6">
+                            Xem chi tiết
+                            </a>
                         </td>
+
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-
-        <!-- Modal xác nhận xuất -->
-        <div id="exportModal" class="modal">
-            <div class="modal-content">
-                <h3>Xác nhận xuất kho</h3>
-                <p>Bạn có chắc chắn muốn xuất kho đơn hàng này không?</p>
-                <div class="modal-buttons">
-                    <button class="btn btn-export" id="confirmExport">Xuất</button>
-                    <button class="btn btn-cancel" id="cancelExport">Hủy</button>
-                </div>
-            </div>
-        </div>
-
         <script>
-        let currentExportId = null;
-        const modal = document.getElementById("exportModal");
-        const confirmBtn = document.getElementById("confirmExport");
-        const cancelBtn = document.getElementById("cancelExport");
-
-        // Hiện modal xác nhận
-        function showExportModal(maDonHang) {
-            currentExportId = maDonHang;
-            modal.style.display = "block";
-        }
-
-        // Đóng modal
-        cancelBtn.onclick = function() {
-            modal.style.display = "none";
-            currentExportId = null;
-        }
-
-        // Xác nhận xuất
-        confirmBtn.onclick = async function() {
-            if (!currentExportId) return;
-            const soLuong = document.getElementById("soLuong" + currentExportId).value;
-            const ghiChu = document.getElementById("ghiChu" + currentExportId).value;
-
-            if (!soLuong || soLuong <= 0) {
-                alert("⚠️ Vui lòng nhập số lượng hợp lệ!");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append("maDonHang", currentExportId);
-            formData.append("soLuongXuat", soLuong);
-            formData.append("ghiChu", ghiChu);
-
-            try {
-                const res = await fetch("index.php?page=xuatthanhpham_xuat", {
-                    method: "POST",
-                    body: formData
-                });
-
-                const data = await res.json();
-                if (data.success) {
-                    alert("✅ Xuất kho thành công!");
-                    location.reload();
-                } else {
-                    alert("❌ " + (data.message || "Xuất thất bại!"));
-                }
-            } catch (err) {
-                console.error("Lỗi khi xuất kho:", err);
-                alert("⚠️ Không thể kết nối máy chủ!");
-            }
-
-            modal.style.display = "none";
-            currentExportId = null;
-        }
 
         // Click ra ngoài modal sẽ đóng
         window.onclick = function(event) {

@@ -222,6 +222,12 @@ switch ($page) {
         $controller = new XuatThanhPhamController();
         $controller->xuat();
         break;
+    case 'xuatthanhpham_chitiet':
+    require 'app/controllers/XuatThanhPhamController.php';
+    $c = new XuatThanhPhamController();
+    $c->chitiet();
+    break;
+
 // ===== Thống kê sản phẩm (bắt cả 2 tên route) =====
 
     case 'thongke_sanpham':

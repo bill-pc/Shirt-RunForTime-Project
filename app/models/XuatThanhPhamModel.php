@@ -82,5 +82,18 @@ class XuatThanhPhamModel {
 
         return true;
     }
+    public function getChiTietDonHang($maDonHang) {
+    $stmt = $this->conn->prepare("
+        SELECT dh.*, sp.tenSanPham, sp.soLuongTon
+        FROM donhangsanxuat dh
+        JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
+        WHERE dh.maDonHang = ?
+    ");
+    $stmt->bind_param("i", $maDonHang);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
 }
 ?>

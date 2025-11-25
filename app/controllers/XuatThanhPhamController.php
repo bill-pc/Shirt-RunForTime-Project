@@ -15,6 +15,20 @@ class XuatThanhPhamController {
         // biến $donhangs sẽ được view dùng
         require_once __DIR__ . '/../views/xuatthanhpham.php';
     }
+public function chitiet() {
+    if (!isset($_GET['id'])) {
+        die("Thiếu mã đơn hàng");
+    }
+
+    $maDonHang = (int)$_GET['id'];
+    $donhang = $this->model->getChiTietDonHang($maDonHang);
+
+    if (!$donhang) {
+        die("Không tìm thấy đơn hàng");
+    }
+
+    require_once __DIR__ . '/../views/xuatthanhpham_chitiet.php';
+}
 
     // Xử lý POST xuất kho (gọi từ fetch của view)
     public function xuat() {
