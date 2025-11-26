@@ -52,6 +52,14 @@ require_once 'app/views/layouts/nav.php';
             .btn-primary:hover {
                 background-color: #4076db;
             }
+            .btn-success {
+    background-color: #cfe9ff;   /* xanh nhạt */
+    color: #0d1a44;
+}
+
+.btn-success:hover {
+    background-color: #b7dcff;
+}
         </style>
 
         <div class="report-container">
@@ -69,8 +77,15 @@ require_once 'app/views/layouts/nav.php';
                         <input type="date" id="end_date" name="end_date" required>
                     </div>
                     <div>
+                        <label style="font-size:14px;">
+                            <input type="checkbox" id="chkAllNVL" name="all_nvl" value="1">
+                            Thống kê tất cả nguyên vật liệu
+                        </label>
+                        <br>
                         <label>Tên NVL:</label><br>
                         <input type="text" name="tenNVL" id="inputTenNVL" placeholder="Nhập tên NVL...">
+                        <div style="margin-top:5px;">
+    </div>
 <ul id="suggestionsNVL" 
     style="position:absolute; background:white; border:1px solid #ccc; list-style:none; padding:0; margin-top:0; width:200px; max-height:150px; overflow-y:auto; display:none; z-index:10;"></ul>
 
@@ -102,28 +117,45 @@ require_once 'app/views/layouts/nav.php';
             </table>
 
             <!-- Nút xuất CSV -->
-            <div>
-                <form id="formExport" method="GET" action="index.php">
-    <input type="hidden" name="page" value="thongke-nvl-xuatcsv">
-    <input type="hidden" id="csv_start_date" name="start_date" value="">
-    <input type="hidden" id="csv_end_date" name="end_date" value="">
-    <input type="hidden" id="csv_tenNVL" name="tenNVL" value="">
-    <input type="hidden" id="csv_loai" name="loai" value="">
-    <button type="submit" class="btn btn-success">📄 Xuất CSV</button>
-</form>
+            <div style="text-align:center; margin-top:25px;">
+    <form id="formExport" method="GET" action="index.php">
+        <input type="hidden" name="page" value="xuatcsv-thongkenvl">
+        <input type="hidden" id="csv_all_nvl" name="all_nvl">
+        <input type="hidden" id="csv_start_date" name="start_date">
+        <input type="hidden" id="csv_end_date" name="end_date">
+        <input type="hidden" id="csv_tenNVL" name="tenNVL">
+        <input type="hidden" id="csv_loai" name="loai">
+        <button type="submit" class="btn btn-success">📄 Xuất CSV</button>
+    </form>
+</div>
 
-            </div>
-
+<div style="margin-top:30px;">
+<h3 style="text-align:center;">Biểu đồ thống kê nhập - xuất NVL</h3>
+<canvas id="chartKhoNVL" height="100"></canvas>
+</div>
 
         </div>
     </main>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.getElementById('formThongKe').addEventListener('submit', async function(e) {
+let chartInstance = null;
+
+const formThongKe = document.getElementById('formThongKe');
+const inputNVL = document.getElementById('inputTenNVL');
+const suggestBox = document.getElementById('suggestionsNVL');
+const chkAllNVL = document.getElementById('chkAllNVL');
+
+formThongKe.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const formData = new FormData(this);
+
+    // Nếu tick "Tất cả NVL" thì bỏ tên NVL
+    if (chkAllNVL.checked) {
+        formData.set('tenNVL', '');
+    }
+
     const res = await fetch('index.php?page=thongke-khonvl', {
         method: 'POST',
         body: formData
@@ -133,9 +165,9 @@ document.getElementById('formThongKe').addEventListener('submit', async function
     try {
         data = await res.json();
     } catch (err) {
-        console.error('Lỗi khi parse JSON:', err);
-        const tbody = document.querySelector('#tableKho tbody');
-        tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">Lỗi server, kiểm tra log.</td></tr>`;
+        console.error('Lỗi parse JSON:', err);
+        document.querySelector('#tableKho tbody').innerHTML =
+            `<tr><td colspan="6" style="color:red;text-align:center;">Lỗi server</td></tr>`;
         return;
     }
 
@@ -155,22 +187,36 @@ document.getElementById('formThongKe').addEventListener('submit', async function
             `;
             tbody.appendChild(tr);
         });
+        renderChart(data);
     } else {
-        tbody.innerHTML = `<tr><td colspan="6" style="color:gray;text-align:center;">Không có dữ liệu để hiển thị</td></tr>`;
+        tbody.innerHTML =
+            `<tr><td colspan="6" style="color:gray;text-align:center;">Không có dữ liệu</td></tr>`;
     }
 
-    // Cập nhật dữ liệu ẩn cho form xuất CSV
+    // Gán dữ liệu cho form Xuất CSV
     document.getElementById('csv_start_date').value = document.getElementById('start_date').value;
     document.getElementById('csv_end_date').value = document.getElementById('end_date').value;
-    document.getElementById('csv_tenNVL').value = document.getElementById('inputTenNVL').value;
+    document.getElementById('csv_tenNVL').value = chkAllNVL.checked ? '' : inputNVL.value;
+    document.getElementById('csv_all_nvl').value = chkAllNVL.checked ? 1 : 0;
+
 });
 
-// --- Gợi ý tên NVL khi nhập ---
-const inputNVL = document.getElementById('inputTenNVL');
-const suggestBox = document.getElementById('suggestionsNVL');
+/* ================= CHECKBOX TẤT CẢ NVL ================= */
+chkAllNVL.addEventListener('change', function() {
+    if (this.checked) {
+        inputNVL.value = '';
+        inputNVL.disabled = true;
+        inputNVL.style.background = '#f3f4f6';
+    } else {
+        inputNVL.disabled = false;
+        inputNVL.style.background = '#fff';
+    }
+});
 
+/* ================= GỢI Ý TÊN NVL ================= */
 inputNVL.addEventListener('input', async function() {
     const keyword = this.value.trim();
+
     if (keyword.length < 1) {
         suggestBox.style.display = 'none';
         return;
@@ -180,31 +226,60 @@ inputNVL.addEventListener('input', async function() {
     const data = await res.json();
 
     suggestBox.innerHTML = '';
+
     if (Array.isArray(data) && data.length > 0) {
         data.forEach(item => {
             const li = document.createElement('li');
             li.textContent = item.label;
             li.style.padding = '5px 10px';
             li.style.cursor = 'pointer';
-            li.addEventListener('click', () => {
+
+            li.onclick = () => {
                 inputNVL.value = item.label;
                 suggestBox.style.display = 'none';
-            });
-            li.addEventListener('mouseover', () => li.style.background = '#f0f0f0');
-            li.addEventListener('mouseout', () => li.style.background = '');
+            };
+
             suggestBox.appendChild(li);
         });
+
         suggestBox.style.display = 'block';
     } else {
         suggestBox.style.display = 'none';
     }
 });
 
-// Ẩn gợi ý khi click ngoài
+/* ================= BIỂU ĐỒ ================= */
+function renderChart(data) {
+    const labels = data.map(i => i.tenNVL);
+    const tongNhap = data.map(i => i.tongNhap);
+    const tongXuat = data.map(i => i.tongXuat);
+
+    const ctx = document.getElementById('chartKhoNVL').getContext('2d');
+
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Tổng nhập', data: tongNhap },
+                { label: 'Tổng xuất', data: tongXuat }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+/* Ẩn gợi ý khi click ngoài */
 document.addEventListener('click', (e) => {
     if (!suggestBox.contains(e.target) && e.target !== inputNVL) {
         suggestBox.style.display = 'none';
     }
 });
 </script>
+
 <?php require_once 'app/views/layouts/footer.php'; ?>

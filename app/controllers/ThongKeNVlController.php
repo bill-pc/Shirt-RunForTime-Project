@@ -15,7 +15,11 @@ class ThongKeNVLController {
             $end = $_POST['end_date'] ?? '';
             $tenNVL = $_POST['tenNVL'] ?? '';
             $loai = $_POST['loai_baocao'] ?? '';
+$allNVL = isset($_POST['all_nvl']);
 
+if ($allNVL) {
+    $tenNVL = ''; // Bỏ lọc theo tên
+}
             // Trả về JSON
             $rows = $this->model->layThongKeKhoNVL($start, $end, $tenNVL, $loai);
 
@@ -34,6 +38,11 @@ class ThongKeNVLController {
     $end_date = $_GET['end_date'] ?? '';
     $tenNVL = $_GET['tenNVL'] ?? '';
     $loai = $_GET['loai'] ?? '';
+$allNVL = isset($_GET['all_nvl']);
+
+if ($allNVL) {
+    $tenNVL = '';
+}
 
     // Nếu thiếu ngày, báo lỗi nhẹ
     if (empty($start_date) || empty($end_date)) {
