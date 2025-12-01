@@ -6,28 +6,24 @@ class UserModel {
         $this->conn = $db;
     }
 
-    // Lấy thông tin người dùng theo maTK
+    // Lấy thông tin người dùng theo mã tài khoản
     public function getUserById($maTK) {
-        $sql = "SELECT maTK, hoTen, chucVu, soDienThoai, email, diaChi
-                FROM nguoidung
+        $sql = "SELECT maTK, hoTen, gioiTinh, ngaySinh, chucVu, soDienThoai, email, diaChi, hinhAnh
+                FROM nguoidung 
                 WHERE maTK = ?";
-
-        $stmt = $this->conn->prepare($sql);
-
-        if (!$stmt) {
-            error_log("Prepare failed: " . $this->conn->error);
+        
+        if ($stmt = $this->conn->prepare($sql)) {
+            $stmt->bind_param("i", $maTK);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $stmt->close();
+            return $user ?: null; // Trả về null nếu không tìm thấy
+        } else {
+            // Ghi log lỗi hoặc ném exception nếu cần
+            error_log("Lỗi truy vấn: " . $this->conn->error);
             return null;
         }
-
-        $stmt->bind_param("i", $maTK);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-
-        $stmt->close();
-
-        return $user ?: null;
     }
 }
 ?>

@@ -54,13 +54,6 @@ switch ($page) {
         $controller = new HomeController();
         $controller->index();
         break;
-
-
-
-    case 'lichlamviec':
-        include './app/views/lichlamviec.php';
-        break;
-
     case 'tao-yeu-cau-nvl':
         require_once './app/controllers/YeuCauNVLController.php';
         $controller = new YeuCauNVLController();

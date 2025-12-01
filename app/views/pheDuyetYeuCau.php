@@ -44,12 +44,12 @@
                             }
                             ?>
                             <tr style="text-align:center;">
-                                <td style="border: 1px solid #dee2e6; padding: 12px;"><?= $i + 1 ?></td>
-                                <td style="border: 1px solid #dee2e6; padding: 12px;"><?= htmlspecialchars($yc['tenPhieu'] ?? 'Không có tên') ?></td>
-                                <td style="border: 1px solid #dee2e6; padding: 12px;"><?= htmlspecialchars($yc['tenNguoiLap'] ?? 'Không rõ') ?></td>
-                                <td style="border: 1px solid #dee2e6; padding: 12px;"><?= !empty($yc['ngayLap']) ? date('d/m/Y', strtotime($yc['ngayLap'])) : '-' ?></td>
-                                <td style="border: 1px solid #dee2e6; padding: 12px;"><?= htmlspecialchars($yc['trangThai'] ?? 'Chưa xác định') ?></td>
-                                <td style="border: 1px solid #dee2e6; padding: 12px;">
+                                <td style="border: 1px solid #dee2e6; padding: 12px; text-align: center;"><?= $i + 1 ?></td>
+                                <td style="border: 1px solid #dee2e6; padding: 12px; text-align: center;"><?= htmlspecialchars($yc['tenPhieu'] ?? 'Không có tên') ?></td>
+                                <td style="border: 1px solid #dee2e6; padding: 12px; text-align: center;"><?= htmlspecialchars($yc['tenNguoiLap'] ?? 'Không rõ') ?></td>
+                                <td style="border: 1px solid #dee2e6; padding: 12px; text-align: center;"><?= !empty($yc['ngayLap']) ? date('d/m/Y', strtotime($yc['ngayLap'])) : '-' ?></td>
+                                <td style="border: 1px solid #dee2e6; padding: 12px; text-align: center;"><?= htmlspecialchars($yc['trangThai'] ?? 'Chưa xác định') ?></td>
+                                <td style="border: 1px solid #dee2e6; padding: 12px; text-align: center;">
                                     <a href="index.php?page=chi-tiet-phe-duyet-yeu-cau&type=<?= urlencode($type) ?>&maPhieu=<?= urlencode($maPhieu) ?>"
                                        class="btn-details"
                                        style="text-decoration:none; background-color:#007bff; color:#fff; padding:6px 12px; border-radius:5px;">

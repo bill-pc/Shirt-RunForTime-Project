@@ -35,11 +35,13 @@ class PheDuyetModel
     {
         $sql = "
             SELECT 
-                k.maYC, 
-                k.tenNguoiLap, 
-                k.trangThaiPhieu
+                k.maYC,
+                k.tenPhieu, 
+                k.tenNguoiLap,
+                k.ngayLap, 
+                k.trangThai
             FROM phieuyeucaukiemtrachatluong k
-            WHERE k.trangThaiPhieu ='Chờ duyệt'
+            WHERE k.trangThai ='Chờ duyệt'
        
         ";
         $result = $this->conn->query($sql);
@@ -55,7 +57,8 @@ public function getAllNhapKho() {
     
     $sql = "
         SELECT 
-            y.maYCNK, 
+            y.maYCNK,
+            y.tenPhieu, 
             y.tenNguoiLap, 
             y.ngayLap AS ngayLap, 
             y.trangThai
@@ -117,10 +120,10 @@ public function getAllNhapKho() {
                 k.tenPhieu,
                 k.tenNguoiLap,
                 k.ngayLap,
-                k.trangThaiPhieu AS trangThai,
+                k.trangThai AS trangThai,
                 c.tenSanPham,
                 c.soLuong,
-                c.ketQuaKiemTra
+                c.donViTinh
             FROM phieuyeucaukiemtrachatluong k
             LEFT JOIN chitietphieuyeucaukiemtrachatluong c 
                 ON k.maYC = c.maYC
@@ -141,6 +144,7 @@ public function getAllNhapKho() {
             SELECT 
                 y.maYCNK,
                 y.tenNguoiLap,
+                y.tenPhieu,
                 y.ngayLap AS ngayLap,
                 y.trangThai,
                 c.tenNVL,
