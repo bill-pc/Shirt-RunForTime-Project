@@ -1,46 +1,59 @@
 <?php
-// app/models/QCModel.php
+require_once 'ketNoi.php';
 
-class QCModel {
+class QCModel
+{
     private $conn;
 
-    public function __construct() {
-        // Giả sử tệp ketNoi.php định nghĩa class Database với hàm connect()
-        $this->conn = (new KetNoi())->connect();
+    public function __construct()
+    {
+        $db = new KetNoi();
+        $this->conn = $db->connect();
     }
 
-    
-    public function getAllYCCL() {
-        // Giả sử trạng thái chờ là 'Chờ duyệt'
+    public function getDanhSachCanKiemTra()
+    {
         $sql = "SELECT 
-                    pyc.maYC, 
-                    pyc.soLuong,
-                    pyc.tenNguoiLap,
-                    sp.maSanPham,
-                    sp.tenSanPham
-                FROM phieuyeucaukiemtrachatluong pyc
-                JOIN san_pham sp ON pyc.maSanPham = sp.maSanPham
-                WHERE pyc.trangThaiPhieu = 'Chờ duyệt'";
-        
-        $query = $this->conn->prepare($sql);
-        $query->execute();
-        $result = $query->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
+                    p.maYC, 
+                    p.tenSanPham, 
+                    p.soLuong AS tongSoLuong,
+                    p.tenNguoiLap, 
+                    p.trangThaiPhieu,
+                    kh.tenKHSX
+                FROM phieuyeucaukiemtrachatluong p
+                LEFT JOIN kehoachsanxuat kh ON  kh.maKHSX
+                WHERE p.trangThaiPhieu IN ('Chờ kiểm tra', 'Chờ duyệt')
+                ORDER BY p.maYC DESC";
+
+        $result = $this->conn->query($sql);
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    
-    public function updateYCCL($maYC, $soLuongDat, $soLuongHong) {
-        $sql = "UPDATE phieuyeucaukiemtrachatluong 
-                SET 
-                    trangThaiPhieu = 'Đã kiểm tra'
-                    -- (Bạn có thể thêm cột 'ghiChu' để lưu kết quả nếu muốn)
-                    -- ghiChu = CONCAT('Kết quả: Đạt ', ?, ', Hỏng ', ?)
-                WHERE maYC = ?";
-        
+
+    public function getChiTietPhieu($maYC)
+    {
+        $sql = "SELECT * FROM phieuyeucaukiemtrachatluong WHERE maYC = ?";
         $stmt = $this->conn->prepare($sql);
-        // $stmt->bind_param("iii", $soLuongDat, $soLuongHong, $maYC);
-        $stmt->bind_param("i", $maYC); // Chỉ cập nhật trạng thái
+        $stmt->bind_param("i", $maYC);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
+
+    public function capNhatKetQuaQC($maYC, $slDat, $slHong, $ghiChu, $nguoiKiemTra)
+    {
+        $sql = "UPDATE phieuyeucaukiemtrachatluong 
+                SET soLuongDat = ?, 
+                    soLuongHong = ?, 
+                    ghiChu = ?, 
+                    ngayKiemTra = NOW(),
+                    trangThaiPhieu = 'Đã duyệt' 
+                WHERE maYC = ?";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bind_param("iisi", $slDat, $slHong, $ghiChu, $maYC);
+
         return $stmt->execute();
     }
 }
-?>

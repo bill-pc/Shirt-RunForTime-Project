@@ -13,29 +13,23 @@ class BaoCaoTongHopModel
 
     /**
      * Lấy dữ liệu báo cáo tổng hợp
-     * @param string $loai - Loại phiếu (vd: 'all', 'baocaoloi', 'phieunhapnvl', ...)
-     * @param string $start - Ngày bắt đầu (Y-m-d)
-     * @param string $end - Ngày kết thúc (Y-m-d)
-     * @return array
      */
     public function getBaoCaoTongHop($loai, $start, $end)
     {
-
         // --- 1. Xây dựng các câu truy vấn con (sub-queries) ---
 
-        // Báo cáo lỗi
+        // 1. Báo cáo lỗi (ĐÃ SỬA: Bỏ JOIN nguoidung vì không còn cột maND)
         $sql_baocaoloi = "SELECT 
             maBaoCao AS id, 
             tenBaoCao AS ten_phieu, 
             'Báo cáo lỗi' AS loai_phieu_text, 
             'baocaoloi' AS loai_phieu_key,
             thoiGian AS ngay_tao, 
-            nd.hoTen AS nguoi_lap,
+            'Ẩn danh' AS nguoi_lap, 
             'Đã báo cáo' AS trang_thai
-        FROM baocaoloi bcl
-        LEFT JOIN nguoidung nd ON bcl.maND = nd.maND";
+        FROM baocaoloi bcl";
 
-        // Phiếu nhập NVL
+        // 2. Phiếu nhập NVL
         $sql_phieunhapnvl = "SELECT 
             maPNVL AS id, 
             tenPNVL AS ten_phieu, 
@@ -46,7 +40,7 @@ class BaoCaoTongHopModel
             'Đã nhập kho' AS trang_thai
         FROM phieunhapnvl";
 
-        // Phiếu xuất NVL
+        // 3. Phiếu xuất NVL
         $sql_phieuxuatnvl = "SELECT 
             maPhieu AS id, 
             tenPhieu AS ten_phieu, 
@@ -57,7 +51,7 @@ class BaoCaoTongHopModel
             'Đã xuất kho' AS trang_thai
         FROM phieuxuatnvl";
 
-        // Phiếu xuất Thành Phẩm
+        // 4. Phiếu xuất Thành Phẩm
         $sql_phieuxuattp = "SELECT 
             maPhieuXuat AS id, 
             CONCAT('Phiếu xuất cho ĐH ', maDonHang) AS ten_phieu, 
@@ -68,7 +62,7 @@ class BaoCaoTongHopModel
             'Đã xuất kho' AS trang_thai
         FROM phieuxuatthanhpham";
 
-        // Yêu cầu cung cấp NVL
+        // 5. Yêu cầu cung cấp NVL
         $sql_yeucaunvl = "SELECT 
             maYCCC AS id, 
             tenPhieu AS ten_phieu, 
@@ -79,18 +73,18 @@ class BaoCaoTongHopModel
             trangThai AS trang_thai
         FROM phieuyeucaucungcapnvl";
 
-        // Yêu cầu Kiểm tra Chất lượng
+        // 6. Yêu cầu Kiểm tra Chất lượng
         $sql_yeucauqc = "SELECT 
-    maYC AS id, 
-    tenSanPham AS ten_phieu, 
-    'Yêu cầu QC' AS loai_phieu_text,
-    'yeucauqc' AS loai_phieu_key,
-    NULL AS ngay_tao, -- <-- SỬA LẠI THÀNH NULL
-    tenNguoiLap AS nguoi_lap,
-    trangThaiPhieu AS trang_thai
-FROM phieuyeucaukiemtrachatluong";
+            maYC AS id, 
+            tenSanPham AS ten_phieu, 
+            'Yêu cầu QC' AS loai_phieu_text,
+            'yeucauqc' AS loai_phieu_key,
+            NULL AS ngay_tao, 
+            tenNguoiLap AS nguoi_lap,
+            trangThaiPhieu AS trang_thai
+        FROM phieuyeucaukiemtrachatluong";
 
-        // Yêu cầu Nhập kho NVL
+        // 7. Yêu cầu Nhập kho NVL
         $sql_yeucaunhapkho = "SELECT 
             maYCNK AS id, 
             CONCAT('YCNK cho KHSX ', maKHSX) AS ten_phieu, 
@@ -101,7 +95,7 @@ FROM phieuyeucaukiemtrachatluong";
             trangThai AS trang_thai
         FROM phieuyeucaunhapkhonvl";
 
-        // Kế hoạch sản xuất
+        // 8. Kế hoạch sản xuất
         $sql_khsx = "SELECT 
             kh.maKHSX AS id, 
             kh.tenKHSX AS ten_phieu, 
@@ -113,18 +107,18 @@ FROM phieuyeucaukiemtrachatluong";
         FROM kehoachsanxuat kh
         LEFT JOIN nguoidung nd ON kh.maND = nd.maND";
 
-        // Đơn hàng sản xuất
+        // 9. Đơn hàng sản xuất
         $sql_donhang = "SELECT 
             maDonHang AS id, 
             tenDonHang AS ten_phieu, 
             'Đơn hàng sản xuất' AS loai_phieu_text,
             'donhang' AS loai_phieu_key,
-            ngayGiao AS ngay_tao, -- Lấy tạm ngayGiao
+            ngayGiao AS ngay_tao, 
             'Kinh doanh' AS nguoi_lap,
             trangThai AS trang_thai
         FROM donhangsanxuat";
 
-        // Ghi nhận thành phẩm
+        // 10. Ghi nhận thành phẩm
         $sql_ghinhanthanhpham = "SELECT 
             g.maGhiNhan AS id, 
             CONCAT('Ghi nhận cho KHSX ', g.maKHSX) AS ten_phieu, 
@@ -160,13 +154,12 @@ FROM phieuyeucaukiemtrachatluong";
         ";
 
         // --- 3. Tạo truy vấn cuối cùng với bộ lọc ---
-        $sql_final = "SELECT * FROM ($sql_union) AS TongHop
-                      WHERE 1=1";
+        $sql_final = "SELECT * FROM ($sql_union) AS TongHop WHERE 1=1";
 
         $params = [];
         $types = "";
 
-        // Lọc theo ngày (luôn bắt buộc)
+        // Lọc theo ngày
         if (!empty($start) && !empty($end)) {
             $sql_final .= " AND ngay_tao BETWEEN ? AND ?";
             $params[] = $start;
@@ -174,14 +167,14 @@ FROM phieuyeucaukiemtrachatluong";
             $types .= "ss";
         }
 
-        // Lọc theo loại (nếu không phải 'all')
+        // Lọc theo loại
         if ($loai != 'all' && !empty($loai)) {
             $sql_final .= " AND loai_phieu_key = ?";
             $params[] = $loai;
             $types .= "s";
         }
 
-        $sql_final .= " ORDER BY ngay_tao DESC"; // Sắp xếp
+        $sql_final .= " ORDER BY ngay_tao DESC";
 
         $stmt = $this->conn->prepare($sql_final);
 
@@ -205,7 +198,6 @@ FROM phieuyeucaukiemtrachatluong";
 
         try {
             switch ($type) {
-                // === BÁO CÁO LỖI ===
                 case 'baocaoloi':
                     $stmt = $this->conn->prepare("SELECT * FROM baocaoloi WHERE maBaoCao = ?");
                     $stmt->bind_param("i", $id);
@@ -213,9 +205,7 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['info'] = $stmt->get_result()->fetch_assoc();
                     break;
 
-                // === PHIẾU NHẬP NVL ===
                 case 'phieunhapnvl':
-                    // Bảng này là bảng chi tiết, nên 'info' chính là chi tiết
                     $stmt = $this->conn->prepare(
                         "SELECT pn.*, n.tenNVL, n.donViTinh 
                          FROM phieunhapnvl pn 
@@ -227,7 +217,6 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['info'] = $stmt->get_result()->fetch_assoc();
                     break;
 
-                // === PHIẾU XUẤT NVL ===
                 case 'phieuxuatnvl':
                     $stmt = $this->conn->prepare("SELECT * FROM phieuxuatnvl WHERE maPhieu = ?");
                     $stmt->bind_param("i", $id);
@@ -245,7 +234,6 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['items'] = $stmt_items->get_result()->fetch_all(MYSQLI_ASSOC);
                     break;
 
-                // === PHIẾU XUẤT THÀNH PHẨM ===
                 case 'phieuxuattp':
                     $stmt = $this->conn->prepare(
                         "SELECT pxtp.*, sp.tenSanPham 
@@ -258,7 +246,6 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['info'] = $stmt->get_result()->fetch_assoc();
                     break;
 
-                // === YÊU CẦU CUNG CẤP NVL ===
                 case 'yeucaunvl':
                     $stmt = $this->conn->prepare("SELECT * FROM phieuyeucaucungcapnvl WHERE maYCCC = ?");
                     $stmt->bind_param("i", $id);
@@ -271,7 +258,6 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['items'] = $stmt_items->get_result()->fetch_all(MYSQLI_ASSOC);
                     break;
 
-                // === YÊU CẦU KIỂM TRA CHẤT LƯỢNG (QC) ===
                 case 'yeucauqc':
                     $stmt = $this->conn->prepare("SELECT * FROM phieuyeucaukiemtrachatluong WHERE maYC = ?");
                     $stmt->bind_param("i", $id);
@@ -284,9 +270,7 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['items'] = $stmt_items->get_result()->fetch_all(MYSQLI_ASSOC);
                     break;
 
-                // === YÊU CẦU NHẬP KHO NVL ===
                 case 'yeucaunhapkho':
-                    // Lưu ý: maYCNK là VARCHAR, nên bind 's'
                     $stmt = $this->conn->prepare("SELECT * FROM phieuyeucaunhapkhonvl WHERE maYCNK = ?");
                     $stmt->bind_param("s", $id);
                     $stmt->execute();
@@ -303,7 +287,6 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['items'] = $stmt_items->get_result()->fetch_all(MYSQLI_ASSOC);
                     break;
 
-                // === KẾ HOẠCH SẢN XUẤT ===
                 case 'khsx':
                     $stmt = $this->conn->prepare(
                         "SELECT kh.*, nd.hoTen AS tenNguoiLap
@@ -326,7 +309,6 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['items'] = $stmt_items->get_result()->fetch_all(MYSQLI_ASSOC);
                     break;
 
-                // === ĐƠN HÀNG SẢN XUẤT ===
                 case 'donhang':
                     $stmt = $this->conn->prepare(
                         "SELECT dh.*, sp.tenSanPham 
@@ -339,7 +321,6 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['info'] = $stmt->get_result()->fetch_assoc();
                     break;
 
-                // === GHI NHẬN THÀNH PHẨM ===
                 case 'ghinhanthanhpham':
                     $stmt = $this->conn->prepare(
                         "SELECT g.*, k.tenKHSX, sp.tenSanPham, nd.hoTen AS tenNhanVien 
@@ -354,7 +335,6 @@ FROM phieuyeucaukiemtrachatluong";
                     $data['info'] = $stmt->get_result()->fetch_assoc();
                     break;
 
-                // === NẾU LOẠI PHIẾU KHÔNG TỒN TẠI ===
                 default:
                     $data['info'] = ['Lỗi' => 'Loại báo cáo này không hợp lệ hoặc chưa được hỗ trợ xem chi tiết.'];
             }
