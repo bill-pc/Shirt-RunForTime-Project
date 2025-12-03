@@ -328,32 +328,32 @@ switch ($page) {
             exit;
         }
         break;
-    // case 'ajax-get-sp-theo-khsx':
-    //     require_once 'app/models/ketNoi.php';
-    //     require_once 'app/models/SanPhamModel.php';
-    //     require_once 'app/models/KeHoachSanXuatModel.php';
-    //     require_once 'app/controllers/GhiNhanTPController.php';
+    case 'ajax-get-sp-theo-khsx':
+        require_once 'app/models/ketNoi.php';
+        require_once 'app/models/SanPhamModel.php';
+        require_once 'app/models/KeHoachSanXuatModel.php';
+        require_once 'app/controllers/GhiNhanTPController.php';
 
-    //     $controller = new GhiNhanThanhPhamController();
-    //     $controller->ajaxGetSanPham();
-    //     break;
-    // case 'ajax-get-nv-theo-xuong':
-    //     require_once 'app/models/ketNoi.php';
-    //     require_once 'app/models/XuongModel.php';
-    //     require_once 'app/models/NhanVienModel.php';
+        $controller = new GhiNhanThanhPhamController();
+        $controller->ajaxGetSanPham();
+        break;
+    case 'ajax-get-nv-theo-xuong':
+        require_once 'app/models/ketNoi.php';
+        require_once 'app/models/XuongModel.php';
+        require_once 'app/models/NhanVienModel.php';
 
-    //     require_once 'app/controllers/GhiNhanTPController.php';
+        require_once 'app/controllers/GhiNhanTPController.php';
 
-    //     $controller = new GhiNhanThanhPhamController();
-    //     $controller->ajaxGetNhanVienByXuong();
-    //     break;
-    // case 'ajax-get-chitiet-phieu':
-    //     require_once 'app/models/ketNoi.php';
-    //     require_once 'app/models/GhiNhanThanhPhamModel.php';
-    //     require_once 'app/controllers/GhiNhanTPController.php';
-    //     $controller = new GhiNhanThanhPhamController();
-    //     $controller->ajaxGetChiTietPhieu();
-    //     break;
+        $controller = new GhiNhanThanhPhamController();
+        $controller->ajaxGetNhanVienByXuong();
+        break;
+    case 'ajax-get-chitiet-phieu':
+        require_once 'app/models/ketNoi.php';
+        require_once 'app/models/GhiNhanThanhPhamModel.php';
+        require_once 'app/controllers/GhiNhanTPController.php';
+        $controller = new GhiNhanThanhPhamController();
+        $controller->ajaxGetChiTietPhieu();
+        break;
     // Báo cáo tổng hợp
     case 'bao-cao-tong-hop':
         require_once 'app/models/BaoCaoTongHopModel.php';
@@ -371,17 +371,17 @@ switch ($page) {
         header('Location: index.php?page=bao-cao-tong-hop');
         exit;
         //QC
-    // case 'bao-cao-chat-luong':
-    //     require_once 'app/controllers/QCController.php';
-    //     $controller = new QCController();
-    //     $controller->index();
-    //     break;
+    case 'bao-cao-chat-luong':
+        require_once 'app/controllers/QCController.php';
+        $controller = new QCController();
+        $controller->index();
+        break;
 
-    // case 'qc-update':
-    //     require_once 'app/controllers/QCController.php';
-    //     $controller = new QCController();
-    //     $controller->update();
-    //     break;
+    case 'qc-update':
+        require_once 'app/controllers/QCController.php';
+        $controller = new QCController();
+        $controller->update();
+        break;
 
     default:
         echo "404 - Trang không tồn tại!";
