@@ -29,7 +29,7 @@ require_once 'app/views/layouts/nav.php';
             .action-icons a{margin:0 6px}
         </style>
 
-        <div class="nhanvien-container">
+        
             <h2>Danh sách nhân viên</h2>
 
             <div class="search-bar">
@@ -93,7 +93,7 @@ require_once 'app/views/layouts/nav.php';
                     <button class="btn" id="cancelDelete">Hủy</button>
                 </div>
             </div>
-        </div>
+
 
         <script>
         // ====== XÓA (giống trang xoanhanvien) ======

@@ -202,6 +202,9 @@ switch ($page) {
         $controller->xuatCSV();
         break;
 
+case 'gioithieu':
+    require_once 'app/views/gioithieu.php';
+    break;
 
     //kho thành phẩm
     case 'xuatthanhpham':

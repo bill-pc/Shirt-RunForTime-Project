@@ -93,6 +93,26 @@ require_once 'app/views/layouts/nav.php';
         }
         </style>
     </main>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const xemNV = document.getElementById("xemNhanVien");
+    const xoaNV = document.getElementById("xoaNhanVien");
+
+    if (xemNV) {
+        xemNV.addEventListener("click", function () {
+            window.location.href = "index.php?page=nhanvien";
+        });
+    }
+
+    if (xoaNV) {
+        xoaNV.addEventListener("click", function () {
+            window.location.href = "index.php?page=nhanvien";
+        });
+    }
+});
+</script>
+
 </div>
 
 <?php require_once 'app/views/layouts/footer.php'; ?>

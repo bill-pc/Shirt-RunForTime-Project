@@ -1,7 +1,7 @@
 <nav class="navigation">
     <div class="nav-links">
         <a href="?page=home" class="nav-button">Trang chủ</a>
-        <a href="#" class="nav-button">Giới thiệu</a>
+        <a href="index.php?page=gioithieu" class="nav-button">Giới thiệu</a>
 
         <?php
         if (session_status() === PHP_SESSION_NONE) {

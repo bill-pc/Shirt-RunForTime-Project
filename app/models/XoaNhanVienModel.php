@@ -89,7 +89,7 @@ class XoaNhanVienModel {
         $stmt = $this->conn->prepare("
             SELECT maND, hoTen, chucVu, phongBan, diaChi, email, soDienThoai
             FROM nguoidung
-            WHERE trangThai = 1 
+            WHERE trangThai = 1 AND chucVu NOT IN ('Giám đốc')
             AND (hoTen LIKE ? OR chucVu LIKE ? OR phongBan LIKE ? OR email LIKE ?)
             ORDER BY maND ASC
         ");

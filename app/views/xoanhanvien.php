@@ -251,27 +251,30 @@ require_once 'app/views/layouts/nav.php';
             </div>
         </div>
 
-        <script>
-        let currentDeleteId = null;
-        const modal = document.getElementById("deleteModal");
-        const confirmBtn = document.getElementById("confirmDelete");
-        const cancelBtn = document.getElementById("cancelDelete");
+<script>
+let currentDeleteId = null;
+const modal = document.getElementById("deleteModal");
+const confirmBtn = document.getElementById("confirmDelete");
+const cancelBtn = document.getElementById("cancelDelete");
 
-        // Hiện modal xác nhận
-        function showDeleteModal(maNV) {
-            currentDeleteId = maNV;
-            modal.style.display = "block";
-        }
+const searchInput = document.getElementById("search");
+const suggestions = document.getElementById("suggestions");
+const tbody = document.querySelector("#nhanvienTable tbody");
 
-        // Đóng modal
-        cancelBtn.onclick = function() {
-            modal.style.display = "none";
-            currentDeleteId = null;
-        }
+// ===== MODAL XOÁ =====
+function showDeleteModal(maNV) {
+    currentDeleteId = maNV;
+    modal.style.display = "block";
+}
 
-        // Khi bấm "Xóa"
-        confirmBtn.onclick = async function() {
+cancelBtn.onclick = function() {
+    modal.style.display = "none";
+    currentDeleteId = null;
+}
+
+confirmBtn.onclick = async function() {
     if (!currentDeleteId) return;
+
     try {
         const res = await fetch(`index.php?page=xoanhanvien&id=${currentDeleteId}`, {
             method: "POST",
@@ -279,6 +282,7 @@ require_once 'app/views/layouts/nav.php';
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
+
         const data = await res.json();
 
         if (data.success) {
@@ -287,24 +291,59 @@ require_once 'app/views/layouts/nav.php';
         } else {
             alert("Xóa thất bại: " + (data.message || "Lỗi không xác định."));
         }
+
     } catch (err) {
         console.error("Lỗi khi xóa nhân viên:", err);
         alert("Không thể xóa nhân viên.");
     }
+
     modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+// ===== HIỂN THỊ BẢNG =====
+function renderTable(data) {
+    if (data.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align:center; color: #ef4444; font-weight: 600;">
+                    Không có nhân viên nào
+                </td>
+            </tr>
+        `;
+        return;
     }
 
+    tbody.innerHTML = data.map(nv => `
+        <tr>
+            <td>${nv.maND}</td>
+            <td>${nv.hoTen}</td>
+            <td>${nv.chucVu}</td>
+            <td>${nv.phongBan}</td>
+            <td>${nv.diaChi}</td>
+            <td>${nv.email}</td>
+            <td>${nv.soDienThoai}</td>
+            <td>
+                <a href="index.php?page=xemnhanvien&id=${nv.maND}">
+                    <i class="fas fa-eye"></i>
+                </a>
 
-        // Click ra ngoài modal sẽ đóng
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
+                <a href="index.php?page=suathongtinnv&id=${nv.maND}" class="btn-action edit">
+                    <i class="fas fa-pen"></i>
+                </a>
 
-const searchInput = document.getElementById("search");
-const suggestions = document.getElementById("suggestions");
+                <button class="btn btn-delete" onclick="showDeleteModal('${nv.maND}')">Xóa</button>
+            </td>
+        </tr>
+    `).join("");
+}
 
+// ===== AUTOCOMPLETE =====
 searchInput.addEventListener("keyup", async () => {
     const keyword = searchInput.value.trim();
 
@@ -317,63 +356,51 @@ searchInput.addEventListener("keyup", async () => {
         const res = await fetch(`index.php?page=timkiem-nhanvien&keyword=${encodeURIComponent(keyword)}`);
         const data = await res.json();
 
-        suggestions.innerHTML = data
-            .map(item => `<li data-id="${item.maND}">${item.hoTen}</li>`)
-            .join("");
+        suggestions.innerHTML = data.map(item => `
+            <li data-id="${item.maND}">${item.hoTen}</li>
+        `).join("");
+
     } catch (error) {
         console.error("Lỗi tìm kiếm:", error);
     }
 });
 
-// Khi người dùng chọn tên
-suggestions.addEventListener("click", (e) => {
-    if (e.target.tagName === "LI") {
-        searchInput.value = e.target.textContent;
-        suggestions.innerHTML = "";
-    }
-});
+// click chọn tên gợi ý
 suggestions.addEventListener("click", async (e) => {
-    if (e.target.tagName === "LI") {
-        const name = e.target.textContent;
-        searchInput.value = name;
-        suggestions.innerHTML = "";
+    if (e.target.tagName !== "LI") return;
 
-        // Gọi lại API để chỉ hiển thị kết quả khớp
-        try {
-            const res = await fetch(`index.php?page=timkiem-nhanvien&keyword=${encodeURIComponent(name)}`);
-            const data = await res.json();
+    const name = e.target.textContent;
+    searchInput.value = name;
+    suggestions.innerHTML = "";
 
-            // Cập nhật bảng
-            const tbody = document.querySelector("#nhanvienTable tbody");
-            tbody.innerHTML = data.map(nv => `
-                <tr>
-                    <td>${nv.maND}</td>
-                    <td>${nv.hoTen}</td>
-                    <td>${nv.chucVu}</td>
-                    <td>${nv.phongBan}</td>
-                    <td>${nv.diaChi}</td>
-                    <td>${nv.email}</td>
-                    <td>${nv.soDienThoai}</td>
-                    <td>
-                        <a href="index.php?page=xemnhanvien&id=<?= $nv['maND'] ?>">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        </a>
-                        <a href="suanhanvien.php?id=<?= $nv['maND'] ?>" class="btn-action edit" title="Sửa">
-                        <i class="fas fa-pen"></i>
-                        </a>
-                    <button class="btn btn-delete" onclick="showDeleteModal('${nv.maND}')">Xóa
-                    </button></td>
-                </tr>
-            `).join("");
-        } catch (error) {
-            console.error("Lỗi khi lọc bảng:", error);
-        }
+    try {
+        const res = await fetch(`index.php?page=timkiem-nhanvien&keyword=${encodeURIComponent(name)}`);
+        const data = await res.json();
+        renderTable(data);
+    } catch (error) {
+        console.error("Lỗi khi lọc bảng:", error);
     }
 });
 
+// ===== NÚT TÌM =====
+document.getElementById("refreshBtn").addEventListener("click", async () => {
+    const keyword = searchInput.value.trim();
 
-        </script>
+    if (!keyword) {
+        location.reload();
+        return;
+    }
+
+    try {
+        const res = await fetch(`index.php?page=timkiem-nhanvien&keyword=${encodeURIComponent(keyword)}`);
+        const data = await res.json();
+        renderTable(data);
+    } catch (error) {
+        console.error("Lỗi tìm kiếm:", error);
+    }
+});
+</script>
+
 
     </main>
 </div>
