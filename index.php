@@ -339,6 +339,32 @@ case 'gioithieu':
             exit;
         }
         break;
+        case 'ajax-get-sp-theo-khsx':
+        require_once 'app/models/ketNoi.php';
+        require_once 'app/models/SanPhamModel.php';
+        require_once 'app/models/KeHoachSanXuatModel.php';
+        require_once 'app/controllers/GhiNhanTPController.php';
+
+        $controller = new GhiNhanThanhPhamController();
+        $controller->ajaxGetSanPham();
+        break;
+    case 'ajax-get-nv-theo-xuong':
+        require_once 'app/models/ketNoi.php';
+        require_once 'app/models/XuongModel.php';
+        require_once 'app/models/NhanVienModel.php';
+
+        require_once 'app/controllers/GhiNhanTPController.php';
+
+        $controller = new GhiNhanThanhPhamController();
+        $controller->ajaxGetNhanVienByXuong();
+        break;
+    case 'ajax-get-chitiet-phieu':
+        require_once 'app/models/ketNoi.php';
+        require_once 'app/models/GhiNhanThanhPhamModel.php';
+        require_once 'app/controllers/GhiNhanTPController.php';
+        $controller = new GhiNhanThanhPhamController();
+        $controller->ajaxGetChiTietPhieu();
+        break;
     case 'bao-cao-tong-hop':
         require_once 'app/models/BaoCaoTongHopModel.php';
         require_once 'app/controllers/BaoCaoTongHopController.php';
@@ -361,7 +387,18 @@ case 'gioithieu':
         $controller = new TaoDonHangSanXuatController();
         $controller->index();
         break;
+        // QC
+    case 'baocao-chatluong':
+        require_once 'app/controllers/QCController.php';
+        $controller = new QCController();
+        $controller->index();
+        break;
 
+    case 'qc-update':
+        require_once 'app/controllers/QCController.php';
+        $controller = new QCController();
+        $controller->update();
+        break;
     case 'luu-don-hang-san-xuat':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require_once 'app/controllers/TaoDonHangSanXuatController.php'; 
