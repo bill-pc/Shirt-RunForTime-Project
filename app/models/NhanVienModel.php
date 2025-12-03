@@ -87,5 +87,54 @@ class NhanVienModel {
 
         return $result;
     }
+
+    // public function getNhanVienByPhongBan($tenPhongBan) {
+    //     $sql = "SELECT maND, hoTen, chucVu 
+    //             FROM nguoidung 
+    //             WHERE trangThai = 1 AND phongBan = ?
+    //             ORDER BY hoTen";
+        
+    //     $stmt = $this->conn->prepare($sql);
+    //     $stmt->bind_param("s", $tenPhongBan);
+    //     $stmt->execute();
+        
+    //     $result = $stmt->get_result();
+    //     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    // }
+
+    public function getNhanVienSanXuat() {
+        $sql = "SELECT maND, hoTen, phongBan 
+                FROM nguoidung 
+                WHERE trangThai = 1 AND phongBan LIKE 'Xưởng%'
+                ORDER BY hoTen";
+        $result = $this->conn->query($sql);
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    public function getXuongCuaNhanVien($maND) {
+        $sql = "SELECT phongBan FROM nguoidung WHERE maND = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return null;
+        $stmt->bind_param("i", $maND);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+        $stmt->close();
+        return $data; 
+    }
+
+    
+    public function getNhanVienTheoPhongBan($phongBan) {
+        $sql = "SELECT maND, hoTen FROM nguoidung WHERE phongBan = ? AND trangThai = 1";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return [];
+        $stmt->bind_param("s", $phongBan);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $data; 
+    }
+
 }
 ?>
