@@ -4,30 +4,34 @@ require_once 'app/models/BaoCaoTongHopModel.php';
 
 class BaoCaoTongHopController
 {
+    private $model;
+
+    public function __construct()
+    {
+        $this->model = new BaoCaoTongHopModel();
+    }
 
     public function index()
     {
         $model = new BaoCaoTongHopModel();
 
-        // Lấy giá trị lọc từ POST hoặc GET (dùng POST để gọn gàng hơn)
+        // SỬA: Không gán ngày mặc định nữa. Nếu không có POST, để rỗng.
         $loai = $_POST['loai_bao_cao'] ?? 'all';
-        // Mặc định lọc 7 ngày gần nhất
-        $start = $_POST['start_date'] ?? date('Y-m-d', strtotime('-7 days'));
-        $end = $_POST['end_date'] ?? date('Y-m-d');
+        $start = $_POST['start_date'] ?? '';
+        $end = $_POST['end_date'] ?? '';
 
-        // Lấy dữ liệu
+        // Gọi Model (Model đã có sẵn logic: nếu $start, $end rỗng thì sẽ không lọc ngày)
         $danhSachBaoCao = $model->getBaoCaoTongHop($loai, $start, $end);
 
-        // Truyền các giá trị lọc ra View để giữ lại trên form
         $filter_values = [
             'loai' => $loai,
             'start' => $start,
             'end' => $end
         ];
 
-        // Tải View
         require_once 'app/views/baoCaoTongHop.php';
     }
+
     public function ajaxGetDetails()
     {
         header('Content-Type: application/json; charset=utf-8');
@@ -40,11 +44,9 @@ class BaoCaoTongHopController
             exit;
         }
 
-        // Gọi Model để lấy dữ liệu
         $model = new BaoCaoTongHopModel();
         $details = $model->getDetail($id, $type);
 
-        // Trả dữ liệu về cho JavaScript
         echo json_encode($details);
         exit;
     }
