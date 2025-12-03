@@ -267,19 +267,16 @@ require_once 'layouts/nav.php';
             </div>
 
             <div class="filter-group">
-                <label for="filter-ngayGiao">Ngày giao:</label>
-                <input type="date" id="filter-ngayGiao">
+                <label for="filter-tuNgay">Ngày giao từ:</label>
+                <input type="date" id="filter-tuNgay">
 
-                <label for="filter-trangThai">Trạng thái:</label>
-                <select id="filter-trangThai">
-                    <option value="">-- Tất cả trạng thái --</option>
-                    <option value="Chờ duyệt">Chờ duyệt</option>
-                    <option value="Đang thực hiện">Đang thực hiện</option>
-                    <option value="Đã xuất kho">Đã xuất kho</option>
-                </select>
+                <label for="filter-denNgay">Đến ngày:</label>
+                <input type="date" id="filter-denNgay">
 
                 <button id="btn-clear-filters" class="btn-secondary">Xóa lọc</button>
+
             </div>
+
             <table class="table-results">
                 <thead>
                     <tr>
@@ -313,7 +310,9 @@ require_once 'layouts/nav.php';
                         <?php foreach ($danhSachKHSX as $khsx): ?>
                             <tr>
                                 <td><?= htmlspecialchars($khsx['tenKHSX']) ?></td>
+
                                 <td><?= htmlspecialchars($khsx['maDonHang']) ?></td>
+
                                 <td><?= htmlspecialchars($khsx['thoiGianBatDau']) ?></td>
                                 <td><?= htmlspecialchars($khsx['thoiGianKetThuc']) ?></td>
                                 <td><?= htmlspecialchars($khsx['trangThai']) ?></td>
