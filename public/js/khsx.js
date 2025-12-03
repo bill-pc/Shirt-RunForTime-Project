@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnStay = document.getElementById("confirm-exit-no");
     const btnExit = document.getElementById("confirm-exit-yes");
     // BỘ LỌC MỚI
-    const filterNgayGiao = document.getElementById("filter-ngayGiao");
-    const filterTrangThai = document.getElementById("filter-trangThai");
+    const filterTuNgay = document.getElementById("filter-tuNgay");
+    const filterDenNgay = document.getElementById("filter-denNgay");
     const btnClearFilters = document.getElementById("btn-clear-filters");
     // (MỚI) Biến toàn cục để lưu dữ liệu NVL và Sản Phẩm
     // Giúp không phải gọi AJAX mỗi khi nhấn "Thêm NVL"
@@ -29,16 +29,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- LOGIC TÌM KIẾM VÀ TẢI BẢNG ---
 
     // 1. Hàm gọi AJAX (Tìm kiếm hoặc tải mặc định)
-    function fetchResults(query, ngayGiao, trangThai) {
+    function fetchResults(query, tuNgay, denNgay) {
         resultsBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Đang tải...</td></tr>';
 
-        // Thêm bộ lọc vào URL
-        const url = `index.php?page=ajax-tim-kiem&query=${query}&ngayGiao=${ngayGiao}&trangThai=${trangThai}`;
+        // URL chứa tham số khoảng ngày
+        const url = `index.php?page=ajax-tim-kiem&query=${query}&tuNgay=${tuNgay}&denNgay=${denNgay}`;
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                buildTable(data); // Xây dựng bảng kết quả
+                buildTable(data);
             })
             .catch(error => {
                 console.error("Lỗi tìm kiếm:", error);
@@ -73,28 +73,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    function triggerSearch() {
+        const query = searchBox.value || '';
+        const tuNgay = filterTuNgay ? filterTuNgay.value : '';
+        const denNgay = filterDenNgay ? filterDenNgay.value : '';
 
+        // Gọi hàm fetch
+        fetchResults(query, tuNgay, denNgay);
+    }
 
     // --- Gắn sự kiện cho các bộ lọc ---
-    if (searchBox) {
-        // Tìm kiếm khi gõ
-        searchBox.addEventListener("input", triggerSearch);
-    }
-    if (filterNgayGiao) {
-        // Lọc khi đổi ngày
-        filterNgayGiao.addEventListener("change", triggerSearch);
-    }
-    if (filterTrangThai) {
-        // Lọc khi đổi trạng thái
-        filterTrangThai.addEventListener("change", triggerSearch);
-    }
+    if (searchBox) searchBox.addEventListener("input", triggerSearch);
+    if (filterTuNgay) filterTuNgay.addEventListener("change", triggerSearch);
+    if (filterDenNgay) filterDenNgay.addEventListener("change", triggerSearch);
+
+    
     if (btnClearFilters) {
-        // Nút xóa lọc
         btnClearFilters.addEventListener("click", function () {
-            searchBox.value = '';
-            filterNgayGiao.value = '';
-            filterTrangThai.value = '';
-            triggerSearch(); // Tải lại danh sách
+            if (searchBox) searchBox.value = '';
+            if (filterTuNgay) filterTuNgay.value = '';
+            if (filterDenNgay) filterDenNgay.value = '';
+            triggerSearch();
         });
     }
 
@@ -121,7 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                // (SỬA LỖI) Lưu dữ liệu vào biến toàn cục
                 globalData.danhSachNVL = data.danhSachNVL || [];
                 globalData.danhSachSanPham = data.danhSachSanPham || [];
 
@@ -168,12 +166,10 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error("Lỗi lấy chi tiết:", error);
-                // Lỗi JSON hay '404' đều sẽ bị bắt ở đây
                 alert("Lỗi khi tải chi tiết. Vui lòng kiểm tra Console (F12) và file index.php.");
             });
     }
 
-    // 6. Gắn sự kiện Mở Modal (Khi click nút "Chọn")
     if (resultsBody) {
         resultsBody.addEventListener("click", function (e) {
             // (SỬA LỖI) Chỉ bắt sự kiện click vào nút .btn-chon
@@ -255,11 +251,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function triggerSearch() {
-        const query = searchBox.value;
-        const ngayGiao = filterNgayGiao.value;
-        const trangThai = filterTrangThai.value;
-        fetchResults(query, ngayGiao, trangThai);
-    }
+
 
 }); 
