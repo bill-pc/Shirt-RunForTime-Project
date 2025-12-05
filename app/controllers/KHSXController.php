@@ -50,11 +50,9 @@ class KHSXController
 
         $keyword = $_GET['query'] ?? '';
 
-        // Lấy khoảng thời gian
         $tuNgay = $_GET['tuNgay'] ?? null;
         $denNgay = $_GET['denNgay'] ?? null;
 
-        // 🔒 YÊU CẦU: Chỉ hiển thị đơn hàng "Chờ duyệt"
         $trangThai = 'Chờ duyệt';
 
         $results = [];
@@ -87,11 +85,9 @@ class KHSXController
             exit;
         }
 
-        // 1. KIỂM TRA DỮ LIỆU ĐẦU VÀO
         $maDonHang = $_POST['maDonHang'] ?? '';
-        
+
         if (empty($maDonHang)) {
-            // Nếu không có mã đơn hàng, báo lỗi ngay
             echo "<script>alert('Lỗi: Không tìm thấy mã đơn hàng!'); window.history.back();</script>";
             exit;
         }
@@ -99,14 +95,22 @@ class KHSXController
         $this->conn->begin_transaction();
 
         try {
+            // Lấy thông tin đơn hàng để biết mã sản phẩm gốc
+            $donHangInfo = $this->donHangModel->getChiTietDonHang($maDonHang);
+            if (!$donHangInfo) {
+                throw new Exception("Không tồn tại đơn hàng này.");
+            }
+            $maSanPhamGoc = $donHangInfo['maSanPham'];
+
             $ngayBatDau = $_POST['ngay_bat_dau'];
             $ngayKetThuc = $_POST['ngay_ket_thuc'];
-            $maNguoiLap = 1; // Giá trị tạm thời
+            $maNguoiLap = isset($_SESSION['user']['maND']) ? $_SESSION['user']['maND'] : 1;
 
-            // 2. TẠO KHSX CHÍNH
+            // 2. TẠO KHSX CHÍNH (Đã thêm maSanPham)
             $dataKHSX = [
                 'tenKHSX' => 'KHSX cho ĐH ' . $maDonHang,
                 'maDonHang' => $maDonHang,
+                'maSanPham' => $maSanPhamGoc, // Lưu sản phẩm chính vào kế hoạch
                 'thoiGianBatDau' => $ngayBatDau,
                 'thoiGianKetThuc' => $ngayKetThuc,
                 'maND' => $maNguoiLap
@@ -115,41 +119,47 @@ class KHSXController
 
             if (!$maKHSX_moi) throw new Exception("Lỗi tạo KHSX");
 
-            // 3. LƯU CHI TIẾT (Giữ nguyên logic cũ của bạn)
-            // ... (Đoạn code vòng lặp lưu chi tiết xưởng cắt/may giữ nguyên) ...
-            // Nếu bạn đã xóa đoạn này để test thì nhớ thêm lại nhé!
-            // Ví dụ rút gọn:
-            if (isset($_POST['xuong_cat'])) {
+            // 3. LƯU CHI TIẾT (Logic giữ nguyên)
+            // Xưởng cắt
+            if (isset($_POST['xuong_cat']) && isset($_POST['xuong_cat']['nvl_id'])) {
                 $xuongCatData = $_POST['xuong_cat'];
                 foreach ($xuongCatData['nvl_id'] as $index => $maNVL) {
-                    $this->keHoachModel->createChiTietKHSX([
-                        'maKHSX' => $maKHSX_moi,
-                        'maSanPham' => $xuongCatData['maSanPham'],
-                        'maXuong' => 1,
-                        'maNVL' => $maNVL,
-                        'soLuongNVL' => $xuongCatData['nvl_soLuong'][$index]
-                    ]);
+                    if (!empty($maNVL)) {
+                        $this->keHoachModel->createChiTietKHSX([
+                            'maKHSX' => $maKHSX_moi,
+                            // 'maSanPham' => ...  <-- XÓA DÒNG NÀY ĐI
+                            'maXuong' => 1,
+                            'maNVL' => $maNVL,
+                            'soLuongNVL' => $xuongCatData['nvl_soLuong'][$index]
+                        ]);
+                    }
                 }
             }
-            // Tương tự cho xưởng may...
 
-            // 4. CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG (QUAN TRỌNG)
-            // Gọi hàm update và kiểm tra kết quả
-            $kqUpdate = $this->donHangModel->updateTrangThai($maDonHang, 'Đang thực hiện');
-            
-            if (!$kqUpdate) {
-                // Nếu update thất bại, ném lỗi để rollback toàn bộ
-                throw new Exception("Lỗi: Không thể cập nhật trạng thái đơn hàng số " . $maDonHang);
+            // XƯỞNG MAY
+            if (isset($_POST['xuong_may']) && isset($_POST['xuong_may']['nvl_id'])) {
+                $xuongMayData = $_POST['xuong_may'];
+                foreach ($xuongMayData['nvl_id'] as $index => $maNVL) {
+                    if (!empty($maNVL)) {
+                        $this->keHoachModel->createChiTietKHSX([
+                            'maKHSX' => $maKHSX_moi,
+                            // 'maSanPham' => ... <-- XÓA DÒNG NÀY ĐI
+                            'maXuong' => 2,
+                            'maNVL' => $maNVL,
+                            'soLuongNVL' => $xuongMayData['nvl_soLuong'][$index]
+                        ]);
+                    }
+                }
             }
 
-            // 5. HOÀN TẤT
-            $this->conn->commit();
-            header('Location: index.php?page=lap-ke-hoach&success=1');
-            exit;
+            // 4. CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG
+            $this->donHangModel->updateTrangThai($maDonHang, 'Đang thực hiện');
 
+            $this->conn->commit();
+            header('Location: index.php?page=lap-khsx&success=1');
+            exit;
         } catch (Exception $e) {
             $this->conn->rollback();
-            // In lỗi chi tiết ra màn hình để xem nguyên nhân
             echo "<h1>Đã xảy ra lỗi!</h1>";
             echo "<p>Chi tiết: " . $e->getMessage() . "</p>";
             echo "<a href='index.php?page=lap-ke-hoach'>Quay lại</a>";
@@ -163,17 +173,22 @@ class KHSXController
         $id = $_GET['id'] ?? 0;
 
         $donHang = $this->donHangModel->getChiTietDonHang($id);
-        $danhSachXuong = $this->xuongModel->getAllXuong();
         $danhSachNVL = $this->nvlModel->getAllNVL();
-        $sanLuongTB = $this->ghiNhanTPModel->getSoLuongTrungBinh();
         $danhSachSanPham = $this->sanPhamModel->getAllSanPham();
+
+        // Lấy năng suất trung bình riêng cho từng xưởng
+        // Từ khóa truyền vào phải khớp với dữ liệu 'phongBan' trong bảng 'nguoidung'
+        $sanLuongCat = $this->ghiNhanTPModel->getSoLuongTrungBinhTheoXuong('Cắt');
+        $sanLuongMay = $this->ghiNhanTPModel->getSoLuongTrungBinhTheoXuong('May');
 
         $data = [
             'donHang' => $donHang,
-            'danhSachXuong' => $danhSachXuong,
             'danhSachNVL' => $danhSachNVL,
-            'sanLuongTB' => $sanLuongTB,
-            'danhSachSanPham' => $danhSachSanPham
+            'danhSachSanPham' => $danhSachSanPham,
+            'nangSuat' => [
+                'xuongCat' => $sanLuongCat,
+                'xuongMay' => $sanLuongMay
+            ]
         ];
 
         header('Content-Type: application/json');

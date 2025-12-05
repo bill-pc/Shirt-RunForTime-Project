@@ -344,10 +344,12 @@ require_once 'layouts/nav.php';
             <div class="form-group inline-group"><label>Sản phẩm (Gốc):</label> <b id="modal-tenSanPham"></b></div>
             <div class="form-group inline-group"><label>Đơn vị:</label> <b id="modal-donVi"></b></div>
             <div class="form-group inline-group"><label>Ngày Giao:</label> <b id="modal-ngayGiao" style="color: red;"></b></div>
-
-            <div class="form-group">
-                <label>Sản lượng TB/ngày (tham khảo):</label>
-                <b id="modal-sanLuongTB"></b> <span>sản phẩm</span>
+            <div style="background: #e9ecef; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; text-decoration: underline;">Năng suất trung bình (tham khảo):</label>
+                <div style="display: flex; gap: 20px;">
+                    <div>Xưởng Cắt: <b id="modal-ns-cat" style="color: #007bff;">0</b> sp/ngày</div>
+                    <div>Xưởng May: <b id="modal-ns-may" style="color: #28a745;">0</b> sp/ngày</div>
+                </div>
             </div>
 
             <hr>

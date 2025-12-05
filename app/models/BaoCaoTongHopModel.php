@@ -1,5 +1,4 @@
 <?php
-// app/models/BaoCaoTongHopModel.php
 require_once 'ketNoi.php';
 
 class BaoCaoTongHopModel
@@ -11,14 +10,10 @@ class BaoCaoTongHopModel
         $this->conn = (new KetNoi())->connect();
     }
 
-    /**
-     * Lấy dữ liệu báo cáo tổng hợp
-     */
+
     public function getBaoCaoTongHop($loai, $start, $end)
     {
-        // --- 1. Xây dựng các câu truy vấn con (sub-queries) ---
 
-        // 1. Báo cáo lỗi (ĐÃ SỬA: Bỏ JOIN nguoidung vì không còn cột maND)
         $sql_baocaoloi = "SELECT 
             maBaoCao AS id, 
             tenBaoCao AS ten_phieu, 
@@ -29,7 +24,6 @@ class BaoCaoTongHopModel
             'Đã báo cáo' AS trang_thai
         FROM baocaoloi bcl";
 
-        // 2. Phiếu nhập NVL
         $sql_phieunhapnvl = "SELECT 
             maPNVL AS id, 
             tenPNVL AS ten_phieu, 
@@ -40,7 +34,6 @@ class BaoCaoTongHopModel
             'Đã nhập kho' AS trang_thai
         FROM phieunhapnvl";
 
-        // 3. Phiếu xuất NVL
         $sql_phieuxuatnvl = "SELECT 
             maPhieu AS id, 
             tenPhieu AS ten_phieu, 
@@ -51,7 +44,6 @@ class BaoCaoTongHopModel
             'Đã xuất kho' AS trang_thai
         FROM phieuxuatnvl";
 
-        // 4. Phiếu xuất Thành Phẩm
         $sql_phieuxuattp = "SELECT 
             maPhieuXuat AS id, 
             CONCAT('Phiếu xuất cho ĐH ', maDonHang) AS ten_phieu, 
@@ -62,7 +54,7 @@ class BaoCaoTongHopModel
             'Đã xuất kho' AS trang_thai
         FROM phieuxuatthanhpham";
 
-        // 5. Yêu cầu cung cấp NVL
+
         $sql_yeucaunvl = "SELECT 
             maYCCC AS id, 
             tenPhieu AS ten_phieu, 
@@ -73,18 +65,16 @@ class BaoCaoTongHopModel
             trangThai AS trang_thai
         FROM phieuyeucaucungcapnvl";
 
-        // 6. Yêu cầu Kiểm tra Chất lượng
         $sql_yeucauqc = "SELECT 
             maYC AS id, 
-            tenSanPham AS ten_phieu, 
+            tenPhieu AS ten_phieu,
             'Yêu cầu QC' AS loai_phieu_text,
             'yeucauqc' AS loai_phieu_key,
             NULL AS ngay_tao, 
             tenNguoiLap AS nguoi_lap,
-            trangThaiPhieu AS trang_thai
+            trangThai AS trang_thai
         FROM phieuyeucaukiemtrachatluong";
 
-        // 7. Yêu cầu Nhập kho NVL
         $sql_yeucaunhapkho = "SELECT 
             maYCNK AS id, 
             CONCAT('YCNK cho KHSX ', maKHSX) AS ten_phieu, 
@@ -95,7 +85,6 @@ class BaoCaoTongHopModel
             trangThai AS trang_thai
         FROM phieuyeucaunhapkhonvl";
 
-        // 8. Kế hoạch sản xuất
         $sql_khsx = "SELECT 
             kh.maKHSX AS id, 
             kh.tenKHSX AS ten_phieu, 
@@ -107,7 +96,6 @@ class BaoCaoTongHopModel
         FROM kehoachsanxuat kh
         LEFT JOIN nguoidung nd ON kh.maND = nd.maND";
 
-        // 9. Đơn hàng sản xuất
         $sql_donhang = "SELECT 
             maDonHang AS id, 
             tenDonHang AS ten_phieu, 
@@ -118,7 +106,6 @@ class BaoCaoTongHopModel
             trangThai AS trang_thai
         FROM donhangsanxuat";
 
-        // 10. Ghi nhận thành phẩm
         $sql_ghinhanthanhpham = "SELECT 
             g.maGhiNhan AS id, 
             CONCAT('Ghi nhận cho KHSX ', g.maKHSX) AS ten_phieu, 
@@ -130,7 +117,6 @@ class BaoCaoTongHopModel
         FROM ghinhanthanhphamtheongay g
         LEFT JOIN nguoidung nd ON g.maNhanVien = nd.maND";
 
-        // --- 2. Gộp tất cả lại ---
         $sql_union = "
             ($sql_baocaoloi)
             UNION ALL
@@ -153,13 +139,11 @@ class BaoCaoTongHopModel
             ($sql_ghinhanthanhpham)
         ";
 
-        // --- 3. Tạo truy vấn cuối cùng với bộ lọc ---
         $sql_final = "SELECT * FROM ($sql_union) AS TongHop WHERE 1=1";
 
         $params = [];
         $types = "";
 
-        // Lọc theo ngày
         if (!empty($start) && !empty($end)) {
             $sql_final .= " AND ngay_tao BETWEEN ? AND ?";
             $params[] = $start;
@@ -167,7 +151,6 @@ class BaoCaoTongHopModel
             $types .= "ss";
         }
 
-        // Lọc theo loại
         if ($loai != 'all' && !empty($loai)) {
             $sql_final .= " AND loai_phieu_key = ?";
             $params[] = $loai;

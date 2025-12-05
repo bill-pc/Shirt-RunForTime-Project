@@ -102,4 +102,28 @@ class GhiNhanThanhPhamModel
         $row = $result->fetch_assoc();
         return $row ? (int)$row['sanLuongTB'] : 0;
     }
+
+    public function getSoLuongTrungBinhTheoXuong($tenXuongKeyword)
+    {
+        
+        $sql = "SELECT AVG(tong_ngay) as sanLuongTB FROM (
+                    SELECT SUM(g.soLuongSPHoanThanh) as tong_ngay
+                    FROM ghinhanthanhphamtheongay g
+                    JOIN nguoidung nd ON g.maNhanVien = nd.maND
+                    WHERE nd.phongBan LIKE ? 
+                    GROUP BY g.ngayLam
+                    ORDER BY g.ngayLam DESC
+                    LIMIT 5
+                ) as bang_tam";
+
+        $stmt = $this->conn->prepare($sql);
+        $keyword = "%" . $tenXuongKeyword . "%";
+        $stmt->bind_param("s", $keyword);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+
+        // Trả về số nguyên (làm tròn)
+        return $row ? (int)$row['sanLuongTB'] : 0;
+    }
 }

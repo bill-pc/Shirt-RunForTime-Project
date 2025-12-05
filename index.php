@@ -387,8 +387,8 @@ case 'gioithieu':
         $controller = new TaoDonHangSanXuatController();
         $controller->index();
         break;
-        // QC
-    case 'baocao-chatluong':
+        // Cập nhật thành phẩm
+    case 'cap-nhat-thanh-pham':
         require_once 'app/controllers/QCController.php';
         $controller = new QCController();
         $controller->index();
@@ -399,6 +399,8 @@ case 'gioithieu':
         $controller = new QCController();
         $controller->update();
         break;
+    // case 'bao-cao-chat-luong':
+    //     break;
     case 'luu-don-hang-san-xuat':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require_once 'app/controllers/TaoDonHangSanXuatController.php'; 

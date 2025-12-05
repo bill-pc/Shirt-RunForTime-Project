@@ -13,19 +13,19 @@ class QCModel
 
     public function getDanhSachCanKiemTra()
     {
-        // ĐÃ SỬA: Bỏ JOIN với bảng kehoachsanxuat
         $sql = "SELECT 
                     p.maYC, 
-                    p.tenSanPham, 
-                    p.soLuong AS tongSoLuong,
+                    ct.tenSanPham, 
+                    ct.soLuong AS tongSoLuong, 
                     p.tenNguoiLap, 
-                    p.trangThaiPhieu
+                    p.trangThai
                 FROM phieuyeucaukiemtrachatluong p
-                WHERE p.trangThaiPhieu IN ('Chờ kiểm tra', 'Chờ duyệt')
+                JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
+                WHERE p.trangThai IN ('Chờ kiểm tra', 'Chờ duyệt')
                 ORDER BY p.maYC DESC";
 
         $result = $this->conn->query($sql);
-        
+
         if (!$result) {
             error_log("Lỗi SQL getDanhSachCanKiemTra: " . $this->conn->error);
             return [];
@@ -45,20 +45,28 @@ class QCModel
 
     public function capNhatKetQuaQC($maYC, $slDat, $slHong, $ghiChu, $nguoiKiemTra)
     {
-        $sql = "UPDATE phieuyeucaukiemtrachatluong 
-                SET soLuongDat = ?, 
-                    soLuongHong = ?, 
-                    ghiChu = ?, 
-                    ngayKiemTra = NOW(),
-                    trangThaiPhieu = 'Đã duyệt' 
-                WHERE maYC = ?";
+        $sqlChiTiet = "UPDATE chitietphieuyeucaukiemtrachatluong 
+                       SET soLuongDat = ?, 
+                           soLuongHong = ?, 
+                           ghiChu = ?, 
+                           ngayKiemTra = NOW(),
+                           trangThaiSanPham = 'Đã kiểm tra'
+                       WHERE maYC = ?";
 
-        $stmt = $this->conn->prepare($sql);
-        
-        // iisi: int, int, string, int
-        $stmt->bind_param("iisi", $slDat, $slHong, $ghiChu, $maYC);
+        $stmt1 = $this->conn->prepare($sqlChiTiet);
+        if (!$stmt1) return false;
+        $stmt1->bind_param("iisi", $slDat, $slHong, $ghiChu, $maYC);
+        $kqChiTiet = $stmt1->execute();
 
-        return $stmt->execute();
+        if ($kqChiTiet) {
+            $sqlPhieu = "UPDATE phieuyeucaukiemtrachatluong 
+                         SET trangThai = 'Đã duyệt' 
+                         WHERE maYC = ?";
+            $stmt2 = $this->conn->prepare($sqlPhieu);
+            $stmt2->bind_param("i", $maYC);
+            return $stmt2->execute();
+        }
+
+        return false;
     }
 }
-?>

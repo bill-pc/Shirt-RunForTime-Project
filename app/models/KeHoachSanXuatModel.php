@@ -92,7 +92,6 @@ class KeHoachSanXuatModel
 
     public function getDanhSachKHSX($limit = 20)
     {
-        // SỬA: Thêm kh.maDonHang vào danh sách cột cần lấy
         $sql = "SELECT 
                     kh.tenKHSX, 
                     kh.maKHSX, 
@@ -120,10 +119,8 @@ class KeHoachSanXuatModel
     }
     public function createKHSX($data)
     {
-        // SỬA: Thay maKHSX bằng maDonHang trong câu lệnh SQL
-        // Cột maKHSX là tự động tăng (AUTO_INCREMENT) nên không cần insert vào
-        $sql = "INSERT INTO kehoachsanxuat (tenKHSX, maDonHang, thoiGianBatDau, thoiGianKetThuc, trangThai, maND)
-            VALUES (?, ?, ?, ?, 'Chờ duyệt', ?)";
+        $sql = "INSERT INTO kehoachsanxuat (tenKHSX, maDonHang, maSanPham, thoiGianBatDau, thoiGianKetThuc, trangThai, maND)
+            VALUES (?, ?, ?, ?, ?, 'Chờ duyệt', ?)";
 
         $stmt = $this->conn->prepare($sql);
 
@@ -131,11 +128,11 @@ class KeHoachSanXuatModel
             throw new Exception("Lỗi SQL Prepare (createKHSX): " . $this->conn->error);
         }
 
-        // SỬA: Thay $data['maKHSX'] bằng $data['maDonHang']
         $stmt->bind_param(
-            "sissi",
+            "siissi",
             $data['tenKHSX'],
             $data['maDonHang'],
+            $data['maSanPham'],
             $data['thoiGianBatDau'],
             $data['thoiGianKetThuc'],
             $data['maND']
@@ -149,12 +146,12 @@ class KeHoachSanXuatModel
     }
     public function createChiTietKHSX($dataChiTiet)
     {
-
         $nvlInfo = $this->getNvlInfo($dataChiTiet['maNVL']);
 
+        // 1. Xóa maSanPham khỏi câu lệnh SQL
         $sql = "INSERT INTO chitietkehoachsanxuat 
-                (maKHSX, maSanPham, maXuong, maNVL, tenNVL, loaiNVL, soLuongNVL, maGNTP)
-                VALUES (?, ?, ?, ?, ?, ?, ?, NULL)";
+            (maKHSX, maXuong, maNVL, tenNVL, loaiNVL, soLuongNVL, maGNTP)
+            VALUES (?, ?, ?, ?, ?, ?, NULL)";
 
         $stmt = $this->conn->prepare($sql);
 
@@ -162,10 +159,11 @@ class KeHoachSanXuatModel
             throw new Exception("Lỗi SQL Prepare (createChiTietKHSX): " . $this->conn->error);
         }
 
+        // 2. Cập nhật bind_param: Chỉ còn 6 tham số
+        // iiissi: int, int, int, string, string, int
         $stmt->bind_param(
-            "iiiissi",
+            "iiissi",
             $dataChiTiet['maKHSX'],
-            $dataChiTiet['maSanPham'],
             $dataChiTiet['maXuong'],
             $dataChiTiet['maNVL'],
             $nvlInfo['tenNVL'],
@@ -251,5 +249,23 @@ class KeHoachSanXuatModel
 
         $result = $stmt->get_result();
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    public function getSanPhamChinh($maKHSX)
+    {
+        $sql = "SELECT sp.maSanPham, sp.tenSanPham
+                FROM kehoachsanxuat kh
+                JOIN san_pham sp ON kh.maSanPham = sp.maSanPham
+                WHERE kh.maKHSX = ?";
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return null;
+
+        $stmt->bind_param("i", $maKHSX);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
+        return $result->fetch_assoc();
     }
 }

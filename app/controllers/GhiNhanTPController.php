@@ -15,23 +15,17 @@ class GhiNhanThanhPhamController
         $khsxModel = new KeHoachSanXuatModel();
         $xuongModel = new XuongModel();
 
-        // Lấy dữ liệu cho các Dropdown
         $danhSachKHSX = $khsxModel->getKHSXDaDuyet();
         $danhSachXuong = $xuongModel->getAllXuong();
 
-        // Lấy lịch sử 5 ngày gần nhất
         $lichSuGhiNhan = $ghiNhanModel->getLichSuGhiNhan();
 
         require_once 'app/views/ghiNhanTP.php';
     }
 
-    /**
-     * XỬ LÝ LƯU DANH SÁCH (JSON)
-     */
     public function luu()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Đọc dữ liệu JSON gửi từ fetch()
             $inputJSON = file_get_contents('php://input');
             $input = json_decode($inputJSON, true);
 
@@ -42,7 +36,6 @@ class GhiNhanThanhPhamController
                 exit;
             }
 
-            // Tạo header chung cho phiếu
             $header = [
                 'maKHSX' => $input['maKHSX'],
                 'maSanPham' => $input['maSanPham'],
@@ -51,7 +44,6 @@ class GhiNhanThanhPhamController
 
             $model = new GhiNhanThanhPhamModel();
 
-            // Gọi Model để lưu
             if ($model->luuDanhSach($header, $input['details'])) {
                 echo json_encode(['success' => true, 'message' => 'Lưu thành công!']);
             } else {
@@ -61,15 +53,20 @@ class GhiNhanThanhPhamController
         }
     }
 
-    // API: Lấy danh sách sản phẩm theo Kế hoạch
     public function ajaxGetSanPham()
     {
         $maKHSX = $_GET['maKHSX'] ?? 0;
         $model = new KeHoachSanXuatModel();
-        echo json_encode($model->getDS_SanPhamTheoKHSX($maKHSX));
+
+        $sanPham = $model->getSanPhamChinh($maKHSX);
+
+        if ($sanPham) {
+            echo json_encode([$sanPham]);
+        } else {
+            echo json_encode([]);
+        }
     }
 
-    // API: Lấy nhân viên theo Xưởng
     public function ajaxGetNhanVienByXuong()
     {
         $maXuong = $_GET['maXuong'] ?? 0;

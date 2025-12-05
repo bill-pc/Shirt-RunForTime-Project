@@ -19,7 +19,6 @@ class DonHangSanXuatModel
         return $query->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    // Hàm tìm kiếm nâng cao (có lọc theo ngày và trạng thái)
     public function timKiemDonHang($keyWord, $tuNgay = null, $denNgay = null, $trangThai = null)
     {
         $sql = 'SELECT dh.maDonHang, dh.tenDonHang, dh.ngayGiao, dh.trangThai
@@ -116,7 +115,6 @@ class DonHangSanXuatModel
         
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
-            // Ghi log lỗi SQL nếu prepare thất bại
             error_log("SQL Error in updateTrangThai: " . $this->conn->error);
             return false;
         }

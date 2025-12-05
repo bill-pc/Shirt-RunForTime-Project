@@ -38,8 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "Lập kế hoạch sản xuất": "index.php?page=lap-khsx",
         "Thống kê kho thành phẩm": "index.php?page=thongke",
         "Báo cáo chất lượng": "index.php?page=baocao-chatluong",
-        "Tạo đơn hàng sản xuất": "index.php?page=tao-don-hang-san-xuat"
-        
+        "Tạo đơn hàng sản xuất": "index.php?page=tao-don-hang-san-xuat",
+        "Cập nhật thành phẩm" : "index.php?page=cap-nhat-thanh-pham"
 
     };
 
