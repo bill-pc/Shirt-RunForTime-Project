@@ -400,6 +400,26 @@ case 'gioithieu':
         $controller->update();
         break;
     // case 'bao-cao-chat-luong':
+      case 'baocao-chatluong':
+    require_once 'app/controllers/BaoCaoChatLuongController.php';
+    $controller = new BaoCaoChatLuongController();
+    $controller->index();
+    break;
+
+case 'baocao-get': 
+    require_once 'app/controllers/BaoCaoChatLuongController.php';
+    $controller = new BaoCaoChatLuongController();
+    $controller->getDetail();
+    break;
+
+case 'baocao-export':
+    require_once 'app/controllers/BaoCaoChatLuongController.php';
+    $controller = new BaoCaoChatLuongController();
+    $controller->export();
+    break;
+
+
+
     //     break;
     case 'luu-don-hang-san-xuat':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -9,15 +9,15 @@
 
         <div class="table-container" style="background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
             <h3 style="margin-bottom:15px; color:#0056b3;">Danh sách phiếu chờ kiểm tra</h3>
-
+    
             <table class="data-table list-table" style="width:100%; border-collapse:collapse;">
                 <thead>
                     <tr style="background:#f1f5f9;">
                         <th style="padding:10px; border:1px solid #e2e8f0;">Mã QC</th>
-                        <th style="padding:10px; border:1px solid #e2e8f0;">Sản phẩm</th>
+                        <th style="padding:10px; border:1px solid #e2e8f0;text-align:center;">Sản phẩm</th>
                         <th style="padding:10px; border:1px solid #e2e8f0;">Tổng SL</th>
                         <th style="padding:10px; border:1px solid #e2e8f0;">Người lập</th>
-                        <th style="padding:10px; border:1px solid #e2e8f0;">Hành động</th>
+                        <th style="padding:10px; border:1px solid #e2e8f0;text-align:center;">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>

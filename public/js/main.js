@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
     const btnMenu = document.getElementById("menuDanhMuc");
     const dropdown = document.getElementById("dropdownDanhMuc");
     const sidebarList = document.getElementById("sidebarList");
 
     const danhMucData = {
-        tongquan: [ "Thông tin cá nhân", "Báo cáo tổng hợp", "Phê duyệt kế hoạch sản xuất"],
+        tongquan: ["Thông tin cá nhân", "Báo cáo tổng hợp", "Phê duyệt kế hoạch sản xuất"],
         nhansu: ["Thêm nhân viên", "Xem nhân viên", "Xóa nhân viên", "Sửa nhân viên"],
         sanxuat: ["Tạo đơn hàng sản xuất", "Lập kế hoạch sản xuất", "Phê duyệt các yêu cầu sản xuất"],
         khoNVL: ["Tạo yêu cầu nhập nguyên vật liệu", "Nhập kho nguyên vật liệu", "Xuất nguyên vật liệu", "Thống kê kho nguyên vật liệu"],
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "Thống kê kho thành phẩm": "index.php?page=thongke",
         "Báo cáo chất lượng": "index.php?page=baocao-chatluong",
         "Tạo đơn hàng sản xuất": "index.php?page=tao-don-hang-san-xuat",
-        "Cập nhật thành phẩm" : "index.php?page=cap-nhat-thanh-pham"
+        "Cập nhật thành phẩm": "index.php?page=cap-nhat-thanh-pham"
 
     };
 
