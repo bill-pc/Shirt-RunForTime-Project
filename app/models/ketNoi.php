@@ -3,7 +3,7 @@ class KetNoi {
     // === THAY ĐỔI THÔNG TIN KẾT NỐI CỦA BẠN Ở ĐÂY ===
     private $host = "localhost";
     private $user = "root";
-    private $pass = "admin";     // Mật khẩu XAMPP của bạn (thường là rỗng)
+    private $pass = "";     // Mật khẩu XAMPP của bạn (thường là rỗng)
     
     // Tên CSDL bạn đã import (ví dụ: QLAo)
     private $dbname = "qlsx_test";   

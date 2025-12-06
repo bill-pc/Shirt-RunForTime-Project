@@ -82,9 +82,6 @@ if (!empty($_SESSION['user']['maND'])) {
             if (!empty($tenThietBi)) {
                 $tenBaoCao .= " - " . $tenThietBi;
             }
-            if (!empty($hoTen)) {
-                $tenBaoCao .= " - " . $hoTen;
-            }
 
             // Xử lý upload hình ảnh (nếu có)
             $hinhAnh = null;

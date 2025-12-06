@@ -15,14 +15,15 @@ class BaoCaoTongHopModel
     {
 
         $sql_baocaoloi = "SELECT 
-            maBaoCao AS id, 
-            tenBaoCao AS ten_phieu, 
-            'Báo cáo lỗi' AS loai_phieu_text, 
-            'baocaoloi' AS loai_phieu_key,
-            thoiGian AS ngay_tao, 
-            'Ẩn danh' AS nguoi_lap, 
-            'Đã báo cáo' AS trang_thai
-        FROM baocaoloi bcl";
+        bcl.maBaoCao AS id, 
+        bcl.tenBaoCao AS ten_phieu, 
+        'Báo cáo lỗi' AS loai_phieu_text, 
+        'baocaoloi' AS loai_phieu_key,
+        bcl.thoiGian AS ngay_tao, 
+        nd.hoTen AS nguoi_lap, 
+        'Đã báo cáo' AS trang_thai
+    FROM baocaoloi bcl
+    JOIN nguoidung nd ON bcl.maND = nd.maND";
 
         $sql_phieunhapnvl = "SELECT 
             maPNVL AS id, 
