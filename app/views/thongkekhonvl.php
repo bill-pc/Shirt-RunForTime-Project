@@ -193,12 +193,20 @@ formThongKe.addEventListener('submit', async function(e) {
             `<tr><td colspan="6" style="color:gray;text-align:center;">Không có dữ liệu</td></tr>`;
     }
 
-    // Gán dữ liệu cho form Xuất CSV
-    document.getElementById('csv_start_date').value = document.getElementById('start_date').value;
-    document.getElementById('csv_end_date').value = document.getElementById('end_date').value;
-    document.getElementById('csv_tenNVL').value = chkAllNVL.checked ? '' : inputNVL.value;
-    document.getElementById('csv_all_nvl').value = chkAllNVL.checked ? 1 : 0;
+   // Sau khi có `data` từ server
 
+let finalTenNVL = '';
+if (!chkAllNVL.checked) {
+    finalTenNVL = inputNVL.value.trim();
+}
+// Nếu để trống và không tick "Tất cả", thì finalTenNVL = '' → toàn bộ → OK
+
+// Gán cho form xuất CSV
+document.getElementById('csv_start_date').value = document.getElementById('start_date').value;
+document.getElementById('csv_end_date').value = document.getElementById('end_date').value;
+document.getElementById('csv_tenNVL').value = finalTenNVL;
+document.getElementById('csv_all_nvl').value = chkAllNVL.checked ? '1' : '';
+document.getElementById('csv_loai').value = '';
 });
 
 /* ================= CHECKBOX TẤT CẢ NVL ================= */

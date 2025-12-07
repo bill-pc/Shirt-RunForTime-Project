@@ -38,7 +38,7 @@ if ($allNVL) {
     $end_date = $_GET['end_date'] ?? '';
     $tenNVL = $_GET['tenNVL'] ?? '';
     $loai = $_GET['loai'] ?? '';
-$allNVL = isset($_GET['all_nvl']);
+$allNVL = !empty($_GET['all_nvl']); // chỉ true khi có giá trị và khác rỗng
 
 if ($allNVL) {
     $tenNVL = '';
