@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th12 07, 2025 lúc 05:40 AM
+-- Thời gian đã tạo: Th12 07, 2025 lúc 10:56 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -299,7 +299,8 @@ CREATE TABLE `congviec` (
 --
 
 INSERT INTO `congviec` (`maCongViec`, `tieuDe`, `moTa`, `trangThai`, `ngayHetHan`, `maKHSX`, `maXuong`) VALUES
-(1, 'Cắt vải', 'cắt vải xanh dương', 'Đang thực hiện', '2025-12-23', 1, 1);
+(1, 'Cắt vải', 'cắt vải xanh dương', 'Đang thực hiện', '2025-12-23', 1, 1),
+(2, 'Ráp thân áo ', 'ráp 200 thân áo', 'Đang thực hiện', '2025-12-16', 1, 2);
 
 -- --------------------------------------------------------
 
@@ -582,8 +583,7 @@ CREATE TABLE `phieuxuatthanhpham` (
 --
 
 INSERT INTO `phieuxuatthanhpham` (`maPhieuXuat`, `maDonHang`, `maSanPham`, `soLuongXuat`, `ngayXuat`, `ghiChu`) VALUES
-(1, 1, 1, 5, '2025-10-30', ''),
-(2, 2, 2, 200, '2025-11-03', '');
+(1, 1, 1, 5, '2025-10-30', '');
 
 -- --------------------------------------------------------
 
@@ -1029,7 +1029,7 @@ ALTER TABLE `chitiet_phieuyeucaunhapkhonvl`
 -- AUTO_INCREMENT cho bảng `congviec`
 --
 ALTER TABLE `congviec`
-  MODIFY `maCongViec` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `maCongViec` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT cho bảng `donhangsanxuat`

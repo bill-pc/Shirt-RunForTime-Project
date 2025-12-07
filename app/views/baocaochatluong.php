@@ -89,7 +89,7 @@
                     <th>Tổng SL</th>
                     
                     <th>Người lập</th>
-                    <th>Hành động</th>
+                    <th></th>
                 </tr>
             </thead>
 
@@ -103,7 +103,7 @@
                     
                     <td style="text-align:center;"><?= $row['tenNguoiLap'] ?></td>
                     <td style="text-align:center;">
-                        <button class="btn-view" onclick="openDetail(<?= $row['maYC'] ?>)">Xem</button>
+                        <button class="btn-view" onclick="openDetail(<?= $row['maYC'] ?>)">Chi tiết</button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
