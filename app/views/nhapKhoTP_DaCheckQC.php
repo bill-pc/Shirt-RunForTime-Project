@@ -15,12 +15,21 @@ require_once 'app/views/layouts/nav.php';
             <?php if (isset($_GET['error'])): ?>
                 <div class="alert alert-error" style="background-color: #f8d7da; color: #721c24; padding: 12px 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
                     <strong>Lỗi!</strong> <?= isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : 'Đã xảy ra lỗi.' ?>
+                    <?php if (strpos($_GET['msg'] ?? '', 'kết nối') !== false): ?>
+                        <br><small>Vui lòng kiểm tra kết nối và thử lại.</small>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 
             <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 12px 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
-                    <strong>Thành công!</strong> Đã nhập kho thành phẩm thành công.
+                    <strong>Thành công!</strong> <?= isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : 'Nhập kho thành công' ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($thongBaoLoi) && !empty($thongBaoLoi)): ?>
+                <div class="alert alert-warning" style="background-color: #fff3cd; color: #856404; padding: 12px 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #ffeaa7;">
+                    <strong>Thông báo!</strong> <?= htmlspecialchars($thongBaoLoi) ?>
                 </div>
             <?php endif; ?>
 
@@ -36,8 +45,8 @@ require_once 'app/views/layouts/nav.php';
                             <tr style="background-color: #f8f9fa;">
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Mã Phiếu</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Sản Phẩm</th>
-                                <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Mã Lô</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Số Lượng</th>
+                                <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Người Lập</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Ngày Kiểm Tra</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Hành Động</th>
                             </tr>
@@ -56,13 +65,13 @@ require_once 'app/views/layouts/nav.php';
                                             <?= htmlspecialchars($phieu['sanPham']) ?>
                                         </td>
                                         <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
-                                            <?= htmlspecialchars($phieu['maLo']) ?>
-                                        </td>
-                                        <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
                                             <?= number_format($phieu['soLuong']) ?>
                                         </td>
                                         <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
-                                            <?= date('Y-m-d', strtotime($phieu['ngayKiemTra'])) ?>
+                                            <?= htmlspecialchars($phieu['tenNguoiLap']) ?>
+                                        </td>
+                                        <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
+                                            <?= isset($phieu['ngayKiemTra']) && !empty($phieu['ngayKiemTra']) ? date('Y-m-d', strtotime($phieu['ngayKiemTra'])) : date('Y-m-d') ?>
                                         </td>
                                         <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
                                             <button 
@@ -78,7 +87,7 @@ require_once 'app/views/layouts/nav.php';
                             <?php else: ?>
                                 <tr>
                                     <td colspan="6" style="border: 1px solid #dee2e6; padding: 15px; text-align: center; color: #6c757d;">
-                                        Không có phiếu kiểm tra chất lượng nào đã đạt.
+                                        Không có phiếu hợp lệ để nhập kho.
                                     </td>
                                 </tr>
                             <?php endif; ?>
@@ -118,15 +127,6 @@ require_once 'app/views/layouts/nav.php';
                             </div>
 
                             <div class="form-group">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
-                                    Mã Lô:
-                                </label>
-                                <div style="padding: 10px 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; font-size: 1em;">
-                                    <?= htmlspecialchars($chiTietPhieu['maLo']) ?>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
                                 <label for="soLuong" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
                                     Số Lượng: *
                                 </label>
@@ -153,7 +153,7 @@ require_once 'app/views/layouts/nav.php';
                                     Ngày Kiểm Tra:
                                 </label>
                                 <div style="padding: 10px 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; font-size: 1em;">
-                                    <?= date('Y-m-d', strtotime($chiTietPhieu['ngayKiemTra'])) ?>
+                                    <?= isset($chiTietPhieu['ngayKiemTra']) && !empty($chiTietPhieu['ngayKiemTra']) ? date('Y-m-d', strtotime($chiTietPhieu['ngayKiemTra'])) : (isset($chiTietPhieu['ngayLap']) ? date('Y-m-d', strtotime($chiTietPhieu['ngayLap'])) : date('Y-m-d')) ?>
                                 </div>
                             </div>
                         </div>
@@ -162,7 +162,7 @@ require_once 'app/views/layouts/nav.php';
                             <button 
                                 type="button" 
                                 class="btn btn-secondary" 
-                                onclick="window.location.href='index.php?page=nhap-kho-tp-da-check-qc'"
+                                onclick="window.location.href='index.php?page=nhap-kho-thanh-pham'"
                                 style="padding: 12px 30px; background-color: #6c757d; color: white; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; transition: background-color 0.3s;"
                                 onmouseover="this.style.backgroundColor='#5a6268'"
                                 onmouseout="this.style.backgroundColor='#6c757d'">
@@ -193,7 +193,7 @@ require_once 'app/views/layouts/nav.php';
 
 <script>
 function selectPhieu(maPhieu) {
-    window.location.href = 'index.php?page=nhap-kho-tp-da-check-qc&maPhieu=' + maPhieu;
+    window.location.href = 'index.php?page=nhap-kho-thanh-pham&maPhieu=' + maPhieu;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -218,6 +218,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!confirm('Bạn có chắc chắn muốn nhập kho thành phẩm này không?')) {
                 e.preventDefault();
                 return false;
+            }
+
+            // Disable button để tránh double submit
+            const btn = document.getElementById('btnLuuNhapKho');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Đang xử lý...';
             }
 
             return true;

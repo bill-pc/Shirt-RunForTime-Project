@@ -39,7 +39,8 @@ document.addEventListener("DOMContentLoaded", function() {
         "Thống kê kho thành phẩm": "index.php?page=thongke",
         "Báo cáo chất lượng": "index.php?page=baocao-chatluong",
         "Tạo đơn hàng sản xuất": "index.php?page=tao-don-hang-san-xuat",
-        "Cập nhật thành phẩm": "index.php?page=cap-nhat-thanh-pham"
+        "Cập nhật thành phẩm": "index.php?page=cap-nhat-thanh-pham",
+        "Nhập kho thành phẩm": "index.php?page=nhap-kho-thanh-pham"
 
     };
 

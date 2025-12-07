@@ -88,12 +88,13 @@ class XemCaLamViecModel {
     /**
      * Lấy lịch làm việc của nhân viên hiện tại trong tuần
      * @param int $maND Mã người dùng
+     * @param int $weekOffset Số tuần offset (0 = tuần này, 1 = tuần tới)
      * @return array Danh sách ca làm việc
      */
-    public function getLichLamViec($maND = null) {
-        // Lấy tuần hiện tại (từ thứ 2 đến chủ nhật)
-        $monday = date('Y-m-d', strtotime('monday this week'));
-        $sunday = date('Y-m-d', strtotime('sunday this week'));
+    public function getLichLamViec($maND = null, $weekOffset = 0) {
+        // Tính toán tuần dựa trên offset (0 = tuần này, 1 = tuần tới)
+        $monday = date('Y-m-d', strtotime('monday this week +' . $weekOffset . ' week'));
+        $sunday = date('Y-m-d', strtotime('sunday this week +' . $weekOffset . ' week'));
         
         // Query lấy dữ liệu từ 3 bảng: chitiet_lichlamviec, calamviec, nguoidung
         $sql = "SELECT 
@@ -207,11 +208,13 @@ class XemCaLamViecModel {
 
     /**
      * Lấy tóm tắt lịch làm việc
+     * @param int $maND Mã người dùng
+     * @param int $weekOffset Số tuần offset (0 = tuần này, 1 = tuần tới)
      */
-    public function getTomTatLichLamViec($maND = null) {
-        // Lấy tuần hiện tại (từ thứ 2 đến chủ nhật)
-        $monday = date('Y-m-d', strtotime('monday this week'));
-        $sunday = date('Y-m-d', strtotime('sunday this week'));
+    public function getTomTatLichLamViec($maND = null, $weekOffset = 0) {
+        // Tính toán tuần dựa trên offset
+        $monday = date('Y-m-d', strtotime('monday this week +' . $weekOffset . ' week'));
+        $sunday = date('Y-m-d', strtotime('sunday this week +' . $weekOffset . ' week'));
         
         // Query để đếm tổng số ca
         $sql = "SELECT COUNT(*) as tongSoCa
@@ -245,7 +248,7 @@ class XemCaLamViecModel {
         }
         
         // Lấy lịch làm việc để tìm ca gần nhất
-        $lichLamViec = $this->getLichLamViec($maND);
+        $lichLamViec = $this->getLichLamViec($maND, $weekOffset);
         
         // Tìm ca gần nhất (ca đầu tiên trong danh sách đã sắp xếp)
         $caGanNhat = null;
@@ -261,10 +264,11 @@ class XemCaLamViecModel {
 
     /**
      * Lấy tuần hiện tại (ngày bắt đầu và kết thúc)
+     * @param int $weekOffset Số tuần offset (0 = tuần này, 1 = tuần tới)
      */
-    public function getTuanHienTai() {
-        $monday = date('d/m/Y', strtotime('monday this week'));
-        $sunday = date('d/m/Y', strtotime('sunday this week'));
+    public function getTuanHienTai($weekOffset = 0) {
+        $monday = date('d/m/Y', strtotime('monday this week +' . $weekOffset . ' week'));
+        $sunday = date('d/m/Y', strtotime('sunday this week +' . $weekOffset . ' week'));
         return [
             'batDau' => $monday,
             'ketThuc' => $sunday

@@ -143,7 +143,9 @@ switch ($page) {
         break;
     // ✅ Trang hiển thị lịch làm việc
     case 'lichlamviec':
-        include './app/views/lichlamviec.php';
+        require_once './app/controllers/XemCaLamViecController.php';
+        $controller = new XemLichLamViecController();
+        $controller->index();
         break;
     case 'search':
         require_once './app/controllers/SearchController.php';
@@ -207,6 +209,21 @@ case 'gioithieu':
     break;
 
     //kho thành phẩm
+    case 'nhap-kho-thanh-pham':
+        require_once 'app/controllers/NhapKhoTP_DaCheckQCController.php';
+        $controller = new NhapKhoTP_DaCheckQCController();
+        $controller->index();
+        break;
+    case 'luu-nhap-kho-tp-da-check-qc':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once 'app/controllers/NhapKhoTP_DaCheckQCController.php';
+            $controller = new NhapKhoTP_DaCheckQCController();
+            $controller->luuNhapKho();
+        } else {
+            header('Location: index.php?page=nhap-kho-thanh-pham');
+            exit;
+        }
+        break;
     case 'xuatthanhpham':
         require_once 'app/controllers/XuatThanhPhamController.php';
         $controller = new XuatThanhPhamController();

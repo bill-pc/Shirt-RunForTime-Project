@@ -25,10 +25,15 @@ class XemLichLamViecController {
             $maND = $this->model->getMaNDFromMaTKPublic($maTK);
         }
 
-        // Lấy dữ liệu lịch làm việc
-        $lichLamViec = $this->model->getLichLamViec($maND);
-        $tomTat = $this->model->getTomTatLichLamViec($maND);
-        $tuanHienTai = $this->model->getTuanHienTai();
+        // Lấy dữ liệu lịch làm việc tuần này (weekOffset = 0)
+        $lichLamViec = $this->model->getLichLamViec($maND, 0);
+        $tomTat = $this->model->getTomTatLichLamViec($maND, 0);
+        $tuanHienTai = $this->model->getTuanHienTai(0);
+        
+        // Lấy dữ liệu lịch làm việc tuần tới (weekOffset = 1)
+        $lichLamViecTuanToi = $this->model->getLichLamViec($maND, 1);
+        $tomTatTuanToi = $this->model->getTomTatLichLamViec($maND, 1);
+        $tuanTiepTheo = $this->model->getTuanHienTai(1);
 
         require_once 'app/views/xemCaLamViec.php';
     }
