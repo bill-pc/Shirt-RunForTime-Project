@@ -241,9 +241,8 @@ case 'gioithieu':
     $c->chitiet();
     break;
 
-// ===== Thống kê sản phẩm (bắt cả 2 tên route) =====
+// ===== Thống kê sản phẩm  =====
 
-    case 'thongke_sanpham':
     case 'thongke':
         require_once __DIR__ . '/app/controllers/ThongKeKhoTPController.php';
         (new ThongKeKhoTPController())->index();

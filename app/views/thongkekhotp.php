@@ -74,9 +74,10 @@ th { background:#eef3ff; font-weight:600; }
                     <th>Mã SP</th>
                     <th>Tên sản phẩm</th>
                     <th>Đơn vị</th>
-                    <th>Số lượng nhập</th>
-                    <th>Số lượng xuất</th>
-                    <th>Tồn cuối</th>
+                    <th>Tổng SL</th>
+                    <th>Tổng xuất</th>
+                    <th>Tồn Kho</th>
+
                 </tr>
             </thead>
 
@@ -86,9 +87,10 @@ th { background:#eef3ff; font-weight:600; }
                     <td><?= $row['maSanPham'] ?></td>
                     <td><?= $row['tenSanPham'] ?></td>
                     <td><?= $row['donVi'] ?></td>
-                    <td><?= $row['soLuongNhap'] ?></td>
-                    <td><?= $row['soLuongXuat'] ?></td>
-                    <td><?= $row['tonCuoi'] ?></td>
+                    <td><?= $row['tongSL'] ?></td>
+                    <td><?= $row['tongXuat'] ?></td>
+                    <td><?= $row['tonKho'] ?></td>
+
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -105,21 +107,23 @@ th { background:#eef3ff; font-weight:600; }
     <script>
     const labels = <?= json_encode(array_column($data, 'tenSanPham')) ?>;
 
-    const nhap = <?= json_encode(array_column($data, 'soLuongNhap')) ?>;
-    const xuat = <?= json_encode(array_column($data, 'soLuongXuat')) ?>;
-    const toncuoi = <?= json_encode(array_column($data, 'tonCuoi')) ?>;
+    const tongSL  = <?= json_encode(array_column($data, 'tongSL')) ?>;
+const tongXuat = <?= json_encode(array_column($data, 'tongXuat')) ?>;
+const tonKho = <?= json_encode(array_column($data, 'tonKho')) ?>;
 
-    new Chart(document.getElementById('chartTP'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                { label: "Nhập kho", data: nhap, backgroundColor:"#4CAF50" },
-                { label: "Xuất kho", data: xuat, backgroundColor:"#F44336" },
-                { label: "Tồn cuối", data: toncuoi, backgroundColor:"#2196F3" }
-            ]
-        }
-    });
+new Chart(document.getElementById('chartTP'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            { label: "Tổng SL", data: tongSL, backgroundColor:"#4CAF50" },
+            { label: "Tổng xuất", data: tongXuat, backgroundColor:"#F44336" },
+            { label: "Tồn Kho", data: tonKho, backgroundColor:"#2196F3" }
+        ]
+    }
+});
+
+
     </script>
 
 </main>

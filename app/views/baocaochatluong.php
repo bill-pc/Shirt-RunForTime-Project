@@ -78,7 +78,7 @@
 <?php require_once 'app/views/layouts/sidebar.php'; ?>
 
 <main class="main-content">
-    <h2 class="main-title" style="text-align:center; color:#0d1a44;">BÁO CÁO CHẤT LƯỢNG</h2>
+    <h2 class="main-title" style="text-align:center; color:#0d1a44;">DANH SÁCH BÁO CÁO CHẤT LƯỢNG</h2>
 
     <div class="table-container">
         <table class="data-table" style="width:100%; border-collapse:collapse;">
@@ -87,7 +87,6 @@
                     <th>Mã QC</th>
                     <th>Sản phẩm</th>
                     <th>Tổng SL</th>
-                    
                     <th>Người lập</th>
                     <th></th>
                 </tr>
