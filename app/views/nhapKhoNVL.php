@@ -13,27 +13,22 @@ require_once 'app/views/layouts/nav.php';
           <div class="form-group">
             <label for="requestRef">Phiếu Yêu Cầu Nhập Kho (chỉ phiếu đã duyệt)</label>
             <select id="requestRef" onchange="loadFromRequest(this.value)">
-  <option value="">-- Chọn phiếu yêu cầu đã duyệt --</option>
-  <?php if (!empty($requests)): ?>
-      <?php foreach ($requests as $row): ?>
-          <option value="<?= htmlspecialchars($row['maYCNK']) ?>">
-              <?= htmlspecialchars($row['maYCNK']) ?> - <?= htmlspecialchars($row['nhaCungCap']) ?> (<?= htmlspecialchars($row['ngayLap']) ?>)
-          </option>
-      <?php endforeach; ?>loadFromRequest
-
-  <?php else: ?>
-      <option disabled>Không có phiếu nào đã duyệt</option>
-  <?php endif; ?>
-</select>
+              <option value="">-- Chọn phiếu yêu cầu đã duyệt --</option>
+              <?php if (!empty($requests)): ?>
+                  <?php foreach ($requests as $row): ?>
+                      <option value="<?= htmlspecialchars($row['maYCNK']) ?>">
+                          Phiếu #<?= htmlspecialchars($row['maYCNK']) ?> - <?= htmlspecialchars($row['tenPhieu']) ?> 
+                          (<?= htmlspecialchars($row['ngayLap']) ?>) - Người lập: <?= htmlspecialchars($row['tenNguoiLap']) ?>
+                      </option>
+                  <?php endforeach; ?>
+              <?php else: ?>
+                  <option disabled>Không có phiếu nào đã duyệt</option>
+              <?php endif; ?>
+            </select>
 
             <small style="color:#555; display:block; margin-top:5px;">
               Hệ thống chỉ cho phép lấy dữ liệu từ các phiếu <b>Đã duyệt</b>.
             </small>
-          </div>
-
-          <div class="form-group">
-            <label for="supplier">Nhà Cung Cấp *</label>
-            <input type="text" id="supplier" placeholder="Nhập tên nhà cung cấp" required>
           </div>
 
           <div class="form-group">
@@ -46,12 +41,12 @@ require_once 'app/views/layouts/nav.php';
             <table>
                   <thead>
       <tr>
+        <th>Mã NVL</th>
         <th>Tên NVL</th>
-        <th>Số lượng yêu cầu</th>
-        <th>Tồn kho</th>
-        <th>Cần nhập</th>
+        <th>Số lượng nhập</th>
         <th>Đơn vị</th>
-        <th>Loại</th>
+        <th>Loại NVL</th>
+        <th>Nhà cung cấp</th>
       </tr>
     </thead>
     <tbody id="linesBody"></tbody>
@@ -83,19 +78,19 @@ require_once 'app/views/layouts/nav.php';
   data.forEach(row => {
     tbody.innerHTML += `
       <tr>
+        <td>${row.maNVL}</td>
         <td>${row.tenNVL}</td>
-        <td>${row.soLuongYeuCau}</td>
-        <td>${row.soLuongTonKho}</td>
-        <td>${row.soLuongCanNhap}</td>
+        <td style="text-align:center; font-weight:bold;">${row.soLuongYeuCau}</td>
         <td>${row.donViTinh ?? '-'}</td>
         <td>${row.loaiNVL ?? '-'}</td>
+        <td>${row.nhaCungCap ?? '-'}</td>
       </tr>`;
   });
 
-  // ✅ Tự động gán dữ liệu cần nhập cho khi lưu phiếu
+  // ✅ Tự động gán dữ liệu ban đầu (số lượng cố định từ phiếu yêu cầu)
   window.selectedItems = data.map(r => ({
     maNVL: parseInt(r.maNVL),
-    soLuong: parseInt(r.soLuongCanNhap) || 0
+    soLuong: parseInt(r.soLuongYeuCau) || 0
   }));
 }
 
@@ -105,19 +100,19 @@ require_once 'app/views/layouts/nav.php';
   e.preventDefault();
 
   if (!window.selectedItems || window.selectedItems.length === 0) {
-    alert('⚠️ Không có dữ liệu cần nhập!');
+    alert('⚠️ Không có dữ liệu để nhập kho!');
     return;
   }
 
   const items = window.selectedItems.filter(i => i.soLuong > 0);
   if (items.length === 0) {
-    alert('⚠️ Tất cả NVL đều không cần nhập (đủ tồn kho)!');
+    alert('⚠️ Phiếu yêu cầu không có NVL nào!');
     return;
   }
 
   const formData = new FormData();
   formData.append('maYCNK', document.getElementById('requestRef').value);
-  formData.append('nhaCungCap', document.getElementById('supplier').value.trim());
+  formData.append('ghiChu', document.getElementById('notes').value.trim());
   formData.append('items', JSON.stringify(items));
 
   try {
@@ -256,6 +251,20 @@ require_once 'app/views/layouts/nav.php';
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+}
+
+.qty-input {
+  width: 80px;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.qty-input:focus {
+  border-color: #004aad;
+  outline: none;
 }
 </style>
 

@@ -47,17 +47,50 @@ public function luuPhieu() {
         return;
     }
 
+    // Debug: Log dữ liệu POST
+    error_log("POST Data: " . print_r($_POST, true));
+
     $model = new PhieuYeuCauNhapKhoModel();
 
+    $maKHSX = intval($_POST['maKHSX'] ?? 0);
+    $dsNVL = $_POST['nvl'] ?? [];
+    
+    // Kiểm tra dữ liệu cơ bản
+    if ($maKHSX <= 0) {
+        echo "<script>
+            alert('⚠️ Vui lòng chọn kế hoạch sản xuất!');
+            window.history.back();
+        </script>";
+        return;
+    }
+
+    if (empty($dsNVL)) {
+        echo "<script>
+            alert('⚠️ Vui lòng chọn ít nhất một nguyên vật liệu!');
+            window.history.back();
+        </script>";
+        return;
+    }
+    
+    // ✅ Lấy nhà cung cấp cho từng NVL
+    $nhaCungCap = [];
+    foreach ($dsNVL as $maNVL) {
+        $key = 'nhaCungCap_' . $maNVL;
+        if (isset($_POST[$key])) {
+            $nhaCungCap[$maNVL] = $_POST[$key];
+        }
+    }
+
     $data = [
-        'maKHSX' => $_POST['maKHSX'] ?? null,
-        'nhaCungCap' => $_POST['nhaCungCap'] ?? '',
+        'maKHSX' => $maKHSX,
         'ngayLap' => $_POST['ngayLap'] ?? date('Y-m-d'),
         'ghiChu' => $_POST['ghiChu'] ?? '',
-        'nvl' => $_POST['nvl'] ?? []
+        'nvl' => $dsNVL,
+        'nhaCungCap' => $nhaCungCap
     ];
 
-    $maKHSX = intval($data['maKHSX'] ?? 0);
+    // Debug
+    error_log("Data to save: " . print_r($data, true));
 
     // ✅ Kiểm tra đã có phiếu cho kế hoạch này chưa
     if ($model->existsByKeHoach($maKHSX)) {

@@ -73,7 +73,7 @@ require_once './app/views/layouts/nav.php';
             <h2>Lập phiếu yêu cầu nhập kho nguyên vật liệu</h2>
           </div>
 
-          <form method="POST" action="index.php?page=luu-phieu-nhap-kho">
+          <form method="POST" action="index.php?page=luu-yeu-cau-nhap-kho">
             <div class="form-row">
               <div class="form-group">
                 <label for="ngayLap" class="required">Ngày lập phiếu</label>
@@ -81,12 +81,16 @@ require_once './app/views/layouts/nav.php';
               </div>
 
               <div class="form-group">
-                <label for="nhaCungCap" class="required">Nhà cung cấp</label>
-                <select id="nhaCungCap" name="nhaCungCap" required>
-                  <option value="">-- Chọn nhà cung cấp --</option>
-                  <option value="NCC001">Công ty Vải Việt Nam</option>
-                  <option value="NCC002">Công ty Sợi Quốc Tế</option>
-                  <option value="NCC003">Công ty Phụ liệu May Mặc</option>
+                <label for="maKHSX" class="required">Kế hoạch sản xuất</label>
+                <select id="maKHSX" name="maKHSX" required>
+                  <option value="">-- Chọn kế hoạch --</option>
+                  <?php if (!empty($danhSachKHSX)): ?>
+                    <?php foreach ($danhSachKHSX as $khsx): ?>
+                      <option value="<?= htmlspecialchars($khsx['maKHSX']) ?>">
+                        <?= htmlspecialchars($khsx['tenKHSX']) ?> (<?= $khsx['thoiGianBatDau'] ?> → <?= $khsx['thoiGianKetThuc'] ?>)
+                      </option>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                 </select>
               </div>
             </div>
@@ -96,20 +100,6 @@ require_once './app/views/layouts/nav.php';
               <textarea id="ghiChu" name="ghiChu" placeholder="Nhập ghi chú nếu có..."></textarea>
             </div>
 
-            <div class="form-group">
-              <label for="maKHSX" class="required">Kế hoạch sản xuất</label>
-              <select id="maKHSX" name="maKHSX" required>
-                <option value="">-- Chọn kế hoạch --</option>
-                <?php if (!empty($danhSachKHSX)): ?>
-                  <?php foreach ($danhSachKHSX as $khsx): ?>
-                    <option value="<?= htmlspecialchars($khsx['maKHSX']) ?>">
-                      <?= htmlspecialchars($khsx['tenKHSX']) ?> (<?= $khsx['thoiGianBatDau'] ?> → <?= $khsx['thoiGianKetThuc'] ?>)
-                    </option>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-              </select>
-            </div>
-
             <div class="table-container">
               <table id="tableNVL">
                 <thead>
@@ -117,15 +107,14 @@ require_once './app/views/layouts/nav.php';
                     <th><input type="checkbox" id="selectAll"></th>
                     <th>Mã NVL</th>
                     <th>Tên NVL</th>
-                    <th>Số lượng cần</th>
+                    <th>Số lượng</th>
                     <th>Đơn vị</th>
-                    <th>Tồn kho</th>
-                    <th>Cần nhập</th>
+                    <th style="min-width: 200px;">Nhà cung cấp</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="7" style="text-align:center; color:gray;">Vui lòng chọn kế hoạch để hiển thị NVL</td>
+                    <td colspan="6" style="text-align:center; color:gray;">Vui lòng chọn kế hoạch để hiển thị NVL</td>
                   </tr>
                 </tbody>
               </table>
@@ -151,9 +140,37 @@ require_once './app/views/layouts/nav.php';
 
 <style>
 <?php include './public/css/phieu-nhap.css'; ?>
+
+.ncc-select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.ncc-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.ncc-select:focus {
+  outline: none;
+  border-color: #3b7ddd;
+  box-shadow: 0 0 0 2px rgba(59, 125, 221, 0.1);
+}
 </style>
 
 <script>
+// Danh sách nhà cung cấp mẫu
+const nhaCungCapList = [
+  'Công ty Vải Việt Nam',
+  'Công ty Sợi Quốc Tế',
+  'Công ty Phụ liệu May Mặc',
+  'Công ty Vải Cotton Cao Cấp',
+  'Công ty Phụ Kiện Thời Trang'
+];
+
 document.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById('ngayLap');
   dateInput.value = new Date().toISOString().split('T')[0];
@@ -164,6 +181,12 @@ function switchTab(tab, e) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(tab).classList.add('active');
   e.target.classList.add('active');
+}
+
+// Cập nhật số lượng NVL được chọn
+function updateSelectedCount() {
+  const checked = document.querySelectorAll('input[name="nvl[]"]:checked').length;
+  document.getElementById('selectedCount').textContent = checked;
 }
 
 // Khi chọn kế hoạch sản xuất
@@ -180,7 +203,7 @@ document.getElementById('maKHSX').addEventListener('change', async (e) => {
       alert('⚠️ Kế hoạch sản xuất này đã được lập phiếu yêu cầu nhập kho NVL rồi!');
       e.target.value = ''; // reset chọn
       document.querySelector('#tableNVL tbody').innerHTML = `
-        <tr><td colspan="7" style="text-align:center; color:gray;">Vui lòng chọn kế hoạch khác</td></tr>`;
+        <tr><td colspan="6" style="text-align:center; color:gray;">Vui lòng chọn kế hoạch khác</td></tr>`;
       return;
     }
   } catch (error) {
@@ -195,58 +218,95 @@ document.getElementById('maKHSX').addEventListener('change', async (e) => {
 
     if (!Array.isArray(data) || data.length === 0) {
       tbody.innerHTML = `
-        <tr><td colspan="7" style="text-align:center; color:gray;">
+        <tr><td colspan="6" style="text-align:center; color:gray;">
           Không có nguyên vật liệu cho kế hoạch này
         </td></tr>`;
       return;
     }
 
-    tbody.innerHTML = data.map(item => `
+    // Tạo options cho nhà cung cấp
+    const nccOptions = nhaCungCapList.map(ncc => `<option value="${ncc}">${ncc}</option>`).join('');
+
+    tbody.innerHTML = data.map((item, index) => {
+      return `
       <tr>
         <td><input type="checkbox" name="nvl[]" value="${item.maNVL}"></td>
         <td>${item.maNVL}</td>
         <td>${item.tenNVL}</td>
         <td>${item.soLuongCan}</td>
         <td>${item.donViTinh ?? '-'}</td>
-        <td>${item.soLuongTonKho ?? 0}</td>
-        <td>${Math.max(item.soLuongCan - (item.soLuongTonKho ?? 0), 0)}</td>
+        <td>
+          <select name="nhaCungCap_${item.maNVL}" class="ncc-select" disabled required>
+            <option value="">-- Chọn nhà cung cấp --</option>
+            ${nccOptions}
+          </select>
+        </td>
       </tr>
-    `).join('');
+    `}).join('');
+    
+    updateSelectedCount();
   } catch (error) {
     console.error('Lỗi tải NVL:', error);
   }
 });
 
-// Cập nhật đếm số lượng NVL được chọn
-// Cập nhật đếm số lượng NVL được chọn
+// Cập nhật khi checkbox thay đổi
 document.addEventListener('change', (e) => {
   if (e.target.name === 'nvl[]') {
-    const checked = document.querySelectorAll('input[name="nvl[]"]:checked').length;
-    document.getElementById('selectedCount').textContent = checked;
+    const row = e.target.closest('tr');
+    const nccSelect = row.querySelector('.ncc-select');
+    
+    if (e.target.checked) {
+      nccSelect.disabled = false;
+      nccSelect.required = true;
+    } else {
+      nccSelect.disabled = true;
+      nccSelect.required = false;
+      nccSelect.value = '';
+    }
+    
+    updateSelectedCount();
   }
 
   if (e.target.id === 'selectAll') {
     const all = document.querySelectorAll('input[name="nvl[]"]');
-    all.forEach(cb => cb.checked = e.target.checked);
-    document.getElementById('selectedCount').textContent = e.target.checked ? all.length : 0;
+    all.forEach(cb => {
+      cb.checked = e.target.checked;
+      const row = cb.closest('tr');
+      const nccSelect = row.querySelector('.ncc-select');
+      if (nccSelect) {
+        nccSelect.disabled = !e.target.checked;
+        nccSelect.required = e.target.checked;
+      }
+    });
+    updateSelectedCount();
   }
 });
 
 // ✅ Kiểm tra trước khi submit form
 document.querySelector('form').addEventListener('submit', function(e) {
-  const rows = document.querySelectorAll('#tableNVL tbody tr');
-  let canNhapCount = 0;
+  const checkedBoxes = document.querySelectorAll('input[name="nvl[]"]:checked');
+  
+  if (checkedBoxes.length === 0) {
+    e.preventDefault();
+    alert("⚠️ Vui lòng chọn ít nhất một nguyên vật liệu cần nhập kho!");
+    return false;
+  }
 
-  rows.forEach(row => {
-    const cell = row.children[6]; // cột “Cần nhập”
-    if (cell && parseFloat(cell.textContent) > 0) {
-      canNhapCount++;
+  // Kiểm tra nhà cung cấp đã được chọn chưa
+  let missingNCC = false;
+  checkedBoxes.forEach(checkbox => {
+    const row = checkbox.closest('tr');
+    const nccSelect = row.querySelector('.ncc-select');
+    if (nccSelect && !nccSelect.value) {
+      missingNCC = true;
+      nccSelect.style.border = '2px solid red';
     }
   });
 
-  if (canNhapCount === 0) {
+  if (missingNCC) {
     e.preventDefault();
-    alert("⚠️ Tất cả nguyên vật liệu đều đủ tồn kho. Không cần lập phiếu nhập kho!");
+    alert("⚠️ Vui lòng chọn nhà cung cấp cho tất cả các NVL được chọn!");
     return false;
   }
 });

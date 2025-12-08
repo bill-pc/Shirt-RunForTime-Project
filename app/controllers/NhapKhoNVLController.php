@@ -34,7 +34,7 @@ class NhapKhoNVLController {
     $data = [
         'tenPNVL' => 'Phiếu nhập nguyên vật liệu',
         'nguoiLap' => $_SESSION['user']['hoTen'] ?? 'Không rõ',
-        'nhaCungCap' => $_POST['nhaCungCap'] ?? '',
+        'ghiChu' => $_POST['ghiChu'] ?? '',
         'ngayNhap' => date('Y-m-d'),
         'maYCNK' => $_POST['maYCNK'] ?? '',
         'items' => json_decode($_POST['items'] ?? '[]', true)

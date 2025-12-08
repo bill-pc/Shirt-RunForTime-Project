@@ -21,62 +21,114 @@ class PheDuyetKeHoachSXModel {
 
     // ✅ 2. Lấy chi tiết kế hoạch (sản phẩm, NVL, xưởng)
     public function getPlanDetails($maKHSX) {
-        $sql = "SELECT k.maKHSX, k.maDonHang, k.ngayBatDau, k.ngayKetThuc, k.ghiChu,
-                       s.tenSanPham, s.soLuongSanXuat, x.tenXuong
+        $sql = "SELECT 
+                    k.maKHSX, 
+                    k.maDonHang, 
+                    k.thoiGianBatDau AS ngayBatDau, 
+                    k.thoiGianKetThuc AS ngayKetThuc, 
+                    d.tenDonHang,
+                    d.tenSanPham,
+                    d.soLuongSanXuat,
+                    s.maSanPham
                 FROM kehoachsanxuat k
-                LEFT JOIN sanpham s ON k.maSanPham = s.maSanPham
-                LEFT JOIN xuong x ON k.maXuong = x.maXuong
+                LEFT JOIN donhangsanxuat d ON k.maDonHang = d.maDonHang
+                LEFT JOIN san_pham s ON d.maSanPham = s.maSanPham
                 WHERE k.maKHSX = ?";
+        
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('i', $maKHSX);
         $stmt->execute();
         $data = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$data) {
+            return null;
+        }
 
         // ✅ Lấy chi tiết nguyên vật liệu cho kế hoạch
-        $sqlNVL = "SELECT c.maNVL, n.tenNVL, n.donViTinh, n.soLuongTonKho, c.soLuongNVL AS soLuongCan, 
-                          CASE 
-                            WHEN n.soLuongTonKho >= c.soLuongNVL THEN 'Đủ kho'
-                            ELSE CONCAT('Thiếu ', c.soLuongNVL - n.soLuongTonKho)
-                          END AS ghiChu
+        $sqlNVL = "SELECT 
+                      c.maNVL, 
+                      c.tenNVL, 
+                      c.loaiNVL,
+                      n.donViTinh, 
+                      n.soLuongTonKho, 
+                      c.soLuongNVL AS soLuongCan,
+                      x.tenXuong,
+                      CASE 
+                        WHEN n.soLuongTonKho >= c.soLuongNVL THEN 'Đủ kho'
+                        ELSE CONCAT('Thiếu ', c.soLuongNVL - n.soLuongTonKho)
+                      END AS ghiChu
                    FROM chitietkehoachsanxuat c
                    JOIN nvl n ON c.maNVL = n.maNVL
+                   LEFT JOIN xuong x ON c.maXuong = x.maXuong
                    WHERE c.maKHSX = ?";
+        
         $stmtNVL = $this->conn->prepare($sqlNVL);
         $stmtNVL->bind_param('i', $maKHSX);
         $stmtNVL->execute();
-        $data['nguyenVatLieu'] = $stmtNVL->get_result()->fetch_all(MYSQLI_ASSOC);
+        $result = $stmtNVL->get_result();
+        
+        $data['nguyenVatLieu'] = $result->fetch_all(MYSQLI_ASSOC);
+        
+        // Lấy tên xưởng từ NVL đầu tiên (giả định tất cả NVL cùng xưởng)
+        if (!empty($data['nguyenVatLieu'])) {
+            $data['tenXuong'] = $data['nguyenVatLieu'][0]['tenXuong'] ?? '—';
+        } else {
+            $data['tenXuong'] = '—';
+        }
+        
+        $stmtNVL->close();
 
         return $data;
     }
 
     public function updatePlanStatus($maKHSX, $trangThai, $ghiChu = '') {
-    $sql = "UPDATE kehoachsanxuat SET trangThai = ?, ghiChu = ? WHERE maKHSX = ?";
-    $stmt = $this->conn->prepare($sql);
+        // Chỉ cập nhật trạng thái, không cập nhật ghiChu vì bảng kehoachsanxuat không có cột này
+        $sql = "UPDATE kehoachsanxuat SET trangThai = ? WHERE maKHSX = ?";
+        $stmt = $this->conn->prepare($sql);
 
-    if (!$stmt) {
-        die("❌ Lỗi prepare SQL: " . $this->conn->error);
+        if (!$stmt) {
+            throw new Exception("Lỗi prepare SQL: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("si", $trangThai, $maKHSX);
+
+        if (!$stmt->execute()) {
+            $error = $stmt->error;
+            $stmt->close();
+            throw new Exception("Lỗi khi cập nhật kế hoạch: " . $error);
+        }
+
+        // Kiểm tra có bản ghi nào được update
+        $affected = $stmt->affected_rows;
+        $stmt->close();
+        
+        if ($affected === 0) {
+            throw new Exception("Không tìm thấy kế hoạch với mã: " . $maKHSX);
+        }
+
+        return true;
     }
 
-    $stmt->bind_param("ssi", $trangThai, $ghiChu, $maKHSX);
-
-    if (!$stmt->execute()) {
-        die("❌ Lỗi khi cập nhật kế hoạch: " . $stmt->error);
+    public function addApprovalHistory($maKHSX, $hanhDong, $ghiChu, $nguoiThucHien) {
+        $sql = "INSERT INTO lichsupheduyet (maKHSX, hanhDong, ghiChu, nguoiThucHien) VALUES (?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        
+        if (!$stmt) {
+            throw new Exception("Lỗi prepare SQL lichsupheduyet: " . $this->conn->error);
+        }
+        
+        $stmt->bind_param("isss", $maKHSX, $hanhDong, $ghiChu, $nguoiThucHien);
+        
+        if (!$stmt->execute()) {
+            $error = $stmt->error;
+            $stmt->close();
+            throw new Exception("Lỗi khi lưu lịch sử: " . $error);
+        }
+        
+        $stmt->close();
+        return true;
     }
-
-    // Debug để kiểm tra có bản ghi nào được update
-    if ($stmt->affected_rows === 0) {
-        echo "<script>alert('⚠️ Không có bản ghi nào được cập nhật (mã kế hoạch không tồn tại).');</script>";
-    }
-
-    $stmt->close();
-}
-public function addApprovalHistory($maKHSX, $hanhDong, $ghiChu, $nguoiThucHien) {
-    $sql = "INSERT INTO lichsupheduyet (maKHSX, hanhDong, ghiChu, nguoiThucHien) VALUES (?, ?, ?, ?)";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->bind_param("isss", $maKHSX, $hanhDong, $ghiChu, $nguoiThucHien);
-    $stmt->execute();
-    $stmt->close();
-}
 
 public function getApprovalHistory($maKHSX) {
     $sql = "SELECT hanhDong, ghiChu, nguoiThucHien, thoiGian 

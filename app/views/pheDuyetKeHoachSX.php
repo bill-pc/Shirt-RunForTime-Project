@@ -14,7 +14,7 @@
           <ul class="plan-list">
             <?php if (!empty($plans)): ?>
               <?php foreach ($plans as $p): ?>
-                <li class="plan-item" onclick="selectPlan(this, <?= $p['maKHSX'] ?>)">
+                <li class="plan-item" data-ma-khsx="<?= $p['maKHSX'] ?>" onclick="selectPlan(this, <?= $p['maKHSX'] ?>)">
                   <div class="plan-item-header">
                     <span class="plan-item-name"><?= htmlspecialchars($p['tenKHSX']) ?></span>
                     <span class="plan-item-status status-pending"><?= htmlspecialchars($p['trangThai']) ?></span>
@@ -77,24 +77,6 @@
         </div>
       </div>
 
-      <!-- Lịch sử phê duyệt -->
-      <div class="section" id="approval-history-section" style="display:none;">
-        <div class="section-title">📜 Lịch Sử Phê Duyệt</div>
-        <div class="section-content">
-          <table class="detail-table" id="history-table">
-            <thead>
-              <tr>
-                <th>Hành động</th>
-                <th>Ghi chú</th>
-                <th>Người thực hiện</th>
-                <th>Thời gian</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
       <!-- Modal Phê duyệt -->
       <div class="modal" id="approveModal">
         <div class="modal-content">
@@ -135,62 +117,60 @@ async function selectPlan(el, maKHSX) {
   document.querySelectorAll(".plan-item").forEach(i => i.classList.remove("active"));
   el.classList.add("active");
 
-  const res = await fetch(`index.php?page=ajax-get-plan-detail&maKHSX=${maKHSX}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`index.php?page=ajax-get-plan-detail&maKHSX=${maKHSX}`);
+    const data = await res.json();
 
-  const section = document.getElementById("plan-detail-section");
-  section.style.display = "block";
+    if (data.error) {
+      alert("❌ " + data.error);
+      return;
+    }
 
-  document.getElementById("order-code").textContent = data.maDonHang || "—";
-  document.getElementById("start-date").textContent = data.ngayBatDau || "—";
-  document.getElementById("end-date").textContent = data.ngayKetThuc || "—";
-  document.getElementById("product-name").textContent = data.tenSanPham || "—";
-  document.getElementById("product-qty").textContent = data.soLuongSanXuat || "—";
-  document.getElementById("workshop-name").textContent = data.tenXuong || "—";
-  document.getElementById("plan-note").textContent = data.ghiChu ?? '';
+    const section = document.getElementById("plan-detail-section");
+    section.style.display = "block";
 
-  // Nguyên vật liệu
-  const tbody = document.querySelector("#materials-table tbody");
-  tbody.innerHTML = "";
-  let totalNeed = 0, totalStock = 0;
+    // Hiển thị thông tin đơn hàng và sản phẩm
+    document.getElementById("order-code").textContent = (data.maDonHang ? `DHSX-${data.maDonHang}` : "—") + 
+      (data.tenDonHang ? ` (${data.tenDonHang})` : "");
+    document.getElementById("start-date").textContent = data.ngayBatDau || "—";
+    document.getElementById("end-date").textContent = data.ngayKetThuc || "—";
+    document.getElementById("product-name").textContent = data.tenSanPham || "—";
+    document.getElementById("product-qty").textContent = (data.soLuongSanXuat || "—") + " cái";
+    document.getElementById("workshop-name").textContent = data.tenXuong || "—";
+    document.getElementById("plan-note").textContent = data.ghiChu || "Không có ghi chú";
 
-  data.nguyenVatLieu.forEach(m => {
-    totalNeed += parseInt(m.soLuongCan);
-    totalStock += parseInt(m.soLuongTonKho);
-    tbody.innerHTML += `
-      <tr>
-        <td>${m.maNVL}</td>
-        <td>${m.tenNVL}</td>
-        <td>${m.donViTinh}</td>
-        <td>${m.soLuongCan}</td>
-        <td>${m.soLuongTonKho}</td>
-        <td>${m.ghiChu}</td>
-      </tr>`;
-  });
-  document.getElementById("total-need").textContent = totalNeed;
-  document.getElementById("total-stock").textContent = totalStock;
+    // Nguyên vật liệu
+    const tbody = document.querySelector("#materials-table tbody");
+    tbody.innerHTML = "";
+    let totalNeed = 0, totalStock = 0;
 
-  // ✅ Lấy lịch sử phê duyệt
-  const historyRes = await fetch(`index.php?page=ajax-get-approval-history&maKHSX=${maKHSX}`);
-  const history = await historyRes.json();
-  const tbodyHistory = document.querySelector("#history-table tbody");
-  tbodyHistory.innerHTML = "";
+    if (data.nguyenVatLieu && data.nguyenVatLieu.length > 0) {
+      data.nguyenVatLieu.forEach(m => {
+        totalNeed += parseInt(m.soLuongCan) || 0;
+        totalStock += parseInt(m.soLuongTonKho) || 0;
+        tbody.innerHTML += `
+          <tr>
+            <td>${m.maNVL}</td>
+            <td>${m.tenNVL} (${m.loaiNVL || ''})</td>
+            <td>${m.donViTinh || ''}</td>
+            <td>${m.soLuongCan}</td>
+            <td>${m.soLuongTonKho}</td>
+            <td style="color: ${m.ghiChu.includes('Thiếu') ? 'red' : 'green'}; font-weight: bold;">
+              ${m.ghiChu}
+            </td>
+          </tr>`;
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Chưa có thông tin nguyên vật liệu</td></tr>';
+    }
 
-  if (history.length > 0) {
-    history.forEach(h => {
-      const icon = h.hanhDong.includes('Từ chối') ? '❌' : '✅';
-      tbodyHistory.innerHTML += `
-        <tr>
-          <td>${icon} ${h.hanhDong}</td>
-          <td>${h.ghiChu || ''}</td>
-          <td>${h.nguoiThucHien}</td>
-          <td>${h.thoiGian}</td>
-        </tr>`;
-    });
-  } else {
-    tbodyHistory.innerHTML = `<tr><td colspan="4" style="text-align:center;">Chưa có lịch sử phê duyệt</td></tr>`;
+    document.getElementById("total-need").textContent = totalNeed;
+    document.getElementById("total-stock").textContent = totalStock;
+
+  } catch (error) {
+    console.error("Lỗi khi tải chi tiết kế hoạch:", error);
+    alert("⚠️ Có lỗi xảy ra khi tải thông tin kế hoạch!");
   }
-  document.getElementById("approval-history-section").style.display = "block";
 }
 
 // 🔹 Modal logic
@@ -202,34 +182,93 @@ function closeRejectModal() { document.getElementById("rejectModal").classList.r
 // 🔹 Xử lý duyệt kế hoạch
 async function confirmApprove() {
   const activePlan = document.querySelector(".plan-item.active");
-  if (!activePlan) return alert("⚠️ Vui lòng chọn một kế hoạch!");
-  const maKHSX = activePlan.getAttribute("onclick").match(/\d+/)[0];
+  if (!activePlan) {
+    alert("⚠️ Vui lòng chọn một kế hoạch!");
+    return;
+  }
+  
+  // Lấy maKHSX từ data attribute thay vì parse onclick
+  const maKHSX = activePlan.getAttribute("data-ma-khsx");
+  
+  if (!maKHSX) {
+    alert("⚠️ Không tìm thấy mã kế hoạch!");
+    console.error("activePlan:", activePlan);
+    return;
+  }
+  
   const ghiChu = document.querySelector("#approveModal textarea").value;
 
-  const res = await fetch("index.php?page=phe-duyet-ke-hoach-sx-process", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `maKeHoach=${maKHSX}&trangThai=Đã duyệt&ghiChu=${encodeURIComponent(ghiChu)}`
-  });
-  const result = await res.json();
-  alert(result.success ? "✅ Kế hoạch đã được phê duyệt!" : "❌ " + result.message);
-  window.location.reload();
+  console.log("Đang phê duyệt kế hoạch:", maKHSX); // Debug
+
+  try {
+    const res = await fetch("index.php?page=phe-duyet-ke-hoach-sx-process", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `maKeHoach=${maKHSX}&trangThai=Đã duyệt&ghiChu=${encodeURIComponent(ghiChu)}`
+    });
+    
+    const result = await res.json();
+    
+    console.log("Kết quả:", result); // Debug
+    
+    if (result.success) {
+      alert("✅ Kế hoạch đã được phê duyệt!");
+      window.location.reload();
+    } else {
+      alert("❌ " + result.message);
+    }
+  } catch (error) {
+    console.error("Lỗi khi phê duyệt:", error);
+    alert("⚠️ Có lỗi xảy ra khi phê duyệt kế hoạch!");
+  }
 }
 
 // 🔹 Xử lý từ chối
 async function confirmReject() {
   const activePlan = document.querySelector(".plan-item.active");
-  if (!activePlan) return alert("⚠️ Vui lòng chọn một kế hoạch!");
-  const maKHSX = activePlan.getAttribute("onclick").match(/\d+/)[0];
+  if (!activePlan) {
+    alert("⚠️ Vui lòng chọn một kế hoạch!");
+    return;
+  }
+  
+  // Lấy maKHSX từ data attribute
+  const maKHSX = activePlan.getAttribute("data-ma-khsx");
+  
+  if (!maKHSX) {
+    alert("⚠️ Không tìm thấy mã kế hoạch!");
+    return;
+  }
+  
   const ghiChu = document.querySelector("#rejectModal textarea").value;
 
-  const res = await fetch("index.php?page=phe-duyet-ke-hoach-sx-process", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `maKeHoach=${maKHSX}&trangThai=Từ chối&ghiChu=${encodeURIComponent(ghiChu)}`
-  });
-  if (res.ok) alert("❌ Kế hoạch đã bị từ chối!"); else alert("⚠️ Có lỗi khi từ chối!");
-  window.location.reload();
+  if (!ghiChu.trim()) {
+    alert("⚠️ Vui lòng nhập lý do từ chối!");
+    return;
+  }
+
+  console.log("Đang từ chối kế hoạch:", maKHSX); // Debug
+
+  try {
+    const res = await fetch("index.php?page=phe-duyet-ke-hoach-sx-process", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `maKeHoach=${maKHSX}&trangThai=Từ chối&ghiChu=${encodeURIComponent(ghiChu)}`
+    });
+    
+    const result = await res.json();
+    
+    console.log("Kết quả:", result); // Debug
+    
+    if (result.success) {
+      alert("❌ Kế hoạch đã bị từ chối!");
+      window.location.reload();
+    } else {
+      alert("⚠️ " + result.message);
+    }
+  } catch (error) {
+    console.error("Lỗi khi từ chối:", error);
+    alert("⚠️ Có lỗi xảy ra khi từ chối kế hoạch!");
+  }
 }
 </script>
 
@@ -250,12 +289,13 @@ async function confirmReject() {
   font-weight: 600;
   border-radius: 4px;
   border: none;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 .btn-cancel {
   background: #dc3545;
   color: #fff;
-  transition: 0.2s;
 }
 .btn-cancel:hover {
   background: #b02a37;
@@ -264,31 +304,65 @@ async function confirmReject() {
 .btn-confirm {
   background: #3b7ddd;
   color: #fff;
-  transition: 0.2s;
 }
 .btn-confirm:hover {
   background: #295fc5;
 }
 
 .main-content { margin-top: 0; padding-top: 10px; width: 100%; }
-.content { max-width: 1000px; margin: 0 auto; padding: 20px 30px; background: #f8fafc; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+.content { max-width: 1200px; margin: 0 auto; padding: 20px 30px; background: #f8fafc; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
 .section { background: #fff; border: 1px solid #dce2ec; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.section-title { background: #142850; color: #fff; font-weight: 600; padding: 10px 15px; border-radius: 8px 8px 0 0; }
+.section-title { background: #142850; color: #fff; font-weight: 600; padding: 12px 15px; border-radius: 8px 8px 0 0; font-size: 16px; }
 .section-content { background: #fff; padding: 18px; border-radius: 0 0 8px 8px; }
-.plan-item { background: #fafafa; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; padding: 10px 15px; cursor: pointer; transition: 0.3s; }
-.plan-item:hover { background: #f1f6ff; }
-.plan-item.active { border-color: #3b7ddd; background: #eaf2ff; }
-.plan-item-status { border: 1px solid #000; padding: 2px 10px; border-radius: 15px; background: #fffbe7; font-size: 12px; }
-.detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-.detail-table th, .detail-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-.btn { flex: 1; padding: 10px; border-radius: 4px; font-weight: 600; cursor: pointer; }
-.btn-approve { background: #3b7ddd; color: #fff; }
-.btn-reject { background: #ff3b3b; color: #fff; }
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); align-items: center; justify-content: center; z-index: 9999; }
+
+/* Danh sách kế hoạch */
+.plan-list { list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto; }
+.plan-item { background: #fafafa; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; padding: 12px 15px; cursor: pointer; transition: all 0.3s ease; }
+.plan-item:hover { background: #f1f6ff; border-color: #3b7ddd; transform: translateX(5px); }
+.plan-item.active { border-color: #3b7ddd; background: #eaf2ff; box-shadow: 0 2px 8px rgba(59, 125, 221, 0.2); }
+.plan-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.plan-item-name { font-weight: 600; color: #142850; }
+.plan-item-date { font-size: 13px; color: #666; }
+.plan-item-status { padding: 3px 12px; border-radius: 15px; background: #fff3cd; border: 1px solid #ffc107; font-size: 12px; font-weight: 600; color: #856404; }
+
+/* Chi tiết kế hoạch */
+.detail-section { margin-bottom: 15px; }
+.detail-label { font-weight: 600; color: #142850; margin-bottom: 5px; font-size: 14px; }
+.detail-value { color: #333; padding: 8px; background: #f8f9fa; border-radius: 4px; }
+
+/* Bảng nguyên vật liệu */
+.detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+.detail-table thead { background: #142850; color: #fff; }
+.detail-table th, .detail-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+.detail-table tbody tr:hover { background: #f1f6ff; }
+.detail-table tfoot { background: #f8f9fa; font-weight: 600; }
+
+/* Nút hành động */
+.action-buttons { display: flex; gap: 15px; margin-top: 20px; }
+.btn { flex: 1; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; font-size: 15px; }
+.btn-approve { background: #28a745; color: #fff; }
+.btn-approve:hover { background: #218838; }
+.btn-reject { background: #dc3545; color: #fff; }
+.btn-reject:hover { background: #c82333; }
+
+/* Modal */
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 9999; }
 .modal.active { display: flex; }
-.modal-content { background: #fff; border-radius: 6px; padding: 25px; max-width: 480px; width: 90%; }
+.modal-content { background: #fff; border-radius: 8px; padding: 25px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.modal-title { font-size: 20px; font-weight: 600; color: #142850; margin-bottom: 15px; }
+.form-group { margin-bottom: 15px; }
+.form-label { display: block; font-weight: 600; margin-bottom: 5px; color: #333; }
+.form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical; min-height: 80px; }
+
+/* Animation */
 #plan-detail-section { animation: fadeIn 0.4s ease-in-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Scrollbar tùy chỉnh */
+.plan-list::-webkit-scrollbar { width: 6px; }
+.plan-list::-webkit-scrollbar-track { background: #f1f1f1; }
+.plan-list::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+.plan-list::-webkit-scrollbar-thumb:hover { background: #555; }
 </style>
 
 <?php require_once 'app/views/layouts/footer.php'; ?>

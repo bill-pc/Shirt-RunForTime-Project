@@ -54,6 +54,13 @@ switch ($page) {
         $controller = new HomeController();
         $controller->index();
         break;
+
+
+
+    case 'lichlamviec':
+        include './app/views/lichlamviec.php';
+        break;
+
     case 'tao-yeu-cau-nvl':
         require_once './app/controllers/YeuCauNVLController.php';
         $controller = new YeuCauNVLController();
@@ -143,9 +150,7 @@ switch ($page) {
         break;
     // ✅ Trang hiển thị lịch làm việc
     case 'lichlamviec':
-        require_once './app/controllers/XemCaLamViecController.php';
-        $controller = new XemLichLamViecController();
-        $controller->index();
+        include './app/views/lichlamviec.php';
         break;
     case 'search':
         require_once './app/controllers/SearchController.php';
@@ -204,26 +209,8 @@ switch ($page) {
         $controller->xuatCSV();
         break;
 
-case 'gioithieu':
-    require_once 'app/views/gioithieu.php';
-    break;
 
     //kho thành phẩm
-    case 'nhap-kho-thanh-pham':
-        require_once 'app/controllers/NhapKhoTP_DaCheckQCController.php';
-        $controller = new NhapKhoTP_DaCheckQCController();
-        $controller->index();
-        break;
-    case 'luu-nhap-kho-tp-da-check-qc':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once 'app/controllers/NhapKhoTP_DaCheckQCController.php';
-            $controller = new NhapKhoTP_DaCheckQCController();
-            $controller->luuNhapKho();
-        } else {
-            header('Location: index.php?page=nhap-kho-thanh-pham');
-            exit;
-        }
-        break;
     case 'xuatthanhpham':
         require_once 'app/controllers/XuatThanhPhamController.php';
         $controller = new XuatThanhPhamController();
@@ -235,14 +222,9 @@ case 'gioithieu':
         $controller = new XuatThanhPhamController();
         $controller->xuat();
         break;
-    case 'xuatthanhpham_chitiet':
-    require 'app/controllers/XuatThanhPhamController.php';
-    $c = new XuatThanhPhamController();
-    $c->chitiet();
-    break;
+// ===== Thống kê sản phẩm (bắt cả 2 tên route) =====
 
-// ===== Thống kê sản phẩm  =====
-
+    case 'thongke_sanpham':
     case 'thongke':
         require_once __DIR__ . '/app/controllers/ThongKeKhoTPController.php';
         (new ThongKeKhoTPController())->index();
@@ -268,17 +250,57 @@ case 'gioithieu':
         require_once './app/controllers/YeuCauNhapKhoController.php';
         (new YeuCauNhapKhoController())->luuPhieu();
         break;
+    
+    // 🔹 PHÊ DUYỆT PHIẾU YÊU CẦU NHẬP KHO NVL
+    case 'phe-duyet-yc-nhap-kho':
+        require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
+        $controller = new PheDuyetYeuCauNhapKhoController();
+        $controller->index();
+        break;
+    
+    case 'duyet-yc-nhap-kho':
+        require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
+        $controller = new PheDuyetYeuCauNhapKhoController();
+        $controller->approve();
+        break;
+    
+    case 'tu-choi-yc-nhap-kho':
+        require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
+        $controller = new PheDuyetYeuCauNhapKhoController();
+        $controller->reject();
+        break;
+    
+    case 'chi-tiet-yc-nhap-kho':
+        require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
+        $controller = new PheDuyetYeuCauNhapKhoController();
+        $controller->getDetails();
+        break;
+
     case 'nhap-kho-nvl':
         require_once './app/controllers/NhapKhoNVLController.php';
         $controller = new NhapKhoNVLController();
         $controller->index();
         break;
+
+    case 'ajax-get-details-nhapkho':
+        require_once './app/controllers/NhapKhoNVLController.php';
+        $controller = new NhapKhoNVLController();
+        $controller->ajaxGetDetails();
+        break;
+
+    case 'luu-phieu-nhap-nvl':
+        require_once './app/controllers/NhapKhoNVLController.php';
+        $controller = new NhapKhoNVLController();
+        $controller->luuPhieu();
+        break;
+
     case 'tao-yeu-cau-kiem-tra-chat-luong':
         require_once './app/controllers/YeuCauKiemTraChatLuongController.php';
         $controller = new YeuCauKiemTraChatLuongController();
         $controller->index();
         break;
 
+    case 'tao-yeu-cau-kiem-tra-chat-luong-create':
     case 'tao-yeu-cau-kiem-tra-chat-luong-process':
         require_once './app/controllers/YeuCauKiemTraChatLuongController.php';
         $controller = new YeuCauKiemTraChatLuongController();
@@ -296,6 +318,19 @@ case 'gioithieu':
         $controller = new PheDuyetKeHoachSXController();
         $controller->duyetKeHoach();
         break;
+
+    case 'ajax-get-plan-detail':
+        require_once './app/controllers/PheDuyetKeHoachSXController.php';
+        $controller = new PheDuyetKeHoachSXController();
+        $controller->ajaxGetPlanDetail();
+        break;
+
+    case 'ajax-get-approval-history':
+        require_once './app/controllers/PheDuyetKeHoachSXController.php';
+        $controller = new PheDuyetKeHoachSXController();
+        $controller->ajaxGetApprovalHistory();
+        break;
+
     case 'capnhatnv':
         require_once './app/controllers/SuaNhanVienController.php';
         $controller = new SuaNhanVienController();
@@ -355,32 +390,6 @@ case 'gioithieu':
             exit;
         }
         break;
-        case 'ajax-get-sp-theo-khsx':
-        require_once 'app/models/ketNoi.php';
-        require_once 'app/models/SanPhamModel.php';
-        require_once 'app/models/KeHoachSanXuatModel.php';
-        require_once 'app/controllers/GhiNhanTPController.php';
-
-        $controller = new GhiNhanThanhPhamController();
-        $controller->ajaxGetSanPham();
-        break;
-    case 'ajax-get-nv-theo-xuong':
-        require_once 'app/models/ketNoi.php';
-        require_once 'app/models/XuongModel.php';
-        require_once 'app/models/NhanVienModel.php';
-
-        require_once 'app/controllers/GhiNhanTPController.php';
-
-        $controller = new GhiNhanThanhPhamController();
-        $controller->ajaxGetNhanVienByXuong();
-        break;
-    case 'ajax-get-chitiet-phieu':
-        require_once 'app/models/ketNoi.php';
-        require_once 'app/models/GhiNhanThanhPhamModel.php';
-        require_once 'app/controllers/GhiNhanTPController.php';
-        $controller = new GhiNhanThanhPhamController();
-        $controller->ajaxGetChiTietPhieu();
-        break;
     case 'bao-cao-tong-hop':
         require_once 'app/models/BaoCaoTongHopModel.php';
         require_once 'app/controllers/BaoCaoTongHopController.php';
@@ -403,40 +412,7 @@ case 'gioithieu':
         $controller = new TaoDonHangSanXuatController();
         $controller->index();
         break;
-        // Cập nhật thành phẩm
-    case 'cap-nhat-thanh-pham':
-        require_once 'app/controllers/QCController.php';
-        $controller = new QCController();
-        $controller->index();
-        break;
 
-    case 'qc-update':
-        require_once 'app/controllers/QCController.php';
-        $controller = new QCController();
-        $controller->update();
-        break;
-    // case 'bao-cao-chat-luong':
-      case 'baocao-chatluong':
-    require_once 'app/controllers/BaoCaoChatLuongController.php';
-    $controller = new BaoCaoChatLuongController();
-    $controller->index();
-    break;
-
-case 'baocao-get': 
-    require_once 'app/controllers/BaoCaoChatLuongController.php';
-    $controller = new BaoCaoChatLuongController();
-    $controller->getDetail();
-    break;
-
-case 'baocao-export':
-    require_once 'app/controllers/BaoCaoChatLuongController.php';
-    $controller = new BaoCaoChatLuongController();
-    $controller->export();
-    break;
-
-
-
-    //     break;
     case 'luu-don-hang-san-xuat':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require_once 'app/controllers/TaoDonHangSanXuatController.php'; 

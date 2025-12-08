@@ -59,69 +59,57 @@ class PhieuYeuCauNhapKhoModel {
         return $result['total'] > 0;
     }
 
-    // 🔹 Tạo mới phiếu nhập kho từ kế hoạch sản xuất
-    // 🔹 Tạo mới phiếu nhập kho từ kế hoạch sản xuất
+    // 🔹 Tạo mới phiếu nhập kho từ kế hoạch sản xuất (Đơn giản - không tính toán)
 public function createPhieuYeuCauNhapKho($data) {
     $maKHSX = intval($data['maKHSX'] ?? 0);
-    $nhaCungCap = trim($data['nhaCungCap'] ?? '');
     $ngayLap = $data['ngayLap'] ?? date('Y-m-d');
     $ghiChu = trim($data['ghiChu'] ?? '');
     $dsNVL = $data['nvl'] ?? [];
+    $nhaCungCap = $data['nhaCungCap'] ?? [];
 
     if ($maKHSX <= 0 || empty($dsNVL)) {
         error_log("❌ Thiếu dữ liệu: maKHSX hoặc danh sách NVL rỗng");
         return false;
     }
 
-    // ✅ Bước 1: Lọc các NVL thật sự cần nhập (soLuongCanNhap > 0)
-    $sqlCheck = "
-        SELECT c.maNVL, (c.soLuongNVL - n.soLuongTonKho) AS soLuongCanNhap
-        FROM chitietkehoachsanxuat c
-        JOIN nvl n ON c.maNVL = n.maNVL
-        WHERE c.maKHSX = ?
-          AND c.maNVL IN (" . implode(',', array_map('intval', $dsNVL)) . ")
-          HAVING soLuongCanNhap > 0
-    ";
-    $stmtCheck = $this->conn->prepare($sqlCheck);
-    $stmtCheck->bind_param('i', $maKHSX);
-    $stmtCheck->execute();
-    $needImport = $stmtCheck->get_result()->fetch_all(MYSQLI_ASSOC);
-
-    // Không có NVL nào cần nhập → dừng
-    if (count($needImport) === 0) {
-        error_log("⚠️ Không có NVL nào cần nhập cho kế hoạch $maKHSX");
-        return false;
-    }
-
-    // ✅ Bước 2: Tiến hành tạo phiếu
     $this->conn->begin_transaction();
     try {
-        $maPhieu = 'YCNK' . date('ymdHis');
+        // Tạo mã phiếu
+        $sqlMaxID = "SELECT COALESCE(MAX(maYCNK), 0) + 1 AS nextID FROM phieuyeucaunhapkhonvl";
+        $result = $this->conn->query($sqlMaxID);
+        $maPhieu = $result->fetch_assoc()['nextID'];
+        
+        $tenPhieu = 'Phiếu yêu cầu nhập kho NVL - KHSX ' . $maKHSX;
+        
+        // Lấy thông tin người dùng từ session
+        session_start();
+        $tenNguoiLap = $_SESSION['username'] ?? 'Admin';
+        $maND = $_SESSION['user_id'] ?? 1;
 
         // Lưu phiếu chính
-        $sqlPhieu = "INSERT INTO phieuyeucaunhapkhonvl (maYCNK, maKHSX, ngayLap, nhaCungCap, ghiChu, trangThai)
-                     VALUES (?, ?, ?, ?, ?, 'Chờ duyệt')";
+        $sqlPhieu = "INSERT INTO phieuyeucaunhapkhonvl (maYCNK, tenPhieu, maKHSX, ngayLap, tenNguoiLap, maND, trangThai)
+                     VALUES (?, ?, ?, ?, ?, ?, 'Chờ duyệt')";
         $stmt = $this->conn->prepare($sqlPhieu);
-        $stmt->bind_param('sisss', $maPhieu, $maKHSX, $ngayLap, $nhaCungCap, $ghiChu);
+        $stmt->bind_param('issssi', $maPhieu, $tenPhieu, $maKHSX, $ngayLap, $tenNguoiLap, $maND);
         $stmt->execute();
 
-        // Lưu chi tiết phiếu: chỉ những NVL cần nhập
-        $sqlCT = "
-            INSERT INTO chitiet_phieuyeucaunhapkhonvl (maYCNK, maNVL, soLuong, soLuongTonKho, soLuongCanNhap)
-            SELECT ?, c.maNVL, c.soLuongNVL,
-                   n.soLuongTonKho,
-                   CASE
-                       WHEN (c.soLuongNVL - n.soLuongTonKho) > 0 THEN (c.soLuongNVL - n.soLuongTonKho)
-                       ELSE 0
-                   END AS soLuongCanNhap
-            FROM chitietkehoachsanxuat c
-            JOIN nvl n ON c.maNVL = n.maNVL
-            WHERE c.maKHSX = ?
-              AND c.maNVL IN (" . implode(',', array_column($needImport, 'maNVL')) . ")
-        ";
-        $stmtCT = $this->conn->prepare($sqlCT);
-        $stmtCT->bind_param('si', $maPhieu, $maKHSX);
-        $stmtCT->execute();
+        // Lưu chi tiết phiếu: tất cả NVL được chọn
+        foreach ($dsNVL as $maNVL) {
+            $nccForThisNVL = $nhaCungCap[$maNVL] ?? '';
+            
+            $sqlCT = "
+                INSERT INTO chitiet_phieuyeucaunhapkhonvl (maYCNK, maNVL, tenNVL, soLuong, donViTinh, nhaCungCap, soLuongTonKho, soLuongCanNhap)
+                SELECT ?, c.maNVL, c.tenNVL, c.soLuongNVL, n.donViTinh, ?,
+                       n.soLuongTonKho, c.soLuongNVL
+                FROM chitietkehoachsanxuat c
+                JOIN nvl n ON c.maNVL = n.maNVL
+                WHERE c.maKHSX = ?
+                  AND c.maNVL = ?
+            ";
+            $stmtCT = $this->conn->prepare($sqlCT);
+            $stmtCT->bind_param('isii', $maPhieu, $nccForThisNVL, $maKHSX, $maNVL);
+            $stmtCT->execute();
+        }
 
         $this->conn->commit();
         return true;
@@ -134,15 +122,53 @@ public function createPhieuYeuCauNhapKho($data) {
 
 
     public function getChiTietPhieu($maYCNK) {
-    $sql = "SELECT c.*, n.tenNVL, n.donViTinh
-            FROM chitiet_phieuyeucaunhapkhonvl c
-            JOIN nvl n ON c.maNVL = n.maNVL
-            WHERE c.maYCNK = ?";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->bind_param('s', $maYCNK);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
-}
+        $sql = "SELECT c.*, n.tenNVL, n.donViTinh
+                FROM chitiet_phieuyeucaunhapkhonvl c
+                JOIN nvl n ON c.maNVL = n.maNVL
+                WHERE c.maYCNK = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('s', $maYCNK);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    // 🔹 Lấy danh sách phiếu chờ duyệt
+    public function getPendingRequests() {
+        $sql = "SELECT p.maYCNK, p.tenPhieu, p.ngayLap, p.tenNguoiLap, p.trangThai,
+                       GROUP_CONCAT(DISTINCT c.nhaCungCap SEPARATOR ', ') as nhaCungCap
+                FROM phieuyeucaunhapkhonvl p
+                LEFT JOIN chitiet_phieuyeucaunhapkhonvl c ON p.maYCNK = c.maYCNK
+                WHERE p.trangThai = 'Chờ duyệt'
+                GROUP BY p.maYCNK, p.tenPhieu, p.ngayLap, p.tenNguoiLap, p.trangThai
+                ORDER BY p.ngayLap DESC";
+        $result = $this->conn->query($sql);
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    // 🔹 Cập nhật trạng thái phiếu (Duyệt / Từ chối)
+    public function updateStatus($maYCNK, $trangThai, $nguoiDuyet, $lyDoTuChoi = null) {
+        $sql = "UPDATE phieuyeucaunhapkhonvl 
+                SET trangThai = ?, nguoiDuyet = ?, ngayDuyet = NOW(), lyDoTuChoi = ?
+                WHERE maYCNK = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('sssi', $trangThai, $nguoiDuyet, $lyDoTuChoi, $maYCNK);
+        return $stmt->execute();
+    }
+
+    // 🔹 Lấy chi tiết phiếu bao gồm thông tin header
+    public function getDetailsByRequest($maYCNK) {
+        $sql = "SELECT p.maYCNK, p.tenPhieu, p.ngayLap, p.tenNguoiLap, p.trangThai,
+                       c.maNVL, c.tenNVL, c.soLuong, c.donViTinh, c.nhaCungCap
+                FROM phieuyeucaunhapkhonvl p
+                LEFT JOIN chitiet_phieuyeucaunhapkhonvl c ON p.maYCNK = c.maYCNK
+                WHERE p.maYCNK = ?
+                ORDER BY c.maNVL";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('i', $maYCNK);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
 
 }

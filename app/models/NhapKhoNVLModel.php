@@ -10,9 +10,13 @@ class NhapKhoNVLModel {
 
     // 🔹 Lấy danh sách phiếu yêu cầu đã duyệt
    public function getApprovedRequests() {
-    $sql = "SELECT DISTINCT maYCNK, ngayLap, nhaCungCap
-            FROM phieuyeucaunhapkhonvl
-            WHERE trangThai = 'Đã duyệt'";
+    $sql = "SELECT p.maYCNK, p.tenPhieu, p.ngayLap, p.tenNguoiLap,
+                   GROUP_CONCAT(DISTINCT c.nhaCungCap SEPARATOR ', ') as nhaCungCap
+            FROM phieuyeucaunhapkhonvl p
+            LEFT JOIN chitiet_phieuyeucaunhapkhonvl c ON p.maYCNK = c.maYCNK
+            WHERE p.trangThai = 'Đã duyệt'
+            GROUP BY p.maYCNK, p.tenPhieu, p.ngayLap, p.tenNguoiLap
+            ORDER BY p.ngayLap DESC";
     
     $result = $this->conn->query($sql);
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
@@ -25,13 +29,12 @@ class NhapKhoNVLModel {
 public function getDetailsByRequest($maYCNK) {
     $sql = "SELECT n.maNVL, n.tenNVL, n.donViTinh, n.loaiNVL,
                    c.soLuong AS soLuongYeuCau,
-                   c.soLuongTonKho,
-                   c.soLuongCanNhap
+                   c.nhaCungCap
             FROM chitiet_phieuyeucaunhapkhonvl c
             JOIN nvl n ON c.maNVL = n.maNVL
             WHERE c.maYCNK = ?";
     $stmt = $this->conn->prepare($sql);
-    $stmt->bind_param('s', $maYCNK);
+    $stmt->bind_param('i', $maYCNK);
     $stmt->execute();
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
@@ -40,14 +43,14 @@ public function getDetailsByRequest($maYCNK) {
 
 
 
-    // 🔹 Lưu phiếu nhập NVL + cập nhật tồn kho
+    // 🔹 Lưu phiếu nhập NVL + cập nhật tồn kho (Đơn giản)
    public function luuPhieuNhap($data) {
     $this->conn->begin_transaction();
 
     try {
         // ✅ Kiểm tra phiếu này đã nhập kho chưa
         $check = $this->conn->prepare("SELECT trangThai FROM phieuyeucaunhapkhonvl WHERE maYCNK=?");
-        $check->bind_param("s", $data['maYCNK']);
+        $check->bind_param("i", $data['maYCNK']);
         $check->execute();
         $result = $check->get_result()->fetch_assoc();
 
@@ -58,56 +61,60 @@ public function getDetailsByRequest($maYCNK) {
             throw new Exception("Phiếu này đã được nhập kho trước đó!");
         }
 
-        // ✅ Lưu phiếu nhập NVL
-        $sqlPN = "INSERT INTO phieunhapnvl 
-                  (tenPNVL, nguoiLap, nhaCungCap, ngayNhap, maYCNK, maNVL, soLuongNhap)
-                  VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmtPN = $this->conn->prepare($sqlPN);
-        if (!$stmtPN) throw new Exception("Lỗi prepare: " . $this->conn->error);
+        // ✅ Lấy nhà cung cấp từ chi tiết phiếu yêu cầu
+        $getNCC = $this->conn->prepare("SELECT maNVL, nhaCungCap FROM chitiet_phieuyeucaunhapkhonvl WHERE maYCNK=?");
+        $getNCC->bind_param("i", $data['maYCNK']);
+        $getNCC->execute();
+        $nccList = $getNCC->get_result()->fetch_all(MYSQLI_ASSOC);
+        $nccMap = [];
+        foreach ($nccList as $row) {
+            $nccMap[$row['maNVL']] = $row['nhaCungCap'];
+        }
 
-foreach ($data['items'] as $item) {
-    $maNVL = (int)$item['maNVL'];
-    $soLuong = (int)$item['soLuong'];
+        // ✅ Lưu phiếu nhập NVL cho từng NVL
+        foreach ($data['items'] as $item) {
+            $maNVL = (int)$item['maNVL'];
+            $soLuong = (int)$item['soLuong'];
 
-    // Bỏ qua nếu số lượng <= 0
-    if ($soLuong <= 0) continue;
+            // Bỏ qua nếu số lượng <= 0
+            if ($soLuong <= 0) continue;
 
-    // ✅ Chuẩn bị statement mới mỗi vòng (tránh cache giá trị)
-    $stmtPN = $this->conn->prepare(
-        "INSERT INTO phieunhapnvl 
-         (tenPNVL, nguoiLap, nhaCungCap, ngayNhap, maYCNK, maNVL, soLuongNhap)
-         VALUES (?, ?, ?, ?, ?, ?, ?)"
-    );
-    if (!$stmtPN) throw new Exception("Lỗi prepare insert: " . $this->conn->error);
+            // Lấy nhà cung cấp từ phiếu yêu cầu
+            $nhaCungCap = $nccMap[$maNVL] ?? '';
 
-    $stmtPN->bind_param(
-        'ssssssi',
-        $data['tenPNVL'],
-        $data['nguoiLap'],
-        $data['nhaCungCap'],
-        $data['ngayNhap'],
-        $data['maYCNK'],
-        $maNVL,
-        $soLuong
-    );
-    $stmtPN->execute();
-    $stmtPN->close();
+            // Insert phiếu nhập
+            $stmtPN = $this->conn->prepare(
+                "INSERT INTO phieunhapnvl 
+                 (tenPNVL, nguoiLap, nhaCungCap, ngayNhap, maYCNK, maNVL, soLuongNhap, ghiChu)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+            if (!$stmtPN) throw new Exception("Lỗi prepare insert: " . $this->conn->error);
 
-    // ✅ Cập nhật tồn kho riêng biệt
-    $stmtUpdate = $this->conn->prepare("UPDATE nvl SET soLuongTonKho = soLuongTonKho + ? WHERE maNVL = ?");
-    if (!$stmtUpdate) throw new Exception("Lỗi prepare update: " . $this->conn->error);
-    $stmtUpdate->bind_param('ii', $soLuong, $maNVL);
-    $stmtUpdate->execute();
-    $stmtUpdate->close();
-}
+            $stmtPN->bind_param(
+                'ssssiiss',
+                $data['tenPNVL'],
+                $data['nguoiLap'],
+                $nhaCungCap,
+                $data['ngayNhap'],
+                $data['maYCNK'],
+                $maNVL,
+                $soLuong,
+                $data['ghiChu']
+            );
+            $stmtPN->execute();
+            $stmtPN->close();
 
-
-
-
+            // ✅ Cập nhật tồn kho
+            $stmtUpdate = $this->conn->prepare("UPDATE nvl SET soLuongTonKho = soLuongTonKho + ? WHERE maNVL = ?");
+            if (!$stmtUpdate) throw new Exception("Lỗi prepare update: " . $this->conn->error);
+            $stmtUpdate->bind_param('ii', $soLuong, $maNVL);
+            $stmtUpdate->execute();
+            $stmtUpdate->close();
+        }
 
         // ✅ Đánh dấu phiếu yêu cầu đã nhập kho
         $stmtStatus = $this->conn->prepare("UPDATE phieuyeucaunhapkhonvl SET trangThai='Đã nhập kho' WHERE maYCNK=?");
-        $stmtStatus->bind_param('s', $data['maYCNK']);
+        $stmtStatus->bind_param('i', $data['maYCNK']);
         $stmtStatus->execute();
 
         $this->conn->commit();

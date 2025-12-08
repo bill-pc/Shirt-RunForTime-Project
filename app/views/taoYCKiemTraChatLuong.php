@@ -18,43 +18,32 @@ require_once __DIR__ . '/layouts/nav.php';
       <form action="index.php?page=tao-yeu-cau-kiem-tra-chat-luong-create" method="POST"
             style="display:flex; align-items:center; gap:15px; margin-bottom:25px; flex-wrap:wrap;">
         <label for="planCode" style="font-weight:600;">Chọn kế hoạch sản xuất:</label>
-        <select name="planCode" id="planCode" required
-                style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:200px;">
+        <select name="planCode" id="planCode" required onchange="loadProductInfo()"
+                style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:300px;">
           <option value="">-- Chọn kế hoạch --</option>
           <?php foreach ($plans as $p): ?>
-            <option value="<?= $p['maKHSX'] ?>"><?= htmlspecialchars($p['tenKHSX']) ?></option>
+            <option value="<?= $p['maKHSX'] ?>" 
+                    data-product='<?= json_encode($p) ?>'>
+              <?= htmlspecialchars($p['tenKHSX']) ?> - <?= htmlspecialchars($p['tenSanPham']) ?>
+            </option>
           <?php endforeach; ?>
         </select>
 
-        <input type="hidden" name="tenNguoiLap"
-               value="<?= $_SESSION['user']['tenNhanVien'] ?? 'Hệ thống' ?>">
-
-        <button type="submit"
+        <button type="submit" id="btnCreate" disabled
                 style="background:#1d3557; color:white; padding:10px 18px; border:none; border-radius:8px;
-                       font-weight:600; cursor:pointer; transition:0.3s;">
+                       font-weight:600; cursor:pointer; transition:0.3s; opacity:0.5;">
           Tạo phiếu kiểm tra chất lượng
         </button>
       </form>
 
-      <!-- Bảng danh sách NVL -->
+      <!-- Bảng thông tin sản phẩm cần kiểm tra -->
       <section style="background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:20px;">
         <h2 style="font-size:20px; color:#1d3557; font-weight:600; margin-bottom:15px;">
-          Danh sách Nguyên Vật Liệu thuộc kế hoạch
+          Thông Tin Sản Phẩm Cần Kiểm Tra Chất Lượng
         </h2>
-        <table id="materialsTable"
-               style="width:100%; border-collapse:collapse; font-size:15px; text-align:center;">
-          <thead style="background:#457b9d; color:white;">
-            <tr>
-              <th style="padding:10px;">Mã NVL</th>
-              <th style="padding:10px;">Tên NVL</th>
-              <th style="padding:10px;">Xưởng</th>
-              <th style="padding:10px;">Số lượng cần kiểm tra</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="4" style="padding:12px; color:#666;">Chưa chọn kế hoạch...</td></tr>
-          </tbody>
-        </table>
+        <div id="productInfo" style="padding:15px; background:#f8f9fa; border-radius:8px; min-height:100px;">
+          <p style="color:#666; text-align:center;">Vui lòng chọn kế hoạch sản xuất để xem thông tin...</p>
+        </div>
       </section>
     </div>
   </main>
@@ -62,47 +51,63 @@ require_once __DIR__ . '/layouts/nav.php';
 
 <!-- ========== STYLE ========== -->
 <style>
-#materialsTable tbody tr:hover {
-  background-color: #f1f8ff;
-  transition: 0.2s;
+.info-row {
+  display: flex;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
 }
-#materialsTable td, #materialsTable th {
-  border-bottom: 1px solid #ddd;
+.info-label {
+  font-weight: 600;
+  color: #1d3557;
+  width: 200px;
+}
+.info-value {
+  color: #333;
+  flex: 1;
 }
 </style>
 
 <!-- ========== SCRIPT ========== -->
 <script>
-document.getElementById('planCode').addEventListener('change', function() {
-  const maKHSX = this.value;
-  const tbody = document.querySelector('#materialsTable tbody');
-  tbody.innerHTML = `<tr><td colspan="4" style="padding:12px; color:#666;">Đang tải dữ liệu...</td></tr>`;
-  if (!maKHSX) {
-    tbody.innerHTML = `<tr><td colspan="4" style="padding:12px; color:#666;">Chưa chọn kế hoạch...</td></tr>`;
+function loadProductInfo() {
+  const select = document.getElementById('planCode');
+  const selectedOption = select.options[select.selectedIndex];
+  const btnCreate = document.getElementById('btnCreate');
+  const productInfo = document.getElementById('productInfo');
+  
+  if (!select.value) {
+    productInfo.innerHTML = '<p style="color:#666; text-align:center;">Vui lòng chọn kế hoạch sản xuất để xem thông tin...</p>';
+    btnCreate.disabled = true;
+    btnCreate.style.opacity = '0.5';
+    btnCreate.style.cursor = 'not-allowed';
     return;
   }
 
-  fetch(`app/controllers/api.php?action=getMaterials&maKHSX=${maKHSX}`)
-
-    .then(res => res.json())
-    .then(data => {
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="padding:12px; color:#888;">Không có NVL nào trong kế hoạch này.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = data.map(row => `
-        <tr>
-          <td>${row.maNVL}</td>
-          <td style="text-align:left; padding-left:15px;">${row.tenNVL}</td>
-          <td>${row.tenXuong}</td>
-          <td>${row.soLuong}</td>
-        </tr>`).join('');
-    })
-    .catch(err => {
-      tbody.innerHTML = `<tr><td colspan="4" style="padding:12px; color:red;">Lỗi tải dữ liệu!</td></tr>`;
-      console.error(err);
-    });
-});
+  const data = JSON.parse(selectedOption.getAttribute('data-product'));
+  
+  productInfo.innerHTML = `
+    <div class="info-row">
+      <div class="info-label">Tên kế hoạch:</div>
+      <div class="info-value">${data.tenKHSX}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Sản phẩm:</div>
+      <div class="info-value"><strong>${data.tenSanPham}</strong></div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Số lượng cần kiểm tra:</div>
+      <div class="info-value"><strong style="color:#d00; font-size:18px;">${data.soLuongSanXuat}</strong> cái</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Thời gian:</div>
+      <div class="info-value">${data.thoiGianBatDau} → ${data.thoiGianKetThuc}</div>
+    </div>
+  `;
+  
+  btnCreate.disabled = false;
+  btnCreate.style.opacity = '1';
+  btnCreate.style.cursor = 'pointer';
+}
 </script>
 
 <?php require_once __DIR__ . '/layouts/footer.php'; ?>
