@@ -1,29 +1,32 @@
 <?php
-
-
 require_once 'layouts/header.php';
 require_once 'layouts/nav.php';
-
-
 ?>
 
 <div class="main-layout-wrapper">
-
-    <?php
-    require_once 'layouts/sidebar.php';
-    ?>
+    <?php require_once 'layouts/sidebar.php'; ?>
 
     <main class="main-content">
         <style>
-            .form-group label {
-                font-size: 18px;
-                color: #000;
-                font-weight: bold;
+            /* --- CSS CHUNG --- */
+            .form-control,
+            input[type="text"],
+            input[type="number"],
+            input[type="date"],
+            select,
+            textarea {
+                width: 100%;
+                height: 38px;
+                padding: 6px 12px;
+                font-size: 14px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                box-sizing: border-box;
+                background-color: #fff;
             }
 
-            .form-group input {
-                width: 60%;
-                height: 20px;
+            textarea {
+                height: auto;
             }
 
             .table-results {
@@ -59,41 +62,32 @@ require_once 'layouts/nav.php';
                 width: 100%;
                 height: 100%;
                 background-color: rgba(0, 0, 0, 0.5);
-
                 justify-content: center;
                 align-items: center;
-
             }
 
             .modal-overlay.show {
                 display: flex;
             }
 
-
-
-            /* --- CSS CHO MODAL POP-UP CHÍNH --- */
-
             .modal-content {
-                background-color: #fff;
+                background: #fff;
                 padding: 25px 30px;
                 border-radius: 8px;
-                width: 600px;
-                max-width: 90%;
+                width: 680px;
+                max-width: 95%;
                 position: relative;
                 box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
                 max-height: 90vh;
                 overflow-y: auto;
             }
 
-
-            /* Nút 'X' để đóng */
             .close-btn {
                 position: absolute;
                 top: 10px;
                 right: 15px;
                 font-size: 28px;
                 font-weight: bold;
-                line-height: 1;
                 color: #888;
                 border: none;
                 background: none;
@@ -104,196 +98,320 @@ require_once 'layouts/nav.php';
                 color: #000;
             }
 
-            .modal-content .form-group {
+            .assignment-box {
+                border-radius: 6px;
+                padding: 15px;
                 margin-bottom: 15px;
+                font-size: 13px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
 
-            .modal-content .form-group label {
-                display: block;
-                font-weight: 600;
-                margin-bottom: 5px;
-                color: #333;
-            }
-
-            .modal-content .form-group b {
-                font-size: 1.1em;
-                color: #0056b3;
-            }
-
-            .modal-content .form-group.inline-group {
-                display: flex;
-                align-items: baseline;
-                /* Căn chỉnh theo dòng chữ */
+            .assignment-box h5 {
+                margin-top: 0;
                 margin-bottom: 12px;
-                /* Giảm khoảng cách giữa các dòng */
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                padding-bottom: 8px;
             }
 
-            .modal-content .form-group.inline-group label {
-                display: inline;
-                /* Sửa từ 'block' thành 'inline' */
-                margin-bottom: 0;
-                /* Xóa khoảng cách dưới */
-                margin-right: 8px;
-                /* Thêm khoảng cách bên phải */
+            .assignment-box label {
                 font-weight: 600;
-                color: #333;
+                margin-bottom: 4px;
+                display: block;
+                font-size: 12px;
+                color: #444;
             }
 
-            .modal-content .form-group.inline-group b {
-                font-size: 1.1em;
-                color: #0056b3;
-                /* Màu xanh */
+            .assignment-row {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 12px;
+                align-items: flex-end;
             }
 
-            .modal-content input[type="date"],
-            .modal-content input[type="number"],
-            .modal-content select {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid #ccc;
+            .assignment-col {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .box-cat {
+                background-color: #e3f2fd;
+                border: 1px solid #90caf9;
+                border-left: 5px solid #1565c0;
+            }
+
+            .box-cat h5 {
+                color: #1565c0;
+            }
+
+            .box-cat input:focus,
+            .box-cat textarea:focus {
+                border-color: #1565c0;
+                outline: none;
+            }
+
+            .box-may {
+                background-color: #fff3e0;
+                border: 1px solid #ffcc80;
+                border-left: 5px solid #ef6c00;
+            }
+
+            .box-may h5 {
+                color: #ef6c00;
+            }
+
+            .box-may input:focus,
+            .box-may textarea:focus {
+                border-color: #ef6c00;
+                outline: none;
+            }
+
+            .btn-add-nvl {
+                background: #28a745;
+                color: white;
+                border: none;
+                padding: 6px 12px;
                 border-radius: 4px;
-                box-sizing: border-box;
-                font-size: 1em;
+                cursor: pointer;
+                font-size: 12px;
+                margin-top: 5px;
             }
 
-            /* Nút bấm */
-            .modal-content .btn-submit {
+            .btn-submit {
                 background-color: #007bff;
                 color: white;
                 padding: 12px 20px;
                 border: none;
                 border-radius: 4px;
                 cursor: pointer;
-                font-size: 1em;
-                font-weight: 600;
+                font-weight: bold;
+                width: 100%;
+                margin-top: 10px;
+                font-size: 16px;
             }
 
-            .modal-content .btn-submit:hover {
+            .btn-submit:hover {
                 background-color: #0056b3;
             }
 
-
-            .confirm-exit-overlay {
-                z-index: 2000;
-                background-color: rgba(0, 0, 0, 0.75);
-            }
-
-            .confirm-box-content {
-                width: 400px;
-                padding: 30px;
-                text-align: center;
-            }
-
-            .confirm-box-content p {
-                font-size: 1.1em;
-                margin-bottom: 25px;
-            }
-
-            .confirm-buttons {
+            .inline-group {
                 display: flex;
-                justify-content: space-around;
+                align-items: baseline;
+                margin-bottom: 6px;
             }
 
-            .confirm-buttons button {
-                padding: 10px 25px;
-                border: none;
-                border-radius: 5px;
-                font-size: 1em;
+            .inline-group label {
+                width: 110px;
                 font-weight: 600;
-                cursor: pointer;
+                color: #555;
             }
 
-            .btn-secondary {
-                background-color: #6c757d;
-                color: white;
+            .inline-group b {
+                color: #0056b3;
+                margin-left: 5px;
             }
 
-            .btn-secondary:hover {
-                background-color: #5a6268;
-            }
-
-            .btn-danger {
-                background-color: #dc3545;
-                color: white;
-            }
-
-            .btn-danger:hover {
-                background-color: #c82333;
-            }
-
-            .filter-group {
+            .nvl-row {
                 display: flex;
-                gap: 15px;
+                gap: 10px;
                 margin-bottom: 10px;
-                align-items: center;
+                align-items: flex-end;
                 background: #f8f9fa;
                 padding: 10px;
-                border-radius: 6px;
-            }
-
-            .filter-group label {
-                font-weight: 600;
-                margin-bottom: 0;
-            }
-
-            .filter-group input,
-            .filter-group select {
-                padding: 8px;
-                border: 1px solid #ccc;
+                border: 1px solid #e9ecef;
                 border-radius: 4px;
             }
 
-            /* CSS cho bảng KHSX mới */
-            .khsx-list-container {
-                margin-top: 30px;
-                padding: 20px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
+            .btn-remove-nvl {
+                height: 38px;
+                width: 30px;
+                border: none;
+                background: transparent;
+                color: #dc3545;
+                font-size: 20px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .khsx-list-container h3 {
-                text-align: center;
-                color: #085da7;
-                margin-bottom: 15px;
+            .btn-remove-nvl:hover {
+                background-color: #ffe6e6;
+                border-radius: 4px;
             }
+
+            /* Nút Lập KHSX mới */
+            .btn-lap-khsx {
+                display: inline-block;
+                padding: 8px 14px;
+                background: linear-gradient(135deg, #1976d2, #0d47a1);
+                color: #fff !important;
+                border-radius: 6px;
+                font-size: 13.5px;
+                font-weight: 600;
+                text-decoration: none;
+                border: none;
+                cursor: pointer;
+                transition: 0.25s;
+            }
+
+            .btn-lap-khsx:hover {
+                background: linear-gradient(135deg, #1565c0, #0b3c91);
+                transform: translateY(-1px);
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            }
+
+            .btn-lap-khsx:active {
+                transform: scale(0.97);
+            }
+
+            .table-results td:last-child,
+            .table-results th:last-child {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+
+            .table-results th,
+            .table-results td {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+
+            /* ============================
+   TABLE – FLAT CLEAN STYLE
+============================ */
+            .table-wrapper {
+                margin-top: 20px;
+            }
+
+            /* Bảng */
+            .table-results {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                background: #fff;
+                border: 1px solid #d7dce3;
+            }
+
+            /* Header */
+            .table-results thead tr {
+                background: #eef2f7;
+                color: #000000ff;
+                border-bottom: 1px solid #d7dce3;
+            }
+
+            .table-results th {
+                padding: 10px 12px;
+                font-weight: 700;
+                text-align: center;
+                letter-spacing: 0.2px;
+                border-right: 1px solid #d7dce3;
+                font-size: 15px;
+            }
+
+            .table-results th:last-child {
+                border-right: none;
+            }
+
+            /* Body */
+            .table-results td {
+                padding: 10px 12px;
+                text-align: center;
+                border-bottom: 1px solid #e6e9ee;
+                border-right: 1px solid #e6e9ee;
+                color: #000000ff;
+            }
+
+            .table-results td:last-child {
+                border-right: none;
+            }
+
+            /* HOVER – nhẹ nhàng */
+            .table-results tbody tr:hover {
+                background: #f5f8fc;
+                transition: 0.2s;
+            }
+
+            /* Dòng cuối không bo cong */
+            .table-results tbody tr:last-child td {
+                border-bottom: none;
+            }
+            
         </style>
+
         <div class="kehoach-form-container">
-            <h2><?php echo $pageTitle ?? 'Lập kế hoạch sản xuất'; ?></h2>
+            <h2><?= $pageTitle ?? 'Lập kế hoạch sản xuất' ?></h2>
             <hr>
 
-            <div class="form-group">
-                <label for="search-box">Tìm kiếm Đơn hàng (theo Tên hoặc Mã):</label>
-                <input type="text" id="search-box" placeholder="Nhập mã hoặc tên đơn hàng...">
+            <!-- FILTER ĐƠN HÀNG -->
+            <div style="background:#f8f9fa; padding:15px; border-radius:5px; margin-bottom:20px;">
+                <div style="margin-bottom:10px;">
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Tìm kiếm Đơn hàng:</label>
+                    <input type="text" id="search-box" placeholder="Nhập mã hoặc tên đơn hàng...">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">Ngày giao:</label>
+                        <input type="date" id="filter-ngayGiao">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">Trạng thái:</label>
+                        <select id="filter-trangThai">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            <option value="Chờ duyệt">Chờ duyệt</option>
+                            <option value="Đang thực hiện">Đang thực hiện</option>
+                            <option value="Đã xuất kho">Đã xuất kho</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; align-items:end;">
+                        <button id="btn-clear-filters" class="btn-secondary"
+                            style="height:38px; padding:0 15px; background:#6c757d; color:white; border:none; border-radius:4px; cursor:pointer;">Xóa
+                            lọc</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="filter-group">
-                <label for="filter-tuNgay">Ngày giao từ:</label>
-                <input type="date" id="filter-tuNgay">
-
-                <label for="filter-denNgay">Đến ngày:</label>
-                <input type="date" id="filter-denNgay">
-
-                <button id="btn-clear-filters" class="btn-secondary">Xóa lọc</button>
-
-            </div>
-
+            <!-- DANH SÁCH ĐƠN HÀNG -->
             <table class="table-results">
                 <thead>
                     <tr>
-                        <th>Mã Đơn Hàng</th>
+                        <th>Mã ĐH</th>
                         <th>Tên Đơn Hàng</th>
                         <th>Ngày Giao</th>
                         <th>Trạng Thái</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
-                <tbody id="results-table-body">
-                </tbody>
-            </table>
-        </div>
+                <tbody id="donhang-tbody">
+                    <?php if (!empty($danhSachDonHang)): ?>
+                        <?php foreach ($danhSachDonHang as $dh): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($dh['maDonHang']) ?></td>
+                                <td><?= htmlspecialchars($dh['tenDonHang']) ?></td>
+                                <td><?= htmlspecialchars($dh['ngayGiao']) ?></td>
+                                <td><?= htmlspecialchars($dh['trangThai']) ?></td>
+                                <td>
+                                    <a href="index.php?page=lap-ke-hoach-chi-tiet&id=<?= $dh['maDonHang'] ?>"
+                                        class="btn-lap-khsx">
+                                        Lập KHSX
+                                    </a>
 
-        <div class="khsx-list-container">
-            <h3>Danh sách Kế hoạch sản xuất đã lập</h3>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding:20px;">Chưa có đơn hàng nào</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+
+            </table>
+
+            <!-- DANH SÁCH KẾ HOẠCH ĐÃ LẬP -->
+            <h3 style="margin-top:30px;">Danh sách Kế hoạch đã lập</h3>
             <table class="table-results">
                 <thead>
                     <tr>
@@ -310,9 +428,7 @@ require_once 'layouts/nav.php';
                         <?php foreach ($danhSachKHSX as $khsx): ?>
                             <tr>
                                 <td><?= htmlspecialchars($khsx['tenKHSX']) ?></td>
-
                                 <td><?= htmlspecialchars($khsx['maDonHang']) ?></td>
-
                                 <td><?= htmlspecialchars($khsx['thoiGianBatDau']) ?></td>
                                 <td><?= htmlspecialchars($khsx['thoiGianKetThuc']) ?></td>
                                 <td><?= htmlspecialchars($khsx['trangThai']) ?></td>
@@ -321,114 +437,143 @@ require_once 'layouts/nav.php';
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" style="text-align: center;">Chưa có kế hoạch sản xuất nào được lập.</td>
+                            <td colspan="6" style="text-align:center; padding:20px;">Chưa có dữ liệu.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
+
+        <!-- MODAL LẬP CHI TIẾT KHSX -->
+        <div class="modal-overlay" id="modal-lap-khsx">
+            <div class="modal-content">
+                <button class="close-btn" id="modal-close">&times;</button>
+                <h3>Lập Kế hoạch sản xuất chi tiết</h3>
+                <form id="form-lap-khsx" method="post" action="index.php?page=lap-ke-hoach-store">
+                    <input type="hidden" name="maDonHang" id="modal-maDonHang">
+
+                    <!-- Xưởng Cắt -->
+                    <div class="assignment-box box-cat" id="box-xuong-cat">
+                        <h5>Xưởng Cắt</h5>
+                        <div id="xuong-cat-list"></div>
+                        <button type="button" class="btn-add-nvl" data-xuong="cat">Thêm NVL</button>
+                    </div>
+
+                    <!-- Xưởng May -->
+                    <div class="assignment-box box-may" id="box-xuong-may">
+                        <h5>Xưởng May</h5>
+                        <div id="xuong-may-list"></div>
+                        <button type="button" class="btn-add-nvl" data-xuong="may">Thêm NVL</button>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Lưu KHSX</button>
+                </form>
+            </div>
+        </div>
+
     </main>
-
 </div>
 
-<div id="order-modal" class="modal-overlay">
-    <div class="modal-content">
-        <button id="close-modal-btn" class="close-btn">&times;</button>
-        <h3>Lập Kế hoạch cho Đơn hàng</h3>
+<?php require_once 'layouts/footer.php'; ?>
 
-        <form action="index.php?page=luu-ke-hoach" method="POST">
-            <input type="hidden" id="modal-maDonHang" name="maDonHang">
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchBox = document.getElementById("search-box");
+        const filterNgayGiao = document.getElementById("filter-ngayGiao");
+        const filterTrangThai = document.getElementById("filter-trangThai");
+        const btnClearFilters = document.getElementById("btn-clear-filters");
+        const tbodyDonHang = document.getElementById("donhang-tbody");
 
-            <div class="form-group inline-group"><label>Mã Đơn Hàng:</label> <b id="modal-maDonHang-display"></b></div>
-            <div class="form-group inline-group"><label>Tên Đơn Hàng:</label> <b id="modal-tenDonHang"></b></div>
-            <div class="form-group inline-group"><label>Sản phẩm (Gốc):</label> <b id="modal-tenSanPham"></b></div>
-            <div class="form-group inline-group"><label>Đơn vị:</label> <b id="modal-donVi"></b></div>
-            <div class="form-group inline-group"><label>Ngày Giao:</label> <b id="modal-ngayGiao" style="color: red;"></b></div>
-            <div style="background: #e9ecef; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; text-decoration: underline;">Năng suất trung bình (tham khảo):</label>
-                <div style="display: flex; gap: 20px;">
-                    <div>Xưởng Cắt: <b id="modal-ns-cat" style="color: #007bff;">0</b> sp/ngày</div>
-                    <div>Xưởng May: <b id="modal-ns-may" style="color: #28a745;">0</b> sp/ngày</div>
-                </div>
-            </div>
+        const modal = document.getElementById("modal-lap-khsx");
+        const modalClose = document.getElementById("modal-close");
+        const formLapKHSX = document.getElementById("form-lap-khsx");
+        const modalMaDonHang = document.getElementById("modal-maDonHang");
+        const xuongCatList = document.getElementById("xuong-cat-list");
+        const xuongMayList = document.getElementById("xuong-may-list");
 
-            <hr>
+        function renderDonHang(data) {
+            if (!data || data.length === 0) {
+                tbodyDonHang.innerHTML = `<tr>
+                <td colspan="5" style="text-align:center; padding:20px;">Chưa có đơn hàng nào</td>
+            </tr>`;
+                return;
+            }
+            tbodyDonHang.innerHTML = data.map(dh => `
+            <tr>
+                <td>${dh.maDonHang}</td>
+                <td>${dh.tenDonHang}</td>
+                <td>${dh.ngayGiao}</td>
+                <td>${dh.trangThai}</td>
+                <td>
+                    <button class="btn btn-primary btn-lap-khsx" data-madonhang="${dh.maDonHang}">Lập KHSX</button>
+                </td>
+            </tr>
+        `).join('');
+            attachModalButtons();
+        }
 
-            <div class="form-group">
-                <label for="ngay_bat_dau_kh">Ngày bắt đầu (Kế hoạch):</label>
-                <input type="date" id="ngay_bat_dau_kh" name="ngay_bat_dau" required>
-            </div>
-            <div class="form-group">
-                <label for="ngay_ket_thuc_kh">Ngày kết thúc (Kế hoạch):</label>
-                <input type="date" id="ngay_ket_thuc_kh" name="ngay_ket_thuc" required readonly>
-            </div>
+        function fetchDonHang() {
+            const query = searchBox.value.trim();
+            const ngayGiao = filterNgayGiao.value;
+            const trangThai = filterTrangThai.value;
 
-            <div class="xuong-block">
-                <div class="xuong-header">
-                    <h4>Phân công XƯỞNG CẮT</h4>
-                </div>
-                <div class="xuong-body">
-                    <div class="form-group">
-                        <label>Giao Sản phẩm:</label>
-                        <select name="xuong_cat[maSanPham]" class="product-select" required>
-                            <option value="">-- Chọn sản phẩm --</option>
-                        </select>
-                    </div>
-                    <div class="nvl-list-container">
-                        <label>Nguyên vật liệu:</label>
-                        <div id="xuong-cat-nvl-list"></div> <button type="button" class="btn-add-nvl" data-target="xuong-cat-nvl-list">
-                            + Thêm NVL
-                        </button>
-                    </div>
-                </div>
-            </div>
+            const params = new URLSearchParams({ query, ngayGiao, trangThai });
+            fetch(`index.php?page=ajax-tim-donhang&${params.toString()}`)
+                .then(res => res.json())
+                .then(data => renderDonHang(data))
+                .catch(err => console.error("Lỗi fetch:", err));
+        }
 
-            <div class="xuong-block">
-                <div class="xuong-header">
-                    <h4>Phân công XƯỞNG MAY</h4>
-                </div>
-                <div class="xuong-body">
-                    <div class="form-group">
-                        <label>Giao Sản phẩm:</label>
-                        <select name="xuong_may[maSanPham]" class="product-select" required>
-                            <option value="">-- Chọn sản phẩm --</option>
-                        </select>
-                    </div>
-                    <div class="nvl-list-container">
-                        <label>Nguyên vật liệu:</label>
-                        <div id="xuong-may-nvl-list"></div> <button type="button" class="btn-add-nvl" data-target="xuong-may-nvl-list">
-                            + Thêm NVL
-                        </button>
-                    </div>
-                </div>
-            </div>
+        searchBox.addEventListener("input", fetchDonHang);
+        filterNgayGiao.addEventListener("change", fetchDonHang);
+        filterTrangThai.addEventListener("change", fetchDonHang);
+        btnClearFilters.addEventListener("click", () => {
+            searchBox.value = '';
+            filterNgayGiao.value = '';
+            filterTrangThai.value = '';
+            fetchDonHang();
+        });
 
-            <br>
-            <button type="submit" class="btn-submit">Lưu Kế hoạch</button>
-        </form>
-    </div>
-</div>
+        fetchDonHang(); // initial load
 
-<div id="confirm-exit-modal" class="modal-overlay confirm-exit-overlay">
-    <div class="modal-content confirm-box-content">
-        <h4>Xác nhận thoát</h4>
-        <p>Bạn có chắc chắn muốn đóng biểu mẫu này không? Mọi thông tin chưa lưu sẽ bị mất.</p>
-        <div class="confirm-buttons">
-            <button id="confirm-exit-no" class="btn btn-secondary">Ở lại</button>
-            <button id="confirm-exit-yes" class="btn btn-danger">Thoát</button>
-        </div>
-    </div>
-</div>
+        // MODAL
+        function attachModalButtons() {
+            document.querySelectorAll(".btn-lap-khsx").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const maDH = btn.dataset.madonhang;
+                    modalMaDonHang.value = maDH;
+                    xuongCatList.innerHTML = '';
+                    xuongMayList.innerHTML = '';
+                    modal.classList.add("show");
+                });
+            });
+        }
 
-<div id="success-modal" class="modal-overlay success-overlay">
-    <div class="modal-content success-box-content">
-        <h3>Lập kế hoạch thành công</h3>
-        <div class="success-buttons">
-            <button id="success-yes" class="btn btn-secondary">Đồng ý</button>
-        </div>
-    </div>
-</div>
-<?php
-require_once 'layouts/footer.php';
-?>
-<script src="public/js/khsx.js"></script>
+        modalClose.addEventListener("click", () => modal.classList.remove("show"));
+        modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("show"); });
+
+        // Thêm NVL
+        document.querySelectorAll(".btn-add-nvl").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const xuong = btn.dataset.xuong;
+                const listContainer = xuong === 'cat' ? xuongCatList : xuongMayList;
+                const index = listContainer.children.length;
+                const html = `
+                <div class="nvl-row">
+                    <input type="hidden" name="xuong_${xuong}[nvl_id][]" value="">
+                    <input type="text" name="xuong_${xuong}[nvl_ten][]" placeholder="Tên NVL">
+                    <input type="number" name="xuong_${xuong}[nvl_soLuong][]" placeholder="Số lượng" min="1" value="1">
+                    <button type="button" class="btn-remove-nvl">&times;</button>
+                </div>`;
+                listContainer.insertAdjacentHTML('beforeend', html);
+            });
+        });
+
+        // Xóa NVL
+        document.addEventListener("click", e => {
+            if (e.target.classList.contains("btn-remove-nvl")) {
+                e.target.closest(".nvl-row").remove();
+            }
+        });
+    });
+</script>

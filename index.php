@@ -143,10 +143,16 @@ switch ($page) {
         $controller->index();
         break;
 
-    case 'chitietkhxs':
-        require_once './app/controllers/CongViecController.php';
-        $c = new CongViecController();
-        $c->detail();
+    case 'lap-khsx':
+        require_once './app/models/ketNoi.php';
+        require_once './app/controllers/KHSXController.php';
+        $controller = new KHSXController();
+        $controller->create();
+        break;
+    case 'lap-ke-hoach-chi-tiet':
+        require_once './app/controllers/KHSXController.php';
+        $controller = new KHSXController();
+        $controller->lapChiTiet();
         break;
     // ✅ Trang hiển thị lịch làm việc
     case 'lichlamviec':
@@ -222,7 +228,7 @@ switch ($page) {
         $controller = new XuatThanhPhamController();
         $controller->xuat();
         break;
-// ===== Thống kê sản phẩm (bắt cả 2 tên route) =====
+    // ===== Thống kê sản phẩm (bắt cả 2 tên route) =====
 
     case 'thongke_sanpham':
     case 'thongke':
@@ -250,26 +256,26 @@ switch ($page) {
         require_once './app/controllers/YeuCauNhapKhoController.php';
         (new YeuCauNhapKhoController())->luuPhieu();
         break;
-    
+
     // 🔹 PHÊ DUYỆT PHIẾU YÊU CẦU NHẬP KHO NVL
     case 'phe-duyet-yc-nhap-kho':
         require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
         $controller = new PheDuyetYeuCauNhapKhoController();
         $controller->index();
         break;
-    
+
     case 'duyet-yc-nhap-kho':
         require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
         $controller = new PheDuyetYeuCauNhapKhoController();
         $controller->approve();
         break;
-    
+
     case 'tu-choi-yc-nhap-kho':
         require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
         $controller = new PheDuyetYeuCauNhapKhoController();
         $controller->reject();
         break;
-    
+
     case 'chi-tiet-yc-nhap-kho':
         require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
         $controller = new PheDuyetYeuCauNhapKhoController();
@@ -415,7 +421,7 @@ switch ($page) {
 
     case 'luu-don-hang-san-xuat':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once 'app/controllers/TaoDonHangSanXuatController.php'; 
+            require_once 'app/controllers/TaoDonHangSanXuatController.php';
             $controller = new TaoDonHangSanXuatController();
             $controller->luu();
         } else {

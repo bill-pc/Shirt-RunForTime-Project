@@ -1,13 +1,10 @@
 <?php
-// app/controllers/KHSXController.php
 require_once 'app/models/DonHangSanXuatModel.php';
-require_once 'app/models/KeHoachSanXuatModel.php';
+require_once 'app/models/LapKHSXModel.php';
 require_once 'app/models/XuongModel.php';
 require_once 'app/models/NVLModel.php';
 require_once 'app/models/GhiNhanThanhPhamModel.php';
 require_once 'app/models/SanPhamModel.php';
-
-
 
 class KHSXController
 {
@@ -21,178 +18,151 @@ class KHSXController
 
     public function __construct()
     {
-        // Kết nối CSDL
-        $database = new KetNoi(); // Giả sử file ketNoi.php đã được require
+        $database = new KetNoi();
         $this->conn = $database->connect();
 
-        // Khởi tạo các model
         $this->donHangModel = new DonHangSanXuatModel();
-        $this->keHoachModel = new KeHoachSanXuatModel();
+        $this->keHoachModel = new LapKHSXModel();
         $this->xuongModel = new XuongModel();
         $this->nvlModel = new NVLModel();
         $this->ghiNhanTPModel = new GhiNhanThanhPhamModel();
         $this->sanPhamModel = new SanPhamModel();
     }
 
+    // -------------------------------------
+    // 1. Trang lập KHSX
+    // -------------------------------------
     public function create()
     {
+        $danhSachDonHang = $this->keHoachModel->getDonHangChuaLapKHSX();
         $danhSachKHSX = $this->keHoachModel->getDanhSachKHSX();
-        $data = [
-            'pageTitle' => 'Lập Kế hoạch Sản xuất',
-            'danhSachKHSX' => $danhSachKHSX
-        ];
+
         include __DIR__ . '/../views/lapKHSX.php';
     }
 
-    public function ajaxTimKiem()
+    // -------------------------------------
+    // 2. Trang lập chi tiết KHSX
+    // -------------------------------------
+    public function lapChiTiet()
     {
-        ob_clean();
+        $maDonHang = $_GET['id'] ?? 0;
 
-        $keyword = $_GET['query'] ?? '';
+        $donHang = $this->donHangModel->getChiTietDonHang($maDonHang);
 
-        $tuNgay = $_GET['tuNgay'] ?? null;
-        $denNgay = $_GET['denNgay'] ?? null;
-
-        $trangThai = 'Chờ duyệt';
-
-        $results = [];
-
-        if ($keyword === '') {
-            $results = $this->donHangModel->getRecentDonHang(10, $tuNgay, $denNgay, $trangThai);
-        } else {
-            $results = $this->donHangModel->timKiemDonHang($keyword, $tuNgay, $denNgay, $trangThai);
-        }
-
-        header('Content-Type: application/json');
-        echo json_encode($results);
-        die();
-    }
-    public function ajaxGetChiTiet()
-    {
-        $id = $_GET['id'] ?? 0;
-
-        $donHang = $this->donHangModel->getChiTietDonHang($id);
-
-        header('Content-Type: application/json');
-        echo json_encode($donHang);
-        die();
-    }
-
-    public function store()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: index.php?page=lap-ke-hoach');
+        if (!$donHang) {
+            echo "Không tìm thấy đơn hàng!";
             exit;
         }
 
-        $maDonHang = $_POST['maDonHang'] ?? '';
+        $danhSachXuong = $this->xuongModel->getAllXuong();
+        $danhSachNVL = $this->nvlModel->getAllNVL();
+        $soLuongTB = $this->ghiNhanTPModel->getSoLuongTrungBinh();
+        $danhSachSanPham = $this->sanPhamModel->getAllSanPham();
 
-        if (empty($maDonHang)) {
-            echo "<script>alert('Lỗi: Không tìm thấy mã đơn hàng!'); window.history.back();</script>";
+        include __DIR__ . '/../views/lapKHSXChiTiet.php';
+    }
+
+    // -------------------------------------
+    // 3. Lưu kế hoạch sản xuất
+    // -------------------------------------
+    public function store()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: index.php?page=lap-ke-hoach");
             exit;
         }
 
         $this->conn->begin_transaction();
 
         try {
-            // Lấy thông tin đơn hàng để biết mã sản phẩm gốc
-            $donHangInfo = $this->donHangModel->getChiTietDonHang($maDonHang);
-            if (!$donHangInfo) {
-                throw new Exception("Không tồn tại đơn hàng này.");
-            }
-            $maSanPhamGoc = $donHangInfo['maSanPham'];
 
-            $ngayBatDau = $_POST['ngay_bat_dau'];
-            $ngayKetThuc = $_POST['ngay_ket_thuc'];
-            $maNguoiLap = isset($_SESSION['user']['maND']) ? $_SESSION['user']['maND'] : 1;
+            // ===== 1. Tạo kế hoạch cha =====
+            $maKHSX = $this->keHoachModel->createKHSX([
+                'tenKHSX' => "KHSX cho ĐH " . $_POST['maDonHang'],
+                'maDonHang' => $_POST['maDonHang'],
+                'thoiGianBatDau' => $_POST['ngay_bat_dau'],
+                'thoiGianKetThuc' => $_POST['ngay_ket_thuc'],
+                'maND' => 1
+            ]);
 
-            // 2. TẠO KHSX CHÍNH (Đã thêm maSanPham)
-            $dataKHSX = [
-                'tenKHSX' => 'KHSX cho ĐH ' . $maDonHang,
-                'maDonHang' => $maDonHang,
-                'maSanPham' => $maSanPhamGoc, // Lưu sản phẩm chính vào kế hoạch
-                'thoiGianBatDau' => $ngayBatDau,
-                'thoiGianKetThuc' => $ngayKetThuc,
-                'maND' => $maNguoiLap
-            ];
-            $maKHSX_moi = $this->keHoachModel->createKHSX($dataKHSX);
-
-            if (!$maKHSX_moi) throw new Exception("Lỗi tạo KHSX");
-
-            // 3. LƯU CHI TIẾT (Logic giữ nguyên)
-            // Xưởng cắt
-            if (isset($_POST['xuong_cat']) && isset($_POST['xuong_cat']['nvl_id'])) {
-                $xuongCatData = $_POST['xuong_cat'];
-                foreach ($xuongCatData['nvl_id'] as $index => $maNVL) {
-                    if (!empty($maNVL)) {
-                        $this->keHoachModel->createChiTietKHSX([
-                            'maKHSX' => $maKHSX_moi,
-                            // 'maSanPham' => ...  <-- XÓA DÒNG NÀY ĐI
-                            'maXuong' => 1,
-                            'maNVL' => $maNVL,
-                            'soLuongNVL' => $xuongCatData['nvl_soLuong'][$index]
-                        ]);
-                    }
-                }
+            if (!$maKHSX) {
+                throw new Exception("Không thể tạo kế hoạch!");
             }
 
-            // XƯỞNG MAY
-            if (isset($_POST['xuong_may']) && isset($_POST['xuong_may']['nvl_id'])) {
-                $xuongMayData = $_POST['xuong_may'];
-                foreach ($xuongMayData['nvl_id'] as $index => $maNVL) {
-                    if (!empty($maNVL)) {
-                        $this->keHoachModel->createChiTietKHSX([
-                            'maKHSX' => $maKHSX_moi,
-                            // 'maSanPham' => ... <-- XÓA DÒNG NÀY ĐI
-                            'maXuong' => 2,
-                            'maNVL' => $maNVL,
-                            'soLuongNVL' => $xuongMayData['nvl_soLuong'][$index]
-                        ]);
-                    }
-                }
+            // ============================================================================
+            // 2. ĐỌC DỮ LIỆU XƯỞNG CẮT (dạng đơn - không phải mảng)
+            // ============================================================================
+            $catKPI = $_POST['xuong_cat']['kpi'] ?? 0;
+            $catStart = $_POST['xuong_cat']['ngayBatDau'] ?? null;
+            $catEnd = $_POST['xuong_cat']['ngayKetThuc'] ?? null;
+
+            $catNVL_IDs = $_POST['xuong_cat']['nvl_id'] ?? [];
+            $catDinhMuc = $_POST['xuong_cat']['nvl_dinhMuc'] ?? [];
+            $catSoLuongNVL = $_POST['xuong_cat']['nvl_soLuong'] ?? [];
+
+            foreach ($catNVL_IDs as $i => $maNVL) {
+
+                $this->keHoachModel->createChiTietKHSX([
+                    'maKHSX' => $maKHSX,
+                    'maXuong' => 1,
+
+                    'maNVL' => $maNVL,
+                    'soLuongNVL' => $catSoLuongNVL[$i] ?? 0,
+
+                    // 5 trường mới
+                    'ngayBatDau' => $catStart,
+                    'ngayKetThuc' => $catEnd,
+                    'KPI' => $catKPI,
+                    'soLuongThanhPham' => 0,
+                    'dinhMuc' => $catDinhMuc[$i] ?? 0,
+
+                    // FK ghi nhận TP = NULL (vì chưa có)
+                    'maGNTP' => null
+                ]);
             }
 
-            // 4. CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG
-            $this->donHangModel->updateTrangThai($maDonHang, 'Đang thực hiện');
+            // ============================================================================
+            // 3. ĐỌC DỮ LIỆU XƯỞNG MAY (dạng đơn - không phải mảng)
+            // ============================================================================
+            $mayKPI = $_POST['xuong_may']['kpi'] ?? 0;
+            $mayStart = $_POST['xuong_may']['ngayBatDau'] ?? null;
+            $mayEnd = $_POST['xuong_may']['ngayKetThuc'] ?? null;
+
+            $mayNVL_IDs = $_POST['xuong_may']['nvl_id'] ?? [];
+            $mayDinhMuc = $_POST['xuong_may']['nvl_dinhMuc'] ?? [];
+            $maySoLuongNVL = $_POST['xuong_may']['nvl_soLuong'] ?? [];
+
+            foreach ($mayNVL_IDs as $i => $maNVL) {
+
+                $this->keHoachModel->createChiTietKHSX([
+                    'maKHSX' => $maKHSX,
+                    'maXuong' => 2,
+
+                    'maNVL' => $maNVL,
+                    'soLuongNVL' => $maySoLuongNVL[$i] ?? 0,
+
+                    'ngayBatDau' => $mayStart,
+                    'ngayKetThuc' => $mayEnd,
+                    'KPI' => $mayKPI,
+                    'soLuongThanhPham' => 0,
+                    'dinhMuc' => $mayDinhMuc[$i] ?? 0,
+
+                    'maGNTP' => null
+                ]);
+            }
+
+            // ===== 4. Cập nhật trạng thái đơn hàng =====
+            $this->donHangModel->updateTrangThai($_POST['maDonHang'], "Đang thực hiện");
 
             $this->conn->commit();
-            header('Location: index.php?page=lap-khsx&success=1');
+            header("Location: index.php?page=lap-khsx&success=1");
             exit;
+
         } catch (Exception $e) {
             $this->conn->rollback();
-            echo "<h1>Đã xảy ra lỗi!</h1>";
-            echo "<p>Chi tiết: " . $e->getMessage() . "</p>";
-            echo "<a href='index.php?page=lap-ke-hoach'>Quay lại</a>";
+            echo "Lỗi lưu kế hoạch: " . $e->getMessage();
             exit;
         }
     }
 
-    public function ajaxGetModalData()
-    {
-        ob_clean();
-        $id = $_GET['id'] ?? 0;
-
-        $donHang = $this->donHangModel->getChiTietDonHang($id);
-        $danhSachNVL = $this->nvlModel->getAllNVL();
-        $danhSachSanPham = $this->sanPhamModel->getAllSanPham();
-
-        // Lấy năng suất trung bình riêng cho từng xưởng
-        // Từ khóa truyền vào phải khớp với dữ liệu 'phongBan' trong bảng 'nguoidung'
-        $sanLuongCat = $this->ghiNhanTPModel->getSoLuongTrungBinhTheoXuong('Cắt');
-        $sanLuongMay = $this->ghiNhanTPModel->getSoLuongTrungBinhTheoXuong('May');
-
-        $data = [
-            'donHang' => $donHang,
-            'danhSachNVL' => $danhSachNVL,
-            'danhSachSanPham' => $danhSachSanPham,
-            'nangSuat' => [
-                'xuongCat' => $sanLuongCat,
-                'xuongMay' => $sanLuongMay
-            ]
-        ];
-
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        die();
-    }
 }
