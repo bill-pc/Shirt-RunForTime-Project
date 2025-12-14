@@ -74,7 +74,6 @@ function loadProductInfo() {
   const selectedOption = select.options[select.selectedIndex];
   const btnCreate = document.getElementById('btnCreate');
   const productInfo = document.getElementById('productInfo');
-  
   if (!select.value) {
     productInfo.innerHTML = '<p style="color:#666; text-align:center;">Vui lòng chọn kế hoạch sản xuất để xem thông tin...</p>';
     btnCreate.disabled = true;

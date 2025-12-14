@@ -1,69 +1,62 @@
 <?php
-require_once './app/models/KeHoachSanXuatModel.php';
-require_once  './app/models/PhieuYeuCauCCNVLModel.php';
+require_once './app/models/YeuCauKiemTraChatLuongModel.php';
 
-class YeuCauNVLController {
+class YeuCauKiemTraChatLuongController {
 
+    // Hiển thị form
     public function index() {
-        // 1. Gọi Model
-        $khsxModel = new KeHoachSanXuatModel();
-        $danhSachKHSX = $khsxModel->getAllPlans();
-
-        // 2. Tải View và truyền dữ liệu $danhSachKHSX ra
-        require_once './app/views/taoYCCungCapNVL.php';
+        $model = new YeuCauKiemTraChatLuongModel();
+        $plans = $model->getApprovedPlans(); // lấy danh sách kế hoạch
+        require_once './app/views/taoYCKiemTraChatLuong.php';
     }
 
-    
-    
-    public function chiTiet() {
-        // Lấy mã KHSX từ URL
-        if (!isset($_GET['maKHSX'])) {
-            echo "Lỗi: Không có mã kế hoạch sản xuất.";
-            return;
-        }
-        $maKHSX = $_GET['maKHSX'];
-
-        // 1. Gọi Model
-        $khsxModel = new KeHoachSanXuatModel();
-        
-        // Lấy thông tin phiếu (để điền tên, người lập)
-        $thongTinPhieu = $khsxModel->getPlanById($maKHSX);
-        
-        // Lấy danh sách NVL (để điền vào bảng)
-        $danhSachNVL = $khsxModel->getMaterialsForPlan($maKHSX);
-
-        // 2. Tải View và truyền 2 khối dữ liệu
-        require_once './app/views/taoYCCungCapNVL_ChiTiet.php';
-    }
-    public function luuPhieu() {
+    // Xử lý tạo phiếu
+    public function create() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $phieuModel = new PhieuYeuCauModel();
-            $success = $phieuModel->createPhieuYeuCau($_POST);
+            $maKHSX = $_POST['planCode'] ?? null;
+            $tenNguoiLap = $_SESSION['user']['hoTen'] ?? 'Admin';
 
-            if ($success) {
-                // Giữ nguyên chuyển hướng khi thành công
-                header('Location: index.php?page=tao-yeu-cau-nvl&success=1');
+            if (!$maKHSX) {
+                echo "<script>alert('❌ Vui lòng chọn kế hoạch sản xuất!');history.back();</script>";
                 exit;
-            } else {
-                // === VÔ HIỆU HÓA TẠM THỜI DÒNG NÀY ===
-                // $maKHSX = isset($_POST['maKHSX']) ? $_POST['maKHSX'] : '';
-                // header('Location: index.php?page=chi-tiet-yeu-cau&maKHSX=' . $maKHSX . '&error=1');
-                // exit;
-
-                // === THAY BẰNG DÒNG NÀY ĐỂ XEM LỖI ===
-                echo "<h1>Lỗi xảy ra khi lưu phiếu!</h1>";
-                echo "<p>Kiểm tra PHP Error Log để biết chi tiết.</p>";
-                // Bạn có thể thử in ra $_POST để kiểm tra dữ liệu gửi lên
-                echo "<pre>Dữ liệu gửi lên:\n";
-                print_r($_POST);
-                echo "</pre>";
-                // Dừng thực thi để xem lỗi (nếu có)
-                // Nếu bạn đã bật display_errors ở index.php, lỗi chi tiết có thể hiện ở đây
-                die(); // Tạm thời dừng ở đây
             }
-        } else {
-             header('Location: index.php?page=tao-yeu-cau-nvl');
-             exit;
+
+            $model = new YeuCauKiemTraChatLuongModel();
+            $product = $model->getProductByPlan($maKHSX);
+
+            if (!$product) {
+                echo "<script>alert('❌ Không tìm thấy thông tin sản phẩm!');history.back();</script>";
+                exit;
+            }
+
+            // Tạo tên phiếu
+            $tenPhieu = 'Phiếu KTCL - ' . $product['tenKHSX'];
+            
+            // Thêm phiếu chính
+            $maYC = $model->themPhieuYeuCau(
+                $tenNguoiLap, 
+                $tenPhieu, 
+                $product['maSanPham'], 
+                $maKHSX
+            );
+
+            if ($maYC) {
+                // Thêm chi tiết phiếu (1 sản phẩm duy nhất)
+                $model->themChiTietPhieu(
+                    $maYC,
+                    $product['maSanPham'],
+                    $product['tenSanPham'],
+                    $product['soLuongSanXuat'],
+                    $product['donVi']
+                );
+                
+                echo "<script>
+                    alert('✅ Tạo phiếu kiểm tra chất lượng thành công!');
+                    window.location='index.php?page=tao-yeu-cau-kiem-tra-chat-luong';
+                </script>";
+            } else {
+                echo "<script>alert('❌ Lỗi khi tạo phiếu!');history.back();</script>";
+            }
         }
     }
 }

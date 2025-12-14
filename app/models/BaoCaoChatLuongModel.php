@@ -18,12 +18,14 @@ class BaoCaoChatLuongModel
                     c.maYC,
                     c.tenSanPham,
                     c.soLuong,
-                    c.ngayKiemTra,
+                    c.soLuongDat,
+                    c.soLuongHong,
+                    p.ngayLap,
                     p.tenNguoiLap
                 FROM chitietphieuyeucaukiemtrachatluong c
                 JOIN phieuyeucaukiemtrachatluong p ON c.maYC = p.maYC
                 WHERE c.trangThaiSanPham = 'Đã kiểm tra'
-                ORDER BY c.ngayKiemTra DESC";
+                ORDER BY p.ngayLap  DESC";
 
         $result = $this->conn->query($sql);
 
@@ -40,6 +42,7 @@ class BaoCaoChatLuongModel
 {
     $sql = "SELECT 
                 c.*,
+                p.ngayLap,
                 p.tenNguoiLap
             FROM chitietphieuyeucaukiemtrachatluong c
             JOIN phieuyeucaukiemtrachatluong p ON c.maYC = p.maYC

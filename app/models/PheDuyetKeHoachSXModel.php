@@ -47,21 +47,21 @@ class PheDuyetKeHoachSXModel {
 
         // ✅ Lấy chi tiết nguyên vật liệu cho kế hoạch
         $sqlNVL = "SELECT 
-                      c.maNVL, 
-                      c.tenNVL, 
-                      c.loaiNVL,
-                      n.donViTinh, 
-                      n.soLuongTonKho, 
-                      c.soLuongNVL AS soLuongCan,
-                      x.tenXuong,
-                      CASE 
-                        WHEN n.soLuongTonKho >= c.soLuongNVL THEN 'Đủ kho'
-                        ELSE CONCAT('Thiếu ', c.soLuongNVL - n.soLuongTonKho)
-                      END AS ghiChu
-                   FROM chitietkehoachsanxuat c
-                   JOIN nvl n ON c.maNVL = n.maNVL
-                   LEFT JOIN xuong x ON c.maXuong = x.maXuong
-                   WHERE c.maKHSX = ?";
+                        c.maNVL, 
+                        c.tenNVL, 
+                        c.loaiNVL,
+                        n.donViTinh, 
+                        n.soLuongTonKho, 
+                        c.soLuongNVL AS soLuongCan,
+                        x.tenXuong,
+                        CASE 
+                            WHEN n.soLuongTonKho >= c.soLuongNVL THEN 'Đủ kho'
+                            ELSE CONCAT('Thiếu ', c.soLuongNVL - n.soLuongTonKho)
+                        END AS ghiChu
+                    FROM chitietkehoachsanxuat c
+                    JOIN nvl n ON c.maNVL = n.maNVL
+                    LEFT JOIN xuong x ON c.maXuong = x.maXuong
+                    WHERE c.maKHSX = ?";
         
         $stmtNVL = $this->conn->prepare($sqlNVL);
         $stmtNVL->bind_param('i', $maKHSX);

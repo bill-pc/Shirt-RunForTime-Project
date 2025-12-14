@@ -108,30 +108,32 @@ require_once 'app/views/layouts/nav.php';
 
         /* Search box */
         .search-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
+    display: flex;
+    align-items: center;
+    gap: 8px; /* khoảng cách nhỏ giữa input & button */
+    margin-bottom: 15px;
+}
 
-        .search-bar input {
-            width: 250px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-        }
+.search-bar input {
+    width: 260px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+}
 
-        .search-bar button {
-            padding: 8px 14px;
-            background-color: #5a8dee;
-            color: white;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-        }
+.search-bar button {
+    padding: 8px 16px;
+    background-color: #5a8dee;
+    color: white;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
 
-        .search-bar button:hover {
-            background-color: #4076db;
-        }
+.search-bar button:hover {
+    background-color: #4076db;
+}
         /* Danh sách gợi ý */
 .suggestions-list {
     position: absolute;
@@ -261,26 +263,24 @@ const searchInput = document.getElementById("search");
 const suggestions = document.getElementById("suggestions");
 const tbody = document.querySelector("#nhanvienTable tbody");
 
-// ===== MODAL XOÁ =====
+// ================= MODAL XOÁ =================
 function showDeleteModal(maNV) {
     currentDeleteId = maNV;
     modal.style.display = "block";
 }
 
-cancelBtn.onclick = function() {
+cancelBtn.onclick = function () {
     modal.style.display = "none";
     currentDeleteId = null;
-}
+};
 
-confirmBtn.onclick = async function() {
+confirmBtn.onclick = async function () {
     if (!currentDeleteId) return;
 
     try {
         const res = await fetch(`index.php?page=xoanhanvien&id=${currentDeleteId}`, {
             method: "POST",
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
 
         const data = await res.json();
@@ -289,33 +289,32 @@ confirmBtn.onclick = async function() {
             alert("Xóa thành công!");
             location.reload();
         } else {
-            alert("Xóa thất bại: " + (data.message || "Lỗi không xác định."));
+            alert("Xóa thất bại: " + (data.message || "Lỗi không xác định"));
         }
 
     } catch (err) {
-        console.error("Lỗi khi xóa nhân viên:", err);
-        alert("Không thể xóa nhân viên.");
+        console.error(err);
+        alert("Không thể xóa nhân viên!");
     }
 
     modal.style.display = "none";
-}
+};
 
-window.onclick = function(event) {
-    if (event.target == modal) {
+window.onclick = function (event) {
+    if (event.target === modal) {
         modal.style.display = "none";
     }
-}
+};
 
-// ===== HIỂN THỊ BẢNG =====
+// ================= RENDER TABLE =================
 function renderTable(data) {
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" style="text-align:center; color: #ef4444; font-weight: 600;">
-                    Không có nhân viên nào
+                <td colspan="8" style="color:red;font-weight:600">
+                    Không tìm thấy nhân viên
                 </td>
-            </tr>
-        `;
+            </tr>`;
         return;
     }
 
@@ -332,18 +331,51 @@ function renderTable(data) {
                 <a href="index.php?page=xemnhanvien&id=${nv.maND}">
                     <i class="fas fa-eye"></i>
                 </a>
-
-                <a href="index.php?page=suathongtinnv&id=${nv.maND}" class="btn-action edit">
+                <a href="index.php?page=suathongtinnv&id=${nv.maND}">
                     <i class="fas fa-pen"></i>
                 </a>
-
-                <button class="btn btn-delete" onclick="showDeleteModal('${nv.maND}')">Xóa</button>
+                <button class="btn btn-delete" onclick="showDeleteModal('${nv.maND}')">
+                    Xóa
+                </button>
             </td>
         </tr>
     `).join("");
 }
 
-// ===== AUTOCOMPLETE =====
+// ================= HÀM TÌM KIẾM =================
+async function searchNhanVien() {
+    const keyword = searchInput.value.trim();
+
+    if (!keyword) {
+        return; // không hiện thông báo
+    }
+
+    try {
+        const res = await fetch(`index.php?page=timkiem-nhanvien&keyword=${encodeURIComponent(keyword)}`);
+        const data = await res.json();
+
+        renderTable(data);   // chỉ render bảng
+        suggestions.innerHTML = "";
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+// ================= NÚT TÌM =================
+document.getElementById("refreshBtn").addEventListener("click", () => {
+    searchNhanVien();
+});
+
+// ================= ENTER ĐỂ TÌM =================
+searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        searchNhanVien();
+    }
+});
+
+// ================= AUTOCOMPLETE =================
 searchInput.addEventListener("keyup", async () => {
     const keyword = searchInput.value.trim();
 
@@ -356,48 +388,22 @@ searchInput.addEventListener("keyup", async () => {
         const res = await fetch(`index.php?page=timkiem-nhanvien&keyword=${encodeURIComponent(keyword)}`);
         const data = await res.json();
 
-        suggestions.innerHTML = data.map(item => `
-            <li data-id="${item.maND}">${item.hoTen}</li>
-        `).join("");
+        suggestions.innerHTML = data.map(item =>
+            `<li data-id="${item.maND}">${item.hoTen}</li>`
+        ).join("");
 
     } catch (error) {
-        console.error("Lỗi tìm kiếm:", error);
+        console.error(error);
     }
 });
 
-// click chọn tên gợi ý
+// ================= CLICK GỢI Ý =================
 suggestions.addEventListener("click", async (e) => {
     if (e.target.tagName !== "LI") return;
 
-    const name = e.target.textContent;
-    searchInput.value = name;
+    searchInput.value = e.target.textContent;
     suggestions.innerHTML = "";
-
-    try {
-        const res = await fetch(`index.php?page=timkiem-nhanvien&keyword=${encodeURIComponent(name)}`);
-        const data = await res.json();
-        renderTable(data);
-    } catch (error) {
-        console.error("Lỗi khi lọc bảng:", error);
-    }
-});
-
-// ===== NÚT TÌM =====
-document.getElementById("refreshBtn").addEventListener("click", async () => {
-    const keyword = searchInput.value.trim();
-
-    if (!keyword) {
-        location.reload();
-        return;
-    }
-
-    try {
-        const res = await fetch(`index.php?page=timkiem-nhanvien&keyword=${encodeURIComponent(keyword)}`);
-        const data = await res.json();
-        renderTable(data);
-    } catch (error) {
-        console.error("Lỗi tìm kiếm:", error);
-    }
+    searchNhanVien();
 });
 </script>
 

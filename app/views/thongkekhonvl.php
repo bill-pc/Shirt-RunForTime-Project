@@ -259,8 +259,9 @@ inputNVL.addEventListener('input', async function() {
 /* ================= BIỂU ĐỒ ================= */
 function renderChart(data) {
     const labels = data.map(i => i.tenNVL);
-    const tongNhap = data.map(i => i.tongNhap);
-    const tongXuat = data.map(i => i.tongXuat);
+    const tongNhap = data.map(i => Number(i.tongNhap));
+    const tongXuat = data.map(i => Number(i.tongXuat));
+    const tonKho   = data.map(i => Number(i.tonKho));
 
     const ctx = document.getElementById('chartKhoNVL').getContext('2d');
 
@@ -271,16 +272,43 @@ function renderChart(data) {
         data: {
             labels: labels,
             datasets: [
-                { label: 'Tổng nhập', data: tongNhap },
-                { label: 'Tổng xuất', data: tongXuat }
+                {
+                    label: 'Tổng nhập',
+                    data: tongNhap
+                },
+                {
+                    label: 'Tổng xuất',
+                    data: tongXuat
+                },
+                {
+                    label: 'Tồn kho',
+                    data: tonKho
+                }
             ]
         },
         options: {
             responsive: true,
-            scales: { y: { beginAtZero: true } }
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: value => value.toLocaleString()
+                    }
+                }
+            }
         }
     });
 }
+
 
 /* Ẩn gợi ý khi click ngoài */
 document.addEventListener('click', (e) => {

@@ -72,7 +72,7 @@ class YeuCauKiemTraChatLuongModel {
         $sql = "INSERT INTO chitietphieuyeucaukiemtrachatluong 
                 (maYC, maSanPham, tenSanPham, soLuong, donViTinh, trangThaiSanPham)
                 VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
+                $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("iisiss", $maYC, $maSanPham, $tenSanPham, $soLuong, $donViTinh, $trangThaiSanPham);
         return $stmt->execute();
     }

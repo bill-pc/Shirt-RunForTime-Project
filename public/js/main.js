@@ -64,6 +64,25 @@ document.addEventListener("DOMContentLoaded", function() {
     const currentPage = window.location.search;
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     const isHomePage = currentPage === "" || currentPage === "?page=home";
+// --- Auto load sidebar khi ở trang giới thiệu ---
+const pageParams = new URLSearchParams(window.location.search);
+const pageName = pageParams.get("page");
+
+const introToSection = {
+    "gioi-thieu-tong-quan": "tongquan",
+    "gioi-thieu-nhan-su": "nhansu",
+    "gioi-thieu-san-xuat": "sanxuat",
+    "gioi-thieu-kho-nvl": "khoNVL",
+    "gioi-thieu-xuong": "xuong",
+    "gioi-thieu-kiem-tra-chat-luong": "qc",
+    "gioi-thieu-kho-thanh-pham": "khoTP",
+    "gioi-thieu-cong-nhan": "congnhan"
+};
+
+if (isLoggedIn && introToSection[pageName]) {
+    const sectionKey = introToSection[pageName];
+    populateSidebar(sectionKey);
+}
 
     // --- Hiển thị sidebar mặc định ---
     if (!isLoggedIn) {
@@ -86,17 +105,28 @@ document.addEventListener("DOMContentLoaded", function() {
             dropdown.classList.toggle("show");
         });
 
-        dropdown.querySelectorAll("button[data-section]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                if (!isLoggedIn) {
-                    alert("Vui lòng đăng nhập để chọn chức năng!");
-                    return;
-                }
-                const section = btn.dataset.section;
-                populateSidebar(section);
-                dropdown.classList.remove("show");
-            });
-        });
+       dropdown.querySelectorAll("button[data-section]").forEach(btn => {
+    btn.addEventListener("click", () => {
+        if (!isLoggedIn) {
+            alert("Vui lòng đăng nhập để chọn chức năng!");
+            return;
+        }
+        const section = btn.dataset.section;
+        // Chuyển hướng tới trang giới thiệu cho danh mục đó
+        const introPages = {
+            tongquan: "gioi-thieu-tong-quan",
+            nhansu: "gioi-thieu-nhan-su",
+            sanxuat: "gioi-thieu-san-xuat",
+            khoNVL: "gioi-thieu-kho-nvl",
+            xuong: "gioi-thieu-xuong",
+            qc: "gioi-thieu-kiem-tra-chat-luong",
+            khoTP: "gioi-thieu-kho-thanh-pham",
+            congnhan: "gioi-thieu-cong-nhan"
+        };
+        const page = introPages[section] || "home";
+        window.location.href = `index.php?page=${page}`;
+    });
+});
 
         document.addEventListener("click", e => {
             if (dropdown.classList.contains("show") &&
