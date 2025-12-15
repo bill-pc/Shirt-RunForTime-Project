@@ -40,19 +40,28 @@ class NhapKhoNVLController {
         'items' => json_decode($_POST['items'] ?? '[]', true)
     ];
 
+    // Nếu json_decode trả về null do JSON không hợp lệ, đặt lại thành mảng rỗng
+    if (!is_array($data['items'])) {
+        $data['items'] = [];
+    }
+
     $result = $this->model->luuPhieuNhap($data);
 
+    // Trả về JSON để frontend xử lý
+    header('Content-Type: application/json; charset=utf-8');
     if ($result['success']) {
-        echo "<script>
-            alert('✅ {$result['message']}');
-            window.location.href = 'index.php?page=nhap-kho-nvl';
-        </script>";
+        echo json_encode([
+            'success' => true,
+            'message' => $result['message'],
+            'redirect' => 'index.php?page=nhap-kho-nvl'
+        ]);
     } else {
-        echo "<script>
-            alert('{$result['message']}');
-            window.location.href = 'index.php?page=nhap-kho-nvl';
-        </script>";
+        echo json_encode([
+            'success' => false,
+            'message' => $result['message']
+        ]);
     }
+    return;
 }
 
 }

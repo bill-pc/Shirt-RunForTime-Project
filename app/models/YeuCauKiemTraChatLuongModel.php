@@ -8,14 +8,17 @@ class YeuCauKiemTraChatLuongModel {
         $this->conn = (new KetNoi())->connect();
     }
 
-    // 🔹 Lấy danh sách kế hoạch đã duyệt (chưa có phiếu KTCL)
+    // 🔹 Lấy danh sách kế hoạch đã duyệt từ đơn hàng "Hoàn thành" (chưa có phiếu KTCL)
     public function getApprovedPlans() {
         $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianBatDau, kh.thoiGianKetThuc,
-                       sp.maSanPham, sp.tenSanPham, dh.soLuongSanXuat
+                       sp.maSanPham, sp.tenSanPham, dh.soLuongSanXuat, dh.tenDonHang,
+                       dh.ngayHoanThanh,
+                       DATE_ADD(kh.thoiGianKetThuc, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
                 FROM kehoachsanxuat kh
                 JOIN donhangsanxuat dh ON kh.maDonHang = dh.maDonHang
-                JOIN san_pham sp ON kh.maSanPham = sp.maSanPham
+                JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
                 WHERE kh.trangThai = 'Đã duyệt'
+                  AND dh.trangThai = 'Hoàn thành'
                   AND kh.maKHSX NOT IN (
                       SELECT DISTINCT maKHSX
                       FROM phieuyeucaukiemtrachatluong
@@ -29,12 +32,13 @@ class YeuCauKiemTraChatLuongModel {
 
     // 🔹 Lấy thông tin sản phẩm từ kế hoạch sản xuất
     public function getProductByPlan($maKHSX) {
-        $sql = "SELECT kh.maKHSX, kh.tenKHSX, 
+        $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianKetThuc,
                        sp.maSanPham, sp.tenSanPham, sp.donVi,
-                       dh.soLuongSanXuat, dh.tenDonHang
+                       dh.soLuongSanXuat, dh.tenDonHang, dh.ngayHoanThanh,
+                       DATE_ADD(kh.thoiGianKetThuc, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
                 FROM kehoachsanxuat kh
                 JOIN donhangsanxuat dh ON kh.maDonHang = dh.maDonHang
-                JOIN san_pham sp ON kh.maSanPham = sp.maSanPham
+                JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
                 WHERE kh.maKHSX = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $maKHSX);
@@ -44,7 +48,7 @@ class YeuCauKiemTraChatLuongModel {
     }
 
     // 🔹 Thêm phiếu yêu cầu kiểm tra chất lượng
-    public function themPhieuYeuCau($tenNguoiLap, $tenPhieu, $maSanPham, $maKHSX) {
+    public function themPhieuYeuCau($tenNguoiLap, $tenPhieu, $maSanPham, $maKHSX, $thoiHanHoanThanh = null) {
         // Lấy maND từ session
         session_start();
         $maND = $_SESSION['user']['maND'] ?? 1;
@@ -52,11 +56,16 @@ class YeuCauKiemTraChatLuongModel {
         $ngayLap = date('Y-m-d');
         $trangThai = 'Chờ duyệt';
         
+        // Nếu không có thời hạn, mặc định là 3 ngày sau
+        if (!$thoiHanHoanThanh) {
+            $thoiHanHoanThanh = date('Y-m-d', strtotime('+3 days'));
+        }
+        
         $sql = "INSERT INTO phieuyeucaukiemtrachatluong 
-                (tenPhieu, maSanPham, trangThai, ngayLap, tenNguoiLap, maND, maKHSX)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+                (tenPhieu, maSanPham, trangThai, ngayLap, tenNguoiLap, maND, maKHSX, thoiHanHoanThanh)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("sisssis", $tenPhieu, $maSanPham, $trangThai, $ngayLap, $tenNguoiLap, $maND, $maKHSX);
+        $stmt->bind_param("sisssiss", $tenPhieu, $maSanPham, $trangThai, $ngayLap, $tenNguoiLap, $maND, $maKHSX, $thoiHanHoanThanh);
         
         if ($stmt->execute()) {
             return $this->conn->insert_id;

@@ -16,18 +16,32 @@ require_once __DIR__ . '/layouts/nav.php';
 
       <!-- Form chọn kế hoạch -->
       <form action="index.php?page=tao-yeu-cau-kiem-tra-chat-luong-create" method="POST"
-            style="display:flex; align-items:center; gap:15px; margin-bottom:25px; flex-wrap:wrap;">
-        <label for="planCode" style="font-weight:600;">Chọn kế hoạch sản xuất:</label>
-        <select name="planCode" id="planCode" required onchange="loadProductInfo()"
-                style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:300px;">
-          <option value="">-- Chọn kế hoạch --</option>
-          <?php foreach ($plans as $p): ?>
-            <option value="<?= $p['maKHSX'] ?>" 
-                    data-product='<?= json_encode($p) ?>'>
-              <?= htmlspecialchars($p['tenKHSX']) ?> - <?= htmlspecialchars($p['tenSanPham']) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
+            style="background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:20px; margin-bottom:25px;">
+        
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px; flex-wrap:wrap;">
+          <label for="planCode" style="font-weight:600; min-width:250px;">Chọn kế hoạch sản xuất (Đơn hàng hoàn thành):</label>
+          <select name="planCode" id="planCode" required onchange="loadProductInfo()"
+                  style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:350px;">
+            <option value="">-- Chọn kế hoạch --</option>
+            <?php if (empty($plans)): ?>
+              <option value="" disabled>Không có đơn hàng nào hoàn thành</option>
+            <?php else: ?>
+              <?php foreach ($plans as $p): ?>
+                <option value="<?= $p['maKHSX'] ?>" 
+                        data-product='<?= json_encode($p) ?>'>
+                  <?= htmlspecialchars($p['tenKHSX']) ?> - <?= htmlspecialchars($p['tenSanPham']) ?> (<?= htmlspecialchars($p['tenDonHang']) ?>)
+                </option>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </select>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px; flex-wrap:wrap;">
+          <label for="thoiHanHoanThanh" style="font-weight:600; min-width:250px;">⏰ Thời hạn hoàn thành kiểm tra:</label>
+          <input type="date" name="thoiHanHoanThanh" id="thoiHanHoanThanh" required
+                 style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:200px;">
+          <span style="color:#666; font-size:14px;">📅 Ngày dự kiến hoàn thành kiểm tra chất lượng</span>
+        </div>
 
         <button type="submit" id="btnCreate" disabled
                 style="background:#1d3557; color:white; padding:10px 18px; border:none; border-radius:8px;
@@ -69,25 +83,60 @@ require_once __DIR__ . '/layouts/nav.php';
 
 <!-- ========== SCRIPT ========== -->
 <script>
+// Hàm tính ngày sau X ngày từ một ngày cụ thể
+function getDateAfterDays(dateString, days) {
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split('T')[0];
+}
+
 function loadProductInfo() {
   const select = document.getElementById('planCode');
   const selectedOption = select.options[select.selectedIndex];
   const btnCreate = document.getElementById('btnCreate');
   const productInfo = document.getElementById('productInfo');
+  const thoiHanInput = document.getElementById('thoiHanHoanThanh');
+  
   if (!select.value) {
     productInfo.innerHTML = '<p style="color:#666; text-align:center;">Vui lòng chọn kế hoạch sản xuất để xem thông tin...</p>';
     btnCreate.disabled = true;
     btnCreate.style.opacity = '0.5';
     btnCreate.style.cursor = 'not-allowed';
+    thoiHanInput.value = '';
+    thoiHanInput.min = '';
     return;
   }
 
   const data = JSON.parse(selectedOption.getAttribute('data-product'));
   
+  // Debug: Kiểm tra dữ liệu nhận được
+  console.log('📊 Data từ dropdown:', data);
+  console.log('📅 thoiGianKetThuc:', data.thoiGianKetThuc);
+  console.log('⏰ thoiHanKiemTraMacDinh:', data.thoiHanKiemTraMacDinh);
+  
+  // Set giá trị mặc định = thoiGianKetThuc + 3 ngày
+  if (data.thoiHanKiemTraMacDinh) {
+    thoiHanInput.value = data.thoiHanKiemTraMacDinh;
+    console.log('✅ Đã set thời hạn từ DB:', data.thoiHanKiemTraMacDinh);
+  } else if (data.thoiGianKetThuc) {
+    const calculatedDate = getDateAfterDays(data.thoiGianKetThuc, 3);
+    thoiHanInput.value = calculatedDate;
+    console.log('✅ Đã tính thời hạn:', data.thoiGianKetThuc, '+ 3 ngày =', calculatedDate);
+  }
+  
+  // Set min date = thoiGianKetThuc (không cho chọn trước ngày kết thúc KHSX)
+  if (data.thoiGianKetThuc) {
+    thoiHanInput.min = data.thoiGianKetThuc;
+  }
+  
   productInfo.innerHTML = `
     <div class="info-row">
       <div class="info-label">Tên kế hoạch:</div>
       <div class="info-value">${data.tenKHSX}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Đơn hàng:</div>
+      <div class="info-value"><strong>${data.tenDonHang}</strong> <span style="background:#28a745; color:white; padding:3px 10px; border-radius:5px; font-size:13px; margin-left:10px;">Hoàn thành</span></div>
     </div>
     <div class="info-row">
       <div class="info-label">Sản phẩm:</div>
@@ -98,8 +147,8 @@ function loadProductInfo() {
       <div class="info-value"><strong style="color:#d00; font-size:18px;">${data.soLuongSanXuat}</strong> cái</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Thời gian:</div>
-      <div class="info-value">${data.thoiGianBatDau} → ${data.thoiGianKetThuc}</div>
+      <div class="info-label">⏰ Thời gian kết thúc KHSX:</div>
+      <div class="info-value"><strong>${data.thoiGianKetThuc || 'N/A'}</strong> <span style="color:#666; font-size:13px; margin-left:5px;">→ Thời hạn kiểm tra: ${data.thoiHanKiemTraMacDinh || (data.thoiGianKetThuc ? getDateAfterDays(data.thoiGianKetThuc, 3) : 'N/A')}</span></div>
     </div>
   `;
   

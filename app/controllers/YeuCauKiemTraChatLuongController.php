@@ -14,10 +14,16 @@ class YeuCauKiemTraChatLuongController {
     public function create() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $maKHSX = $_POST['planCode'] ?? null;
+            $thoiHanHoanThanh = $_POST['thoiHanHoanThanh'] ?? null;
             $tenNguoiLap = $_SESSION['user']['hoTen'] ?? 'Admin';
 
             if (!$maKHSX) {
                 echo "<script>alert('❌ Vui lòng chọn kế hoạch sản xuất!');history.back();</script>";
+                exit;
+            }
+
+            if (!$thoiHanHoanThanh) {
+                echo "<script>alert('❌ Vui lòng chọn thời hạn hoàn thành kiểm tra!');history.back();</script>";
                 exit;
             }
 
@@ -29,15 +35,22 @@ class YeuCauKiemTraChatLuongController {
                 exit;
             }
 
+            // Validate: Thời hạn phải sau ngày kết thúc KHSX
+            if (isset($product['thoiGianKetThuc']) && $thoiHanHoanThanh <= $product['thoiGianKetThuc']) {
+                echo "<script>alert('❌ Thời hạn kiểm tra phải sau ngày kết thúc kế hoạch sản xuất ({$product['thoiGianKetThuc']})!');history.back();</script>";
+                exit;
+            }
+
             // Tạo tên phiếu
             $tenPhieu = 'Phiếu KTCL - ' . $product['tenKHSX'];
             
-            // Thêm phiếu chính
+            // Thêm phiếu chính (có thời hạn hoàn thành)
             $maYC = $model->themPhieuYeuCau(
                 $tenNguoiLap, 
                 $tenPhieu, 
                 $product['maSanPham'], 
-                $maKHSX
+                $maKHSX,
+                $thoiHanHoanThanh
             );
 
             if ($maYC) {

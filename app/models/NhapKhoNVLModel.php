@@ -47,6 +47,11 @@ public function getDetailsByRequest($maYCNK) {
    public function luuPhieuNhap($data) {
     $this->conn->begin_transaction();
 
+    // Nếu không có items, không thực hiện lưu
+    if (empty($data['items']) || !is_array($data['items'])) {
+        throw new Exception('Không có mục nào để lưu vào kho.');
+    }
+
     try {
         // ✅ Kiểm tra phiếu này đã nhập kho chưa
         $check = $this->conn->prepare("SELECT trangThai FROM phieuyeucaunhapkhonvl WHERE maYCNK=?");
@@ -85,23 +90,33 @@ public function getDetailsByRequest($maYCNK) {
             // Insert phiếu nhập
             $stmtPN = $this->conn->prepare(
                 "INSERT INTO phieunhapnvl 
-                 (tenPNVL, nguoiLap, nhaCungCap, ngayNhap, maYCNK, maNVL, soLuongNhap, ghiChu)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                 (tenPNVL, nguoiLap, nhaCungCap, ngayNhap, maYCNK, maNVL, soLuongNhap)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)"
             );
             if (!$stmtPN) throw new Exception("Lỗi prepare insert: " . $this->conn->error);
 
-            $stmtPN->bind_param(
-                'ssssiiss',
+            // Bind types: tenPNVL(s), nguoiLap(s), nhaCungCap(s), ngayNhap(s), maYCNK(i), maNVL(i), soLuong(i)
+            $bindOk = $stmtPN->bind_param(
+                'ssssiii',
                 $data['tenPNVL'],
                 $data['nguoiLap'],
                 $nhaCungCap,
                 $data['ngayNhap'],
                 $data['maYCNK'],
                 $maNVL,
-                $soLuong,
-                $data['ghiChu']
+                $soLuong
             );
-            $stmtPN->execute();
+
+            if (!$bindOk) {
+                throw new Exception('Lỗi bind_param insert: ' . $stmtPN->error);
+            }
+
+            if (!$stmtPN->execute()) {
+                $err = $stmtPN->error;
+                $stmtPN->close();
+                throw new Exception('Lỗi execute insert: ' . $err);
+            }
+
             $stmtPN->close();
 
             // ✅ Cập nhật tồn kho

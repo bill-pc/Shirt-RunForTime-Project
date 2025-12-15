@@ -8,13 +8,15 @@ class PhieuYeuCauNhapKhoModel {
         $this->conn = (new KetNoi())->connect();
     }
 
-    // 🔹 Lấy danh sách phiếu yêu cầu nhập kho
+    // 🔹 Lấy danh sách phiếu yêu cầu nhập kho (đã cải tiến)
     public function getAll() {
-        $sql = "SELECT p.maYCNK, p.ngayLap, p.trangThai, COUNT(c.maNVL) AS soLuongNVL
+        $sql = "SELECT p.maYCNK, p.tenPhieu, p.ngayLap, p.trangThai, 
+                       COUNT(DISTINCT c.maNVL) AS soLoaiNVL,
+                       p.tenNguoiLap
                 FROM phieuyeucaunhapkhonvl p
                 LEFT JOIN chitiet_phieuyeucaunhapkhonvl c ON p.maYCNK = c.maYCNK
-                GROUP BY p.maYCNK, p.ngayLap, p.trangThai
-                ORDER BY p.ngayLap DESC";
+                GROUP BY p.maYCNK, p.tenPhieu, p.ngayLap, p.trangThai, p.tenNguoiLap
+                ORDER BY p.ngayLap DESC, p.maYCNK DESC";
         $result = $this->conn->query($sql);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }

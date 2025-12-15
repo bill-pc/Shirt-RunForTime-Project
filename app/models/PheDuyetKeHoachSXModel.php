@@ -45,15 +45,16 @@ class PheDuyetKeHoachSXModel {
             return null;
         }
 
-        // ✅ Lấy chi tiết nguyên vật liệu cho kế hoạch
+        // ✅ Lấy chi tiết nguyên vật liệu cho kế hoạch (hiển thị tất cả xưởng được phân công)
         $sqlNVL = "SELECT 
                         c.maNVL, 
                         c.tenNVL, 
                         c.loaiNVL,
+                        c.maXuong,
+                        x.tenXuong,
                         n.donViTinh, 
                         n.soLuongTonKho, 
                         c.soLuongNVL AS soLuongCan,
-                        x.tenXuong,
                         CASE 
                             WHEN n.soLuongTonKho >= c.soLuongNVL THEN 'Đủ kho'
                             ELSE CONCAT('Thiếu ', c.soLuongNVL - n.soLuongTonKho)
@@ -61,7 +62,8 @@ class PheDuyetKeHoachSXModel {
                     FROM chitietkehoachsanxuat c
                     JOIN nvl n ON c.maNVL = n.maNVL
                     LEFT JOIN xuong x ON c.maXuong = x.maXuong
-                    WHERE c.maKHSX = ?";
+                    WHERE c.maKHSX = ?
+                    ORDER BY c.maXuong, c.maNVL";
         
         $stmtNVL = $this->conn->prepare($sqlNVL);
         $stmtNVL->bind_param('i', $maKHSX);
@@ -70,12 +72,14 @@ class PheDuyetKeHoachSXModel {
         
         $data['nguyenVatLieu'] = $result->fetch_all(MYSQLI_ASSOC);
         
-        // Lấy tên xưởng từ NVL đầu tiên (giả định tất cả NVL cùng xưởng)
-        if (!empty($data['nguyenVatLieu'])) {
-            $data['tenXuong'] = $data['nguyenVatLieu'][0]['tenXuong'] ?? '—';
-        } else {
-            $data['tenXuong'] = '—';
+        // Lấy danh sách tất cả xưởng được phân công
+        $workshopList = [];
+        foreach ($data['nguyenVatLieu'] as $nvl) {
+            if (!empty($nvl['tenXuong']) && !in_array($nvl['tenXuong'], $workshopList)) {
+                $workshopList[] = $nvl['tenXuong'];
+            }
         }
+        $data['tenXuong'] = !empty($workshopList) ? implode(', ', $workshopList) : '—';
         
         $stmtNVL->close();
 

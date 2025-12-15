@@ -44,12 +44,13 @@
           <div class="detail-section"><div class="detail-label">Xưởng Phân Công</div><div class="detail-value" id="workshop-name">—</div></div>
 
           <div class="detail-section">
-            <div class="detail-label">Nguyên Vật Liệu &amp; Số Lượng</div>
+            <div class="detail-label">Nguyên Vật Liệu &amp; Phân Công Xưởng</div>
             <table class="detail-table" id="materials-table">
               <thead>
                 <tr>
                   <th>Mã NVL</th>
                   <th>Tên NVL</th>
+                  <th>Xưởng</th>
                   <th>ĐVT</th>
                   <th>SL cần</th>
                   <th>Tồn kho</th>
@@ -57,14 +58,6 @@
                 </tr>
               </thead>
               <tbody></tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="3" style="text-align:right;">TỔNG SL CẦN</th>
-                  <th id="total-need">0</th>
-                  <th id="total-stock">0</th>
-                  <th></th>
-                </tr>
-              </tfoot>
             </table>
           </div>
 
@@ -139,19 +132,17 @@ async function selectPlan(el, maKHSX) {
     document.getElementById("workshop-name").textContent = data.tenXuong || "—";
     document.getElementById("plan-note").textContent = data.ghiChu || "Không có ghi chú";
 
-    // Nguyên vật liệu
+    // Nguyên vật liệu với phân công xưởng
     const tbody = document.querySelector("#materials-table tbody");
     tbody.innerHTML = "";
-    let totalNeed = 0, totalStock = 0;
 
     if (data.nguyenVatLieu && data.nguyenVatLieu.length > 0) {
       data.nguyenVatLieu.forEach(m => {
-        totalNeed += parseInt(m.soLuongCan) || 0;
-        totalStock += parseInt(m.soLuongTonKho) || 0;
         tbody.innerHTML += `
           <tr>
             <td>${m.maNVL}</td>
             <td>${m.tenNVL} (${m.loaiNVL || ''})</td>
+            <td style="font-weight: 600; color: #142850;">${m.tenXuong || '—'}</td>
             <td>${m.donViTinh || ''}</td>
             <td>${m.soLuongCan}</td>
             <td>${m.soLuongTonKho}</td>
@@ -161,11 +152,8 @@ async function selectPlan(el, maKHSX) {
           </tr>`;
       });
     } else {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Chưa có thông tin nguyên vật liệu</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Chưa có thông tin nguyên vật liệu</td></tr>';
     }
-
-    document.getElementById("total-need").textContent = totalNeed;
-    document.getElementById("total-stock").textContent = totalStock;
 
   } catch (error) {
     console.error("Lỗi khi tải chi tiết kế hoạch:", error);

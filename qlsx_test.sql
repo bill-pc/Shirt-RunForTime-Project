@@ -1182,3 +1182,164 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+-- =====================================================
+-- DỮ LIỆU TEST CHO CHỨC NĂNG KIỂM TRA CHẤT LƯỢNG
+-- =====================================================
+-- Ngày tạo: 14/12/2025
+-- Mục đích: Test chức năng tạo phiếu yêu cầu kiểm tra chất lượng
+-- =====================================================
+
+-- 1️⃣ CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG HIỆN CÓ
+-- Đổi đơn hàng số 1 sang "Hoàn thành"
+UPDATE `donhangsanxuat` 
+SET `trangThai` = 'Hoàn thành' 
+WHERE `maDonHang` = 1;
+
+-- 2️⃣ THÊM SẢN PHẨM MỚI
+INSERT INTO `san_pham` (`maSanPham`, `tenSanPham`, `loaiSanPham`, `soLuongTon`, `donVi`, `moTa`, `trangThaiSanPham`, `maKho`) VALUES
+(7, 'Áo sơ mi đỏ', 'Áo', 0, 'Cái', 'Áo sơ mi đỏ tươi, tay dài', 1, 2),
+(8, 'Áo sơ mi xanh lá', 'Áo', 0, 'Cái', 'Áo sơ mi xanh lá, công sở', 1, 2);
+
+-- 3️⃣ THÊM ĐơN HÀNG MỚI VỚI TRẠNG THÁI "HOÀN THÀNH"
+INSERT INTO `donhangsanxuat` (`maDonHang`, `tenDonHang`, `tenSanPham`, `soLuongSanXuat`, `donVi`, `diaChiNhan`, `trangThai`, `ngayGiao`, `maSanPham`) VALUES
+(10, 'DHSX10', 'Áo sơ mi đỏ', 5000, 'Cái', '123 Nguyễn Văn Linh, Q.7, TP.HCM', 'Hoàn thành', '2025-12-10', 7),
+(11, 'DHSX11', 'Áo sơ mi xanh lá', 3000, 'Cái', '456 Võ Văn Tần, Q.3, TP.HCM', 'Hoàn thành', '2025-12-12', 8);
+
+-- 4️⃣ THÊM KẾ HOẠCH SẢN XUẤT CHO CÁC ĐƠN HÀNG HOÀN THÀNH
+-- Xóa các kế hoạch cũ nếu có
+DELETE FROM kehoachsanxuat WHERE maKHSX IN (12, 13);
+
+-- Thêm kế hoạch mới
+INSERT INTO `kehoachsanxuat` (`maKHSX`, `tenKHSX`, `maDonHang`, `thoiGianBatDau`, `thoiGianKetThuc`, `trangThai`, `maND`) VALUES
+(12, 'KHSX cho DHSX10', 10, '2025-11-15', '2025-12-10', 'Đã duyệt', 1),
+(13, 'KHSX cho DHSX11', 11, '2025-11-20', '2025-12-12', 'Đã duyệt', 1);
+
+-- Thêm trường maSanPham vào kế hoạch sản xuất (nếu thiếu)
+UPDATE kehoachsanxuat kh
+JOIN donhangsanxuat dh ON kh.maDonHang = dh.maDonHang
+SET kh.maSanPham = dh.maSanPham
+WHERE kh.maKHSX IN (12, 13);
+
+-- 5️⃣ THÊM LỊCH SỬ PHÊ DUYỆT
+INSERT INTO `lichsupheduyet` (`maKHSX`, `hanhDong`, `ghiChu`, `nguoiThucHien`, `thoiGian`) VALUES
+(12, 'Đã duyệt', 'Kế hoạch sản xuất áo đỏ được phê duyệt', 'TranKienQuoc', '2025-11-15 08:00:00'),
+(13, 'Đã duyệt', 'Kế hoạch sản xuất áo xanh lá được phê duyệt', 'TranKienQuoc', '2025-11-20 09:30:00');
+
+-- =====================================================
+-- TỔNG KẾT DỮ LIỆU TEST
+-- =====================================================
+-- ✅ Đơn hàng maDonHang = 1: DHSX1 - Hoàn thành (đã cập nhật)
+-- ✅ Đơn hàng maDonHang = 10: DHSX10 - 5000 áo đỏ - Hoàn thành
+-- ✅ Đơn hàng maDonHang = 11: DHSX11 - 3000 áo xanh lá - Hoàn thành
+-- 
+-- ✅ Kế hoạch maKHSX = 1: KHSX1 cho DHSX1 - Đã duyệt
+-- ✅ Kế hoạch maKHSX = 12: KHSX cho DHSX10 - Đã duyệt
+-- ✅ Kế hoạch maKHSX = 13: KHSX cho DHSX11 - Đã duyệt
+-- =====================================================
+
+-- 📝 CÁCH TEST:
+-- 1. Import file SQL này vào database qlsx_test
+-- 2. Đăng nhập vào hệ thống
+-- 3. Vào menu "Tạo Yêu Cầu Kiểm Tra Chất Lượng"
+-- 4. Dropdown sẽ hiển thị 3 kế hoạch:
+--    - KHSX1 - Áo sơ mi hoa cúc (DHSX1) - 2000 cái
+--    - KHSX cho DHSX10 - Áo sơ mi đỏ (DHSX10) - 5000 cái
+--    - KHSX cho DHSX11 - Áo sơ mi xanh lá (DHSX11) - 3000 cái
+-- 5. Chọn một kế hoạch và tạo phiếu KTCL
+-- 6. Kiểm tra phiếu đã tạo trong bảng phieuyeucaukiemtrachatluong
+
+-- =====================================================
+-- QUERY KIỂM TRA SAU KHI TEST
+-- =====================================================
+
+-- Xem danh sách đơn hàng hoàn thành:
+-- SELECT * FROM donhangsanxuat WHERE trangThai = 'Hoàn thành';
+
+-- Xem các kế hoạch đã duyệt từ đơn hàng hoàn thành:
+-- SELECT kh.*, dh.trangThai as trangThaiDonHang
+-- FROM kehoachsanxuat kh
+-- JOIN donhangsanxuat dh ON kh.maDonHang = dh.maDonHang
+-- WHERE kh.trangThai = 'Đã duyệt' AND dh.trangThai = 'Hoàn thành';
+
+-- Xem các phiếu KTCL đã tạo:
+-- SELECT * FROM phieuyeucaukiemtrachatluong ORDER BY maYC DESC;
+
+-- Xem chi tiết phiếu KTCL:
+-- SELECT ct.*, p.tenPhieu, p.trangThai
+-- FROM chitietphieuyeucaukiemtrachatluong ct
+-- JOIN phieuyeucaukiemtrachatluong p ON ct.maYC = p.maYC
+-- ORDER BY ct.maYC DESC;
+
+-- =====================================================
+
+-- THÊM CỘT NGÀY HOÀN THÀNH VÀO ĐƠN HÀNG SẢN XUẤT
+-- =====================================================
+
+-- Thêm cột ngayHoanThanh để lưu ngày đơn hàng chuyển sang "Hoàn thành"
+ALTER TABLE `donhangsanxuat` 
+ADD COLUMN `ngayHoanThanh` DATE NULL AFTER `trangThai`;
+
+-- Cập nhật ngày hoàn thành cho các đơn hàng đã hoàn thành
+UPDATE `donhangsanxuat` 
+SET `ngayHoanThanh` = '2025-12-10' 
+WHERE `maDonHang` = 1;
+
+UPDATE `donhangsanxuat` 
+SET `ngayHoanThanh` = '2025-12-10' 
+WHERE `maDonHang` = 10;
+
+UPDATE `donhangsanxuat` 
+SET `ngayHoanThanh` = '2025-12-12' 
+WHERE `maDonHang` = 11;
+
+-- =====================================================
+-- KIỂM TRA
+-- =====================================================
+SELECT maDonHang, tenDonHang, trangThai, ngayGiao, ngayHoanThanh
+FROM donhangsanxuat
+WHERE trangThai = 'Hoàn thành';
+-- ================================================
+-- Thêm cột "Thời hạn hoàn thành kiểm tra chất lượng"
+-- ================================================
+
+-- Thêm cột thoiHanHoanThanh vào bảng phieuyeucaukiemtrachatluong
+ALTER TABLE phieuyeucaukiemtrachatluong 
+ADD COLUMN thoiHanHoanThanh DATE NULL COMMENT 'Thời hạn hoàn thành việc kiểm tra chất lượng';
+
+-- Cập nhật thời hạn cho phiếu hiện có (ví dụ: 3 ngày sau ngày lập phiếu)
+UPDATE phieuyeucaukiemtrachatluong 
+SET thoiHanHoanThanh = DATE_ADD(ngayLap, INTERVAL 3 DAY);
+
+-- Kiểm tra kết quả
+SELECT maYC, tenPhieu, ngayLap, thoiHanHoanThanh, 
+       DATEDIFF(thoiHanHoanThanh, ngayLap) as soNgayKiemTra
+FROM phieuyeucaukiemtrachatluong;
+-- ================================================
+-- THÊM CỘT SỐ LƯỢNG ĐẠT VÀ HỎNG VÀO CHI TIẾT PHIẾU KTCL
+-- ================================================
+
+-- Thêm cột SoLuongDat (Số lượng sản phẩm đạt tiêu chuẩn chất lượng)
+ALTER TABLE chitietphieuyeucaukiemtrachatluong 
+ADD COLUMN soLuongDat INT DEFAULT 0 COMMENT 'Số lượng sản phẩm đạt tiêu chuẩn';
+
+-- Thêm cột SoLuongHong (Số lượng sản phẩm không đạt/lỗi)
+ALTER TABLE chitietphieuyeucaukiemtrachatluong 
+ADD COLUMN soLuongHong INT DEFAULT 0 COMMENT 'Số lượng sản phẩm lỗi/không đạt';
+
+-- Cập nhật dữ liệu mẫu cho bản ghi hiện có (maYC = 4)
+-- Giả sử: Tổng 200 cái → 190 đạt, 10 hỏng
+UPDATE chitietphieuyeucaukiemtrachatluong 
+SET soLuongDat = 190, 
+    soLuongHong = 10 
+WHERE maYC = 4;
+
+-- Kiểm tra kết quả
+SELECT ct.maCTPKT, ct.maYC, ct.tenSanPham, ct.soLuong, 
+       ct.soLuongDat, ct.soLuongHong,
+       (ct.soLuongDat + ct.soLuongHong) as tongKiemTra,
+       ROUND((ct.soLuongDat / ct.soLuong * 100), 2) as tiLeDAT
+FROM chitietphieuyeucaukiemtrachatluong ct;
+
+-- Thêm ràng buộc kiểm tra (optional): Tổng đạt + hỏng không vượt quá số lượng cần kiểm tra
+ALTER TABLE chitietphieuyeucaukiemtrachatluong
+ADD CONSTRAINT chk_soLuongKiemTra CHECK (soLuongDat + soLuongHong <= soLuong);

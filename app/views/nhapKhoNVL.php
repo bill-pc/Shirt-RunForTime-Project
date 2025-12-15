@@ -96,7 +96,7 @@ require_once 'app/views/layouts/nav.php';
 
 
   // === GỬI FORM LƯU PHIẾU NHẬP ===
- document.getElementById('materialForm').addEventListener('submit', async (e) => {
+document.getElementById('materialForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!window.selectedItems || window.selectedItems.length === 0) {
@@ -120,19 +120,28 @@ require_once 'app/views/layouts/nav.php';
       method: 'POST',
       body: formData
     });
-    const text = await res.text();
 
-    // Chạy script trả về (alert + redirect)
-    if (text.includes('<script')) {
-      const temp = document.createElement('div');
-      temp.innerHTML = text;
-      temp.querySelectorAll('script').forEach(s => eval(s.innerText));
+    // Try parse JSON response
+    const text = await res.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch (e) { /* not JSON */ }
+
+    if (json && typeof json === 'object') {
+      if (json.success) {
+        alert('✅ ' + (json.message || 'Lưu phiếu nhập thành công'));
+        if (json.redirect) window.location.href = json.redirect;
+      } else {
+        alert('❌ ' + (json.message || 'Lỗi khi lưu phiếu nhập'));
+      }
     } else {
-      document.body.innerHTML = text;
+      // Fallback: show raw response
+      console.warn('Server returned non-JSON response:', text);
+      alert('Đã xảy ra lỗi khi lưu phiếu nhập! Vui lòng kiểm tra log server.');
     }
+
   } catch (err) {
     console.error('❌ Lỗi khi gửi dữ liệu:', err);
-    alert('Đã xảy ra lỗi khi lưu phiếu nhập!');
+    alert('Đã xảy ra lỗi khi lưu phiếu nhập! (network)');
   }
 });
 

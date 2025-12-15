@@ -24,24 +24,42 @@ require_once './app/views/layouts/nav.php';
             <h2>Danh sách phiếu yêu cầu nhập kho</h2>
           </div>
 
+          <!-- Bộ lọc theo ngày -->
+          <div style="padding: 15px; background: #f8f9fa; border-bottom: 1px solid #ddd;">
+            <div style="display: flex; gap: 15px; align-items: center;">
+              <div>
+                <label style="font-weight: 600; margin-right: 8px;">Từ ngày:</label>
+                <input type="date" id="filterFromDate" class="filter-date-input">
+              </div>
+              <div>
+                <label style="font-weight: 600; margin-right: 8px;">Đến ngày:</label>
+                <input type="date" id="filterToDate" class="filter-date-input">
+              </div>
+              <button onclick="filterByDate()" class="btn-primary btn-small">Lọc</button>
+              <button onclick="resetFilter()" class="btn-secondary btn-small">Đặt lại</button>
+            </div>
+          </div>
+
           <div class="table-container">
-            <table>
+            <table id="tablePhieu">
               <thead>
                 <tr>
-                  <th>Mã phiếu</th>
-                  <th>Ngày lập</th>
-                  <th>Số lượng NVL</th>
-                  <th>Trạng thái</th>
-                  <th>Hành động</th>
+                  <th style="width: 40px;">STT</th>
+                  <th>Tên phiếu</th>
+                  <th style="width: 120px;">Ngày lập</th>
+                  <th style="width: 100px;">Số loại NVL</th>
+                  <th style="width: 130px;">Trạng thái</th>
+                  <th style="width: 100px;">Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 <?php if (!empty($danhSachPhieu)): ?>
-                  <?php foreach ($danhSachPhieu as $phieu): ?>
-                    <tr>
-                      <td><?= htmlspecialchars($phieu['maYCNK']) ?></td>
-                      <td><?= htmlspecialchars($phieu['ngayLap']) ?></td>
-                      <td><?= htmlspecialchars($phieu['soLuongNVL']) ?></td>
+                  <?php $stt = 1; foreach ($danhSachPhieu as $phieu): ?>
+                    <tr data-ngaylap="<?= htmlspecialchars($phieu['ngayLap']) ?>">
+                      <td style="text-align: center;"><?= $stt++ ?></td>
+                      <td style="font-weight: 600;"><?= htmlspecialchars($phieu['tenPhieu']) ?></td>
+                      <td><?= date('d/m/Y', strtotime($phieu['ngayLap'])) ?></td>
+                      <td style="text-align: center;"><?= htmlspecialchars($phieu['soLoaiNVL']) ?> loại</td>
                       <td>
                         <?php if ($phieu['trangThai'] === 'Đã duyệt'): ?>
                         <span class="status-badge status-approved">Đã duyệt</span>
@@ -52,13 +70,16 @@ require_once './app/views/layouts/nav.php';
                       <?php else: ?>
                         <span class="status-badge status-pending">Chờ duyệt</span>
                       <?php endif; ?>
-
                       </td>
-                      <td><button class="btn-primary btn-small">Xem</button></td>
+                      <td>
+                        <button class="btn-primary btn-small" onclick="xemChiTietPhieu(<?= $phieu['maYCNK'] ?>, '<?= htmlspecialchars($phieu['tenPhieu']) ?>')">
+                          👁 Xem
+                        </button>
+                      </td>
                     </tr>
                   <?php endforeach; ?>
                 <?php else: ?>
-                  <tr><td colspan="5" style="text-align:center;">Không có phiếu nào</td></tr>
+                  <tr><td colspan="6" style="text-align:center; color: #999;">Không có phiếu nào</td></tr>
                 <?php endif; ?>
               </tbody>
             </table>
@@ -136,6 +157,55 @@ require_once './app/views/layouts/nav.php';
   </main>
 </div>
 
+<!-- Modal xem chi tiết phiếu -->
+<div class="modal" id="modalChiTiet">
+  <div class="modal-overlay" onclick="dongModalChiTiet()"></div>
+  <div class="modal-container" style="max-width: 900px;">
+    <div class="modal-header">
+      <h3 id="modalTitle">Chi tiết phiếu yêu cầu nhập kho</h3>
+      <button class="modal-close" onclick="dongModalChiTiet()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+        <div>
+          <strong>Mã phiếu:</strong> <span id="detailMaPhieu">—</span>
+        </div>
+        <div>
+          <strong>Ngày lập:</strong> <span id="detailNgayLap">—</span>
+        </div>
+        <div>
+          <strong>Người lập:</strong> <span id="detailNguoiLap">—</span>
+        </div>
+        <div>
+          <strong>Trạng thái:</strong> <span id="detailTrangThai">—</span>
+        </div>
+      </div>
+
+      <h4 style="margin-bottom: 10px; color: #142850;">Danh sách nguyên vật liệu</h4>
+      <div class="table-container">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">STT</th>
+              <th>Mã NVL</th>
+              <th>Tên NVL</th>
+              <th>Số lượng</th>
+              <th>Đơn vị</th>
+              <th>Nhà cung cấp</th>
+            </tr>
+          </thead>
+          <tbody id="detailTableBody">
+            <tr><td colspan="6" style="text-align:center;">Đang tải...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="dongModalChiTiet()">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <?php require_once './app/views/layouts/footer.php'; ?>
 
 <style>
@@ -158,6 +228,140 @@ require_once './app/views/layouts/nav.php';
   outline: none;
   border-color: #3b7ddd;
   box-shadow: 0 0 0 2px rgba(59, 125, 221, 0.1);
+}
+
+/* Date filter input */
+.filter-date-input {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.filter-date-input:focus {
+  outline: none;
+  border-color: #3b7ddd;
+  box-shadow: 0 0 0 2px rgba(59, 125, 221, 0.1);
+}
+
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-container {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  width: 90%;
+  max-width: 800px;
+}
+
+.modal-header {
+  padding: 20px 25px;
+  border-bottom: 2px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #142850;
+  font-size: 20px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.modal-close:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-footer {
+  padding: 15px 25px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #f8f9fa;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.detail-table thead {
+  background: #142850;
+  color: white;
+}
+
+.detail-table th {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+  color: white !important;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.detail-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.detail-table tbody tr:hover {
+  background: #f1f6ff;
+}
+
+.detail-table tbody tr td:first-child {
+  text-align: center;
 }
 </style>
 
@@ -308,6 +512,129 @@ document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
     alert("⚠️ Vui lòng chọn nhà cung cấp cho tất cả các NVL được chọn!");
     return false;
+  }
+});
+
+// ✅ Lọc theo ngày
+function filterByDate() {
+  const fromDate = document.getElementById('filterFromDate').value;
+  const toDate = document.getElementById('filterToDate').value;
+  const rows = document.querySelectorAll('#tablePhieu tbody tr');
+
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    const ngayLap = row.getAttribute('data-ngaylap');
+    
+    if (!ngayLap) {
+      row.style.display = '';
+      return;
+    }
+
+    let showRow = true;
+
+    if (fromDate && ngayLap < fromDate) {
+      showRow = false;
+    }
+
+    if (toDate && ngayLap > toDate) {
+      showRow = false;
+    }
+
+    row.style.display = showRow ? '' : 'none';
+    if (showRow) visibleCount++;
+  });
+
+  if (visibleCount === 0) {
+    const tbody = document.querySelector('#tablePhieu tbody');
+    if (!document.getElementById('noResultRow')) {
+      tbody.innerHTML = '<tr id="noResultRow"><td colspan="6" style="text-align:center; color: #999;">Không tìm thấy phiếu trong khoảng thời gian này</td></tr>';
+    }
+  } else {
+    const noResultRow = document.getElementById('noResultRow');
+    if (noResultRow) noResultRow.remove();
+  }
+}
+
+// ✅ Đặt lại bộ lọc
+function resetFilter() {
+  document.getElementById('filterFromDate').value = '';
+  document.getElementById('filterToDate').value = '';
+  
+  const rows = document.querySelectorAll('#tablePhieu tbody tr');
+  rows.forEach(row => row.style.display = '');
+  
+  const noResultRow = document.getElementById('noResultRow');
+  if (noResultRow) noResultRow.remove();
+}
+
+// ✅ Xem chi tiết phiếu
+async function xemChiTietPhieu(maYCNK, tenPhieu) {
+  const modal = document.getElementById('modalChiTiet');
+  modal.classList.add('active');
+  
+  document.getElementById('modalTitle').textContent = tenPhieu;
+  document.getElementById('detailMaPhieu').textContent = 'YCNK-' + maYCNK;
+  document.getElementById('detailTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;">⏳ Đang tải dữ liệu...</td></tr>';
+
+  try {
+    const res = await fetch(`app/controllers/ajax_get_phieu_detail.php?maYCNK=${maYCNK}`);
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      document.getElementById('detailTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; color: #999;">Không có dữ liệu</td></tr>';
+      return;
+    }
+
+    // Lấy thông tin header từ dòng đầu tiên
+    const firstRow = data[0];
+    document.getElementById('detailNgayLap').textContent = firstRow.ngayLap ? new Date(firstRow.ngayLap).toLocaleDateString('vi-VN') : '—';
+    document.getElementById('detailNguoiLap').textContent = firstRow.tenNguoiLap || '—';
+    
+    let statusHTML = '';
+    switch (firstRow.trangThai) {
+      case 'Đã duyệt':
+        statusHTML = '<span class="status-badge status-approved">✓ Đã duyệt</span>';
+        break;
+      case 'Đã nhập kho':
+        statusHTML = '<span class="status-badge status-success">✓ Đã nhập kho</span>';
+        break;
+      case 'Từ chối':
+        statusHTML = '<span class="status-badge status-rejected">✕ Từ chối</span>';
+        break;
+      default:
+        statusHTML = '<span class="status-badge status-pending">⏳ Chờ duyệt</span>';
+    }
+    document.getElementById('detailTrangThai').innerHTML = statusHTML;
+
+    // Hiển thị danh sách NVL
+    const tbody = document.getElementById('detailTableBody');
+    tbody.innerHTML = data.map((item, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${item.maNVL || '—'}</td>
+        <td>${item.tenNVL || '—'}</td>
+        <td style="text-align: right;">${item.soLuong || 0}</td>
+        <td>${item.donViTinh || '—'}</td>
+        <td>${item.nhaCungCap || '—'}</td>
+      </tr>
+    `).join('');
+
+  } catch (error) {
+    console.error('Lỗi tải chi tiết phiếu:', error);
+    document.getElementById('detailTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; color: red;">❌ Lỗi tải dữ liệu</td></tr>';
+  }
+}
+
+// ✅ Đóng modal
+function dongModalChiTiet() {
+  document.getElementById('modalChiTiet').classList.remove('active');
+}
+
+// Đóng modal khi nhấn ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    dongModalChiTiet();
   }
 });
 
