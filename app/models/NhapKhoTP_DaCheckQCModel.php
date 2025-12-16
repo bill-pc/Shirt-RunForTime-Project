@@ -9,38 +9,35 @@ class NhapKhoTP_DaCheckQCModel {
     }
 
     /**
-     * Lấy danh sách phiếu kiểm tra chất lượng đã đạt và chưa nhập kho
+     * Lấy danh sách phiếu kiểm tra chất lượng chưa nhập kho
      * Lấy từ bảng: phieuyeucaukiemtrachatluong và chitietphieuyeucaukiemtrachatluong
      * Chỉ lấy những phiếu chưa có trong nhapkhotp (chưa nhập kho) để có thể nhập kho mới
      */
     public function getDanhSachPhieuQCDaDat() {
         try {
-            // Lấy danh sách phiếu QC đã duyệt, đã kiểm tra, có số lượng đạt > 0 và chưa nhập kho
+            // Lấy danh sách phiếu QC chưa nhập kho
             $sql = "SELECT 
                         p.maYC AS maPhieu,
                         p.maYC AS maYC,
                         COALESCE(ct.tenSanPham, sp.tenSanPham) AS sanPham,
-                        ct.soLuongDat AS soLuong,
+                        ct.soLuong AS soLuong,
+                        ct.soLuongDat AS soLuongDat,
                         ct.ngayKiemTra AS ngayKiemTra,
                         p.maSanPham,
                         p.tenNguoiLap,
                         p.tenPhieu,
+                        p.trangThai,
                         ct.tenSanPham AS tenSanPhamChiTiet
                     FROM phieuyeucaukiemtrachatluong p
-                    INNER JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
-                    INNER JOIN san_pham sp ON p.maSanPham = sp.maSanPham
+                    LEFT JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
+                    LEFT JOIN san_pham sp ON p.maSanPham = sp.maSanPham
                     LEFT JOIN nhapkhotp n ON p.maYC = n.maYC
-                    WHERE p.trangThai = 'Đã duyệt'
-                        AND p.trangThai != 'Đã nhập kho'
-                        AND ct.trangThaiSanPham = 'Đã kiểm tra'
-                        AND ct.soLuongDat > 0
-                        AND n.maPhieu IS NULL
+                    WHERE n.maPhieu IS NULL
                     ORDER BY p.maYC DESC";
             
             $result = $this->conn->query($sql);
 
             if (!$result) {
-                // Ghi chi tiết SQL và lỗi để debug
                 error_log("Lỗi truy vấn danh sách phiếu QC. SQL: " . $sql . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
@@ -63,36 +60,30 @@ class NhapKhoTP_DaCheckQCModel {
                         p.maYC AS maPhieu,
                         p.maYC AS maYC,
                         COALESCE(ct.tenSanPham, sp.tenSanPham) AS sanPham,
-                        ct.soLuongDat AS soLuong,
+                        ct.soLuong AS soLuong,
+                        ct.soLuongDat AS soLuongDat,
+                        ct.soLuongHong AS soLuongHong,
                         ct.ngayKiemTra AS ngayKiemTra,
                         p.maSanPham,
                         p.tenNguoiLap,
                         p.tenPhieu,
                         p.ngayLap,
+                        p.trangThai,
                         sp.tenSanPham AS tenSanPhamFull,
                         ct.tenSanPham AS tenSanPhamChiTiet,
-                        ct.soLuongDat,
-                        ct.soLuongHong,
-                        ct.soLuong AS soLuongYeuCau,
                         ct.donViTinh,
-                        ct.ghiChu AS ghiChuQC,
                         ct.trangThaiSanPham
                     FROM phieuyeucaukiemtrachatluong p
-                    INNER JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
-                    INNER JOIN san_pham sp ON p.maSanPham = sp.maSanPham
+                    LEFT JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
+                    LEFT JOIN san_pham sp ON p.maSanPham = sp.maSanPham
                     LEFT JOIN nhapkhotp n ON p.maYC = n.maYC
                     WHERE p.maYC = ? 
-                        AND p.trangThai = 'Đã duyệt'
-                        AND p.trangThai != 'Đã nhập kho'
-                        AND ct.trangThaiSanPham = 'Đã kiểm tra'
-                        AND ct.soLuongDat > 0
                         AND n.maPhieu IS NULL
                     LIMIT 1";
             
             $stmt = $this->conn->prepare($sql);
 
             if (!$stmt) {
-                // Ghi chi tiết SQL để debug
                 error_log("Lỗi chuẩn bị truy vấn chi tiết phiếu QC. SQL: " . $sql . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
@@ -100,7 +91,6 @@ class NhapKhoTP_DaCheckQCModel {
             $stmt->bind_param("i", $maYC);
 
             if (!$stmt->execute()) {
-                // Ghi lỗi thực thi cùng SQL và params
                 error_log("Lỗi thực thi truy vấn chi tiết phiếu QC. SQL: " . $sql . " | Params: maYC=" . $maYC . " | Error: " . $stmt->error);
                 $stmt->close();
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
@@ -139,14 +129,10 @@ class NhapKhoTP_DaCheckQCModel {
                                 ct.soLuongDat, ct.trangThaiSanPham, ct.ngayKiemTra, 
                                 ct.tenSanPham, sp.tenSanPham AS tenSanPhamSP
                         FROM phieuyeucaukiemtrachatluong p
-                        INNER JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
-                        INNER JOIN san_pham sp ON p.maSanPham = sp.maSanPham
+                        LEFT JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
+                        LEFT JOIN san_pham sp ON p.maSanPham = sp.maSanPham
                         LEFT JOIN nhapkhotp n ON p.maYC = n.maYC
                         WHERE p.maYC = ? 
-                        AND p.trangThai = 'Đã duyệt'
-                        AND p.trangThai != 'Đã nhập kho'
-                        AND ct.trangThaiSanPham = 'Đã kiểm tra'
-                        AND ct.soLuongDat > 0
                         AND n.maPhieu IS NULL
                         LIMIT 1";
             
@@ -257,6 +243,29 @@ class NhapKhoTP_DaCheckQCModel {
             }
             
             $stmtUpdateTrangThai->close();
+
+            // 6️⃣ Cập nhật trạng thái đơn hàng thành "Chờ xuất kho"
+            $sqlUpdateDH = "UPDATE donhangsanxuat 
+                           SET trangThai = 'Chờ xuất kho'
+                           WHERE maSanPham = ? 
+                           AND trangThai != 'Chờ xuất kho'
+                           LIMIT 1";
+            
+            $stmtUpdateDH = $this->conn->prepare($sqlUpdateDH);
+
+            if (!$stmtUpdateDH) {
+                error_log("Lỗi chuẩn bị truy vấn cập nhật đơn hàng. SQL: " . $sqlUpdateDH . " | Error: " . $this->conn->error);
+                throw new Exception("Lỗi cập nhật trạng thái đơn hàng. Vui lòng thử lại sau.");
+            }
+
+            $stmtUpdateDH->bind_param("i", $maSanPham);
+
+            if (!$stmtUpdateDH->execute()) {
+                error_log("Lỗi cập nhật đơn hàng. SQL: " . $sqlUpdateDH . " | Params: maSanPham=" . $maSanPham . " | Error: " . $stmtUpdateDH->error);
+                throw new Exception("Lỗi cập nhật trạng thái đơn hàng. Vui lòng thử lại sau.");
+            }
+            
+            $stmtUpdateDH->close();
 
             // Commit transaction
             if (!$this->conn->commit()) {

@@ -15,11 +15,11 @@ require_once __DIR__ . '/layouts/nav.php';
       </div>
 
       <!-- Form chọn kế hoạch -->
-      <form action="index.php?page=tao-yeu-cau-kiem-tra-chat-luong-create" method="POST"
+      <form action="index.php?page=tao-yeu-cau-kiem-tra-chat-luong-process" method="POST"
             style="background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:20px; margin-bottom:25px;">
         
         <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px; flex-wrap:wrap;">
-          <label for="planCode" style="font-weight:600; min-width:250px;">Chọn kế hoạch sản xuất (Đơn hàng hoàn thành):</label>
+          <label for="planCode" style="font-weight:600; min-width:250px;">🏭 Chọn kế hoạch (Đơn hàng đã hoàn thành):</label>
           <select name="planCode" id="planCode" required onchange="loadProductInfo()"
                   style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:350px;">
             <option value="">-- Chọn kế hoạch --</option>
@@ -37,10 +37,10 @@ require_once __DIR__ . '/layouts/nav.php';
         </div>
 
         <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px; flex-wrap:wrap;">
-          <label for="thoiHanHoanThanh" style="font-weight:600; min-width:250px;">⏰ Thời hạn hoàn thành kiểm tra:</label>
+          <label for="thoiHanHoanThanh" style="font-weight:600; min-width:250px;">⏰ Hạn kiểm tra (tối đa +3 ngày):</label>
           <input type="date" name="thoiHanHoanThanh" id="thoiHanHoanThanh" required
                  style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:200px;">
-          <span style="color:#666; font-size:14px;">📅 Ngày dự kiến hoàn thành kiểm tra chất lượng</span>
+          <span style="color:#666; font-size:14px;">📅 Tính từ ngày giao dự kiến + tối đa 3 ngày</span>
         </div>
 
         <button type="submit" id="btnCreate" disabled
@@ -111,22 +111,27 @@ function loadProductInfo() {
   
   // Debug: Kiểm tra dữ liệu nhận được
   console.log('📊 Data từ dropdown:', data);
-  console.log('📅 thoiGianKetThuc:', data.thoiGianKetThuc);
+  console.log('📅 ngayGiao:', data.ngayGiao);
   console.log('⏰ thoiHanKiemTraMacDinh:', data.thoiHanKiemTraMacDinh);
   
-  // Set giá trị mặc định = thoiGianKetThuc + 3 ngày
+  // Set giá trị mặc định = ngayGiao + 3 ngày
   if (data.thoiHanKiemTraMacDinh) {
     thoiHanInput.value = data.thoiHanKiemTraMacDinh;
     console.log('✅ Đã set thời hạn từ DB:', data.thoiHanKiemTraMacDinh);
-  } else if (data.thoiGianKetThuc) {
-    const calculatedDate = getDateAfterDays(data.thoiGianKetThuc, 3);
+  } else if (data.ngayGiao) {
+    const calculatedDate = getDateAfterDays(data.ngayGiao, 3);
     thoiHanInput.value = calculatedDate;
-    console.log('✅ Đã tính thời hạn:', data.thoiGianKetThuc, '+ 3 ngày =', calculatedDate);
+    console.log('✅ Đã tính thời hạn:', data.ngayGiao, '+ 3 ngày =', calculatedDate);
   }
   
-  // Set min date = thoiGianKetThuc (không cho chọn trước ngày kết thúc KHSX)
-  if (data.thoiGianKetThuc) {
-    thoiHanInput.min = data.thoiGianKetThuc;
+  // Set min date = ngayGiao (không cho chọn trước ngày giao)
+  if (data.ngayGiao) {
+    thoiHanInput.min = data.ngayGiao;
+  }
+  
+  // Set max date = ngayGiao + 3 ngày (tối đa)
+  if (data.ngayGiao) {
+    thoiHanInput.max = getDateAfterDays(data.ngayGiao, 3);
   }
   
   productInfo.innerHTML = `
@@ -136,7 +141,7 @@ function loadProductInfo() {
     </div>
     <div class="info-row">
       <div class="info-label">Đơn hàng:</div>
-      <div class="info-value"><strong>${data.tenDonHang}</strong> <span style="background:#28a745; color:white; padding:3px 10px; border-radius:5px; font-size:13px; margin-left:10px;">Hoàn thành</span></div>
+      <div class="info-value"><strong>${data.tenDonHang}</strong> <span style="background:#28a745; color:white; padding:3px 10px; border-radius:5px; font-size:13px; margin-left:10px;">✓ Hoàn thành</span></div>
     </div>
     <div class="info-row">
       <div class="info-label">Sản phẩm:</div>
@@ -147,8 +152,8 @@ function loadProductInfo() {
       <div class="info-value"><strong style="color:#d00; font-size:18px;">${data.soLuongSanXuat}</strong> cái</div>
     </div>
     <div class="info-row">
-      <div class="info-label">⏰ Thời gian kết thúc KHSX:</div>
-      <div class="info-value"><strong>${data.thoiGianKetThuc || 'N/A'}</strong> <span style="color:#666; font-size:13px; margin-left:5px;">→ Thời hạn kiểm tra: ${data.thoiHanKiemTraMacDinh || (data.thoiGianKetThuc ? getDateAfterDays(data.thoiGianKetThuc, 3) : 'N/A')}</span></div>
+      <div class="info-label">📦 Ngày giao dự kiến:</div>
+      <div class="info-value"><strong>${data.ngayGiao || 'N/A'}</strong> <span style="color:#666; font-size:13px; margin-left:5px;">→ Hạn kiểm tra tối đa: ${data.thoiHanKiemTraMacDinh || (data.ngayGiao ? getDateAfterDays(data.ngayGiao, 3) : 'N/A')}</span></div>
     </div>
   `;
   

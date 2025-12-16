@@ -21,7 +21,7 @@ class QCModel
                     p.trangThai
                 FROM phieuyeucaukiemtrachatluong p
                 JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
-                WHERE p.trangThai IN ('Chờ kiểm tra', 'Chờ duyệt')
+                WHERE p.trangThai IN ('Chờ kiểm tra', 'Đã duyệt')
                 ORDER BY p.maYC DESC";
 
         $result = $this->conn->query($sql);

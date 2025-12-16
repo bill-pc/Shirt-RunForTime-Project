@@ -96,12 +96,15 @@ public function createPhieuYeuCauNhapKho($data) {
         $stmt->execute();
 
         // Lưu chi tiết phiếu: tất cả NVL được chọn
+        // ✅ Công thức: Số lượng = Số lượng cần nhập - (Số lượng tồn kho * 10%)
         foreach ($dsNVL as $maNVL) {
             $nccForThisNVL = $nhaCungCap[$maNVL] ?? '';
             
             $sqlCT = "
                 INSERT INTO chitiet_phieuyeucaunhapkhonvl (maYCNK, maNVL, tenNVL, soLuong, donViTinh, nhaCungCap, soLuongTonKho, soLuongCanNhap)
-                SELECT ?, c.maNVL, c.tenNVL, c.soLuongNVL, n.donViTinh, ?,
+                SELECT ?, c.maNVL, c.tenNVL, 
+                       GREATEST(0, ROUND(c.soLuongNVL - (n.soLuongTonKho * 0.1), 2)), 
+                       n.donViTinh, ?,
                        n.soLuongTonKho, c.soLuongNVL
                 FROM chitietkehoachsanxuat c
                 JOIN nvl n ON c.maNVL = n.maNVL

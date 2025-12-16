@@ -27,12 +27,18 @@ class PheDuyetYeuCauNhapKhoController
     public function approve()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
             return;
         }
 
+        header('Content-Type: application/json; charset=utf-8');
+
         $maYCNK = $_POST['maYCNK'] ?? null;
-        $nguoiDuyet = $_SESSION['user']['tenNV'] ?? 'Admin';
+        
+        // Lấy tên người duyệt từ session
+        $nguoiDuyet = isset($_SESSION['user']['hoTen']) ? $_SESSION['user']['hoTen'] : 
+                      (isset($_SESSION['user']['tenNV']) ? $_SESSION['user']['tenNV'] : 'Admin');
 
         if (!$maYCNK) {
             echo json_encode(['success' => false, 'message' => 'Thiếu mã phiếu yêu cầu']);
@@ -54,13 +60,19 @@ class PheDuyetYeuCauNhapKhoController
     public function reject()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
             return;
         }
 
+        header('Content-Type: application/json; charset=utf-8');
+
         $maYCNK = $_POST['maYCNK'] ?? null;
         $lyDoTuChoi = $_POST['lyDoTuChoi'] ?? '';
-        $nguoiDuyet = $_SESSION['user']['tenNV'] ?? 'Admin';
+        
+        // Lấy tên người duyệt từ session
+        $nguoiDuyet = isset($_SESSION['user']['hoTen']) ? $_SESSION['user']['hoTen'] : 
+                      (isset($_SESSION['user']['tenNV']) ? $_SESSION['user']['tenNV'] : 'Admin');
 
         if (!$maYCNK) {
             echo json_encode(['success' => false, 'message' => 'Thiếu mã phiếu yêu cầu']);
@@ -81,6 +93,8 @@ class PheDuyetYeuCauNhapKhoController
      */
     public function getDetails()
     {
+        header('Content-Type: application/json; charset=utf-8');
+        
         $maYCNK = $_GET['maYCNK'] ?? null;
 
         if (!$maYCNK) {

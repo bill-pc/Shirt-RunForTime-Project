@@ -71,7 +71,7 @@ require_once 'app/views/layouts/nav.php';
                                             <?= htmlspecialchars($phieu['tenNguoiLap']) ?>
                                         </td>
                                         <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
-                                            <?= isset($phieu['ngayKiemTra']) && !empty($phieu['ngayKiemTra']) ? date('Y-m-d', strtotime($phieu['ngayKiemTra'])) : date('Y-m-d') ?>
+                                            <?= isset($phieu['ngayKiemTra']) && !empty($phieu['ngayKiemTra']) ? date('d/m/Y', strtotime($phieu['ngayKiemTra'])) : date('d/m/Y') ?>
                                         </td>
                                         <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
                                             <button 
@@ -150,10 +150,10 @@ require_once 'app/views/layouts/nav.php';
 
                             <div class="form-group">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
-                                    Ngày Kiểm Tra:
+                                    Ngày Nhập Kho:
                                 </label>
                                 <div style="padding: 10px 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; font-size: 1em;">
-                                    <?= isset($chiTietPhieu['ngayKiemTra']) && !empty($chiTietPhieu['ngayKiemTra']) ? date('Y-m-d', strtotime($chiTietPhieu['ngayKiemTra'])) : (isset($chiTietPhieu['ngayLap']) ? date('Y-m-d', strtotime($chiTietPhieu['ngayLap'])) : date('Y-m-d')) ?>
+                                    <?= date('d/m/Y') ?>
                                 </div>
                             </div>
                         </div>

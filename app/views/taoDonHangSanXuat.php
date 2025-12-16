@@ -32,28 +32,41 @@ require_once 'app/views/layouts/nav.php';
                         <label for="tenSanPham" class="required" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
                             Sản Phẩm 
                         </label>
-                        <input 
-                            type="text" 
-                            id="tenSanPham" 
-                            name="tenSanPham" 
-                            class="form-control" 
-                            list="danhSachSanPham"
-                            placeholder="Nhập tên sản phẩm"
-                            required
-                            autocomplete="off"
-                            style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; transition: border-color 0.3s;"
-                            onfocus="this.style.borderColor='#085da7'"
-                            onblur="this.style.borderColor='#ddd'"
-                        >
-                        <datalist id="danhSachSanPham">
-                            <?php if (!empty($danhSachSanPham)): ?>
-                                <?php foreach ($danhSachSanPham as $sp): ?>
-                                    <option value="<?= htmlspecialchars($sp['tenSanPham']) ?>"></option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </datalist>
+                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <select 
+                                    id="tenSanPham" 
+                                    name="tenSanPham" 
+                                    class="form-control" 
+                                    required
+                                    style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; transition: border-color 0.3s; cursor: pointer;"
+                                    onfocus="this.style.borderColor='#085da7'"
+                                    onblur="this.style.borderColor='#ddd'"
+                                >
+                                    <option value="">-- Chọn sản phẩm --</option>
+                                    <?php if (!empty($danhSachSanPham)): ?>
+                                        <?php foreach ($danhSachSanPham as $sp): ?>
+                                            <option value="<?= htmlspecialchars($sp['tenSanPham']) ?>" data-id="<?= htmlspecialchars($sp['maSanPham']) ?>">
+                                                <?= htmlspecialchars($sp['tenSanPham']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            <button 
+                                type="button" 
+                                id="btnThemSanPhamMoi" 
+                                class="btn btn-add"
+                                title="Thêm sản phẩm mới"
+                                style="padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; font-size: 1em; font-weight: 600; white-space: nowrap;"
+                                onmouseover="this.style.backgroundColor='#218838'"
+                                onmouseout="this.style.backgroundColor='#28a745'"
+                            >
+                                + Thêm mới
+                            </button>
+                        </div>
                         <input type="hidden" id="sanPhamId" name="sanPhamId">
-                        <small style="color: #6c757d; display: block; margin-top: 6px;">Bạn có thể nhập tên sản phẩm mới nếu chưa có trong hệ thống.</small>
+                        <small style="color: #6c757d; display: block; margin-top: 6px;">Chọn sản phẩm từ danh sách hoặc nhấn "+ Thêm mới" để tạo sản phẩm mới.</small>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
@@ -167,27 +180,45 @@ document.addEventListener('DOMContentLoaded', function() {
         ngayGiaoInput.value = `${year}-${month}-${day}`;
     }
 
-    // Map dữ liệu sản phẩm để tự động nhận diện khi người dùng nhập
+    // Map dữ liệu sản phẩm cho combobox
     const danhSachSanPham = <?php echo json_encode($danhSachSanPham ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-    const tenSanPhamInput = document.getElementById('tenSanPham');
+    const tenSanPhamSelect = document.getElementById('tenSanPham');
     const sanPhamIdInput = document.getElementById('sanPhamId');
+    const btnThemSanPhamMoi = document.getElementById('btnThemSanPhamMoi');
 
-    const dongBoSanPhamId = () => {
-        if (!tenSanPhamInput || !sanPhamIdInput) return;
-        const value = tenSanPhamInput.value.trim().toLowerCase();
-        const match = danhSachSanPham.find(sp => (sp.tenSanPham || '').toLowerCase() === value);
-        sanPhamIdInput.value = match ? match.maSanPham : '';
-    };
+    // ✅ Xử lý khi thay đổi lựa chọn trong combobox
+    if (tenSanPhamSelect) {
+        tenSanPhamSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const maSanPham = selectedOption.getAttribute('data-id');
+            sanPhamIdInput.value = maSanPham || '';
+        });
+    }
 
-    if (tenSanPhamInput) {
-        tenSanPhamInput.addEventListener('input', dongBoSanPhamId);
+    // ✅ Xử lý nút "Thêm mới" - Mở modal hoặc form để thêm sản phẩm
+    if (btnThemSanPhamMoi) {
+        btnThemSanPhamMoi.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tenSanPhamMoi = prompt('Nhập tên sản phẩm mới:');
+            if (tenSanPhamMoi && tenSanPhamMoi.trim()) {
+                // Thêm option mới vào combobox
+                const newOption = document.createElement('option');
+                newOption.value = tenSanPhamMoi.trim();
+                newOption.textContent = tenSanPhamMoi.trim();
+                newOption.setAttribute('data-id', '0'); // 0 = sản phẩm mới chưa có ID
+                newOption.selected = true;
+                tenSanPhamSelect.appendChild(newOption);
+                tenSanPhamSelect.value = tenSanPhamMoi.trim();
+                sanPhamIdInput.value = '0';
+            }
+        });
     }
 
     // Validate form trước khi submit
     const form = document.getElementById('formTaoDonHang');
     if (form) {
         form.addEventListener('submit', function(e) {
-            const tenSanPham = tenSanPhamInput ? tenSanPhamInput.value.trim() : '';
+            const tenSanPham = tenSanPhamSelect ? tenSanPhamSelect.value.trim() : '';
             const soLuong = document.getElementById('soLuong').value;
             const ngayGiao = document.getElementById('ngayGiao').value;
             const diaChiNhan = document.getElementById('diaChiNhan').value.trim();
@@ -215,7 +246,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
 
-            dongBoSanPhamId();
             return true;
         });
     }

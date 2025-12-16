@@ -77,7 +77,7 @@
 
   <script>
     function viewDetails(maYCNK) {
-      fetch(`index.php?route=chi-tiet-yc-nhap-kho&maYCNK=${maYCNK}`)
+      fetch(`index.php?page=chi-tiet-yc-nhap-kho&maYCNK=${maYCNK}`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -111,7 +111,7 @@
       const formData = new FormData();
       formData.append('maYCNK', maYCNK);
 
-      fetch('index.php?route=duyet-yc-nhap-kho', {
+      fetch('index.php?page=duyet-yc-nhap-kho', {
         method: 'POST',
         body: formData
       })
@@ -145,7 +145,7 @@
       formData.append('maYCNK', maYCNK);
       formData.append('lyDoTuChoi', lyDo);
 
-      fetch('index.php?route=tu-choi-yc-nhap-kho', {
+      fetch('index.php?page=tu-choi-yc-nhap-kho', {
         method: 'POST',
         body: formData
       })

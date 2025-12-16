@@ -110,8 +110,14 @@ document.getElementById('materialForm').addEventListener('submit', async (e) => 
     return;
   }
 
+  const maYCNK = document.getElementById('requestRef').value;
+  if (!maYCNK) {
+    alert('⚠️ Vui lòng chọn phiếu yêu cầu!');
+    return;
+  }
+
   const formData = new FormData();
-  formData.append('maYCNK', document.getElementById('requestRef').value);
+  formData.append('maYCNK', maYCNK);
   formData.append('ghiChu', document.getElementById('notes').value.trim());
   formData.append('items', JSON.stringify(items));
 
@@ -129,6 +135,10 @@ document.getElementById('materialForm').addEventListener('submit', async (e) => 
     if (json && typeof json === 'object') {
       if (json.success) {
         alert('✅ ' + (json.message || 'Lưu phiếu nhập thành công'));
+        document.getElementById('materialForm').reset();
+        document.getElementById('linesBody').innerHTML = '';
+        document.getElementById('requestRef').value = '';
+        // Tải lại danh sách phiếu
         if (json.redirect) window.location.href = json.redirect;
       } else {
         alert('❌ ' + (json.message || 'Lỗi khi lưu phiếu nhập'));

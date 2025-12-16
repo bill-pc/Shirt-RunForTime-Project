@@ -29,36 +29,49 @@ class NhapKhoNVLController {
 
     // ✅ Bật hiển thị lỗi để dễ debug
     error_reporting(E_ALL);
-    ini_set('display_errors', 1);
+    ini_set('display_errors', 0);
 
-    $data = [
-        'tenPNVL' => 'Phiếu nhập nguyên vật liệu',
-        'nguoiLap' => $_SESSION['user']['hoTen'] ?? 'Không rõ',
-        'ghiChu' => $_POST['ghiChu'] ?? '',
-        'ngayNhap' => date('Y-m-d'),
-        'maYCNK' => $_POST['maYCNK'] ?? '',
-        'items' => json_decode($_POST['items'] ?? '[]', true)
-    ];
-
-    // Nếu json_decode trả về null do JSON không hợp lệ, đặt lại thành mảng rỗng
-    if (!is_array($data['items'])) {
-        $data['items'] = [];
-    }
-
-    $result = $this->model->luuPhieuNhap($data);
-
-    // Trả về JSON để frontend xử lý
     header('Content-Type: application/json; charset=utf-8');
-    if ($result['success']) {
-        echo json_encode([
-            'success' => true,
-            'message' => $result['message'],
-            'redirect' => 'index.php?page=nhap-kho-nvl'
-        ]);
-    } else {
+
+    try {
+        $maYCNK = $_POST['maYCNK'] ?? '';
+        if (!$maYCNK) {
+            throw new Exception('Không tìm thấy mã phiếu yêu cầu!');
+        }
+
+        $items = json_decode($_POST['items'] ?? '[]', true);
+        if (!is_array($items)) {
+            $items = [];
+        }
+
+        $data = [
+            'tenPNVL' => 'Phiếu nhập nguyên vật liệu',
+            'nguoiLap' => isset($_SESSION['user']['hoTen']) ? $_SESSION['user']['hoTen'] : 'Không rõ',
+            'ghiChu' => $_POST['ghiChu'] ?? '',
+            'ngayNhap' => date('Y-m-d'),
+            'maYCNK' => $maYCNK,
+            'items' => $items
+        ];
+
+        $result = $this->model->luuPhieuNhap($data);
+
+        // Trả về JSON để frontend xử lý
+        if ($result['success']) {
+            echo json_encode([
+                'success' => true,
+                'message' => $result['message'],
+                'redirect' => 'index.php?page=nhap-kho-nvl'
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => $result['message']
+            ]);
+        }
+    } catch (Exception $e) {
         echo json_encode([
             'success' => false,
-            'message' => $result['message']
+            'message' => 'Lỗi: ' . $e->getMessage()
         ]);
     }
     return;

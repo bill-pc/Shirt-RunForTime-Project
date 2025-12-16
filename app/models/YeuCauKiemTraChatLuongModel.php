@@ -8,17 +8,17 @@ class YeuCauKiemTraChatLuongModel {
         $this->conn = (new KetNoi())->connect();
     }
 
-    // 🔹 Lấy danh sách kế hoạch đã duyệt từ đơn hàng "Hoàn thành" (chưa có phiếu KTCL)
+    // 🔹 Lấy danh sách kế hoạch từ đơn hàng "Hoàn thành" (chưa có phiếu KTCL)
+    // Thời hạn kiểm tra = ngayGiao của đơn hàng + 3 ngày
     public function getApprovedPlans() {
         $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianBatDau, kh.thoiGianKetThuc,
                        sp.maSanPham, sp.tenSanPham, dh.soLuongSanXuat, dh.tenDonHang,
-                       dh.ngayHoanThanh,
-                       DATE_ADD(kh.thoiGianKetThuc, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
+                       dh.ngayGiao, dh.trangThai,
+                       DATE_ADD(dh.ngayGiao, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
                 FROM kehoachsanxuat kh
                 JOIN donhangsanxuat dh ON kh.maDonHang = dh.maDonHang
                 JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
-                WHERE kh.trangThai = 'Đã duyệt'
-                  AND dh.trangThai = 'Hoàn thành'
+                WHERE dh.trangThai = 'Hoàn thành'
                   AND kh.maKHSX NOT IN (
                       SELECT DISTINCT maKHSX
                       FROM phieuyeucaukiemtrachatluong
@@ -31,15 +31,16 @@ class YeuCauKiemTraChatLuongModel {
 
 
     // 🔹 Lấy thông tin sản phẩm từ kế hoạch sản xuất
+    // Thời hạn kiểm tra = ngayGiao của đơn hàng + 3 ngày
     public function getProductByPlan($maKHSX) {
         $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianKetThuc,
                        sp.maSanPham, sp.tenSanPham, sp.donVi,
-                       dh.soLuongSanXuat, dh.tenDonHang, dh.ngayHoanThanh,
-                       DATE_ADD(kh.thoiGianKetThuc, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
+                       dh.soLuongSanXuat, dh.tenDonHang, dh.ngayGiao, dh.trangThai,
+                       DATE_ADD(dh.ngayGiao, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
                 FROM kehoachsanxuat kh
                 JOIN donhangsanxuat dh ON kh.maDonHang = dh.maDonHang
                 JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
-                WHERE kh.maKHSX = ?";
+                WHERE kh.maKHSX = ? AND dh.trangThai = 'Hoàn thành'";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $maKHSX);
         $stmt->execute();
@@ -49,12 +50,14 @@ class YeuCauKiemTraChatLuongModel {
 
     // 🔹 Thêm phiếu yêu cầu kiểm tra chất lượng
     public function themPhieuYeuCau($tenNguoiLap, $tenPhieu, $maSanPham, $maKHSX, $thoiHanHoanThanh = null) {
-        // Lấy maND từ session
-        session_start();
-        $maND = $_SESSION['user']['maND'] ?? 1;
+        // Lấy maND từ session (không gọi session_start() ở đây)
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $maND = isset($_SESSION['user']['maND']) ? $_SESSION['user']['maND'] : 1;
         
         $ngayLap = date('Y-m-d');
-        $trangThai = 'Chờ duyệt';
+        $trangThai = 'Chờ duyệt'; // ✅ String "Chờ duyệt" không phải số 0
         
         // Nếu không có thời hạn, mặc định là 3 ngày sau
         if (!$thoiHanHoanThanh) {
@@ -65,7 +68,9 @@ class YeuCauKiemTraChatLuongModel {
                 (tenPhieu, maSanPham, trangThai, ngayLap, tenNguoiLap, maND, maKHSX, thoiHanHoanThanh)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("sisssiss", $tenPhieu, $maSanPham, $trangThai, $ngayLap, $tenNguoiLap, $maND, $maKHSX, $thoiHanHoanThanh);
+        
+        // ✅ Đảm bảo bind_param đúng: s=string, i=int, s=string, s=string, s=string, i=int, i=int, s=string
+        $stmt->bind_param("sisissis", $tenPhieu, $maSanPham, $trangThai, $ngayLap, $tenNguoiLap, $maND, $maKHSX, $thoiHanHoanThanh);
         
         if ($stmt->execute()) {
             return $this->conn->insert_id;
@@ -75,14 +80,14 @@ class YeuCauKiemTraChatLuongModel {
 
 
     // 🔹 Thêm chi tiết phiếu yêu cầu kiểm tra
-    public function themChiTietPhieu($maYC, $maSanPham, $tenSanPham, $soLuong, $donViTinh) {
+    public function themChiTietPhieu($maYC, $maSanPham, $tenSanPham, $soLuong, $donVi) {
         $trangThaiSanPham = 'Chờ kiểm tra';
         
         $sql = "INSERT INTO chitietphieuyeucaukiemtrachatluong 
                 (maYC, maSanPham, tenSanPham, soLuong, donViTinh, trangThaiSanPham)
                 VALUES (?, ?, ?, ?, ?, ?)";
-                $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("iisiss", $maYC, $maSanPham, $tenSanPham, $soLuong, $donViTinh, $trangThaiSanPham);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iisiss", $maYC, $maSanPham, $tenSanPham, $soLuong, $donVi, $trangThaiSanPham);
         return $stmt->execute();
     }
 }

@@ -31,7 +31,8 @@ require_once 'app/views/layouts/nav.php';
                                 <select id="maKHSX" class="form-control select-custom">
                                     <option value="">-- Chọn kế hoạch --</option>
                                     <?php foreach ($danhSachKHSX as $kh): ?>
-                                        <option value="<?= $kh['maKHSX'] ?>"><?= htmlspecialchars($kh['tenKHSX']) ?></option>
+                                        <option value="<?= $kh['maKHSX'] ?>"><?= htmlspecialchars($kh['tenKHSX']) ?>
+                                        </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -55,7 +56,8 @@ require_once 'app/views/layouts/nav.php';
                                     <select id="filterXuong" class="form-control">
                                         <option value="">-- Tất cả --</option>
                                         <?php foreach ($danhSachXuong as $x): ?>
-                                            <option value="<?= $x['maXuong'] ?>"><?= htmlspecialchars($x['tenXuong']) ?></option>
+                                            <option value="<?= $x['maXuong'] ?>"><?= htmlspecialchars($x['tenXuong']) ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -69,7 +71,8 @@ require_once 'app/views/layouts/nav.php';
 
                                 <div class="form-group">
                                     <label class="required">Số lượng</label>
-                                    <input type="number" id="soLuong" class="form-control text-center" placeholder="0" min="1">
+                                    <input type="number" id="soLuong" class="form-control text-center" placeholder="0"
+                                        min="1">
                                 </div>
 
                                 <div class="form-group">
@@ -135,12 +138,15 @@ require_once 'app/views/layouts/nav.php';
                                             <tr>
                                                 <td><?= date('d/m', strtotime($row['ngayLam'])) ?></td>
                                                 <td>
-                                                    <div class="fw-bold text-primary"><?= htmlspecialchars($row['tenKHSX']) ?></div>
-                                                    <small class="text-muted"><?= htmlspecialchars($row['tenSanPham']) ?></small>
+                                                    <div class="fw-bold text-primary"><?= htmlspecialchars($row['tenKHSX']) ?>
+                                                    </div>
+                                                    <small
+                                                        class="text-muted"><?= htmlspecialchars($row['tenSanPham']) ?></small>
                                                 </td>
                                                 <td class="text-center fw-bold text-success"><?= $row['tongSoLuong'] ?></td>
                                                 <td class="text-end">
-                                                    <button class="btn-icon" onclick="viewDetail('<?= $row['ngayLam'] ?>', <?= $row['maKHSX'] ?>)">
+                                                    <button class="btn-icon"
+                                                        onclick="viewDetail('<?= $row['ngayLam'] ?>', <?= $row['maKHSX'] ?>)">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                 </td>
@@ -518,7 +524,7 @@ require_once 'app/views/layouts/nav.php';
     document.addEventListener('DOMContentLoaded', () => {
 
         // 1. Load Sản phẩm khi chọn KHSX
-        document.getElementById('maKHSX').addEventListener('change', async function() {
+        document.getElementById('maKHSX').addEventListener('change', async function () {
             const maKHSX = this.value;
             const spSelect = document.getElementById('maSanPham');
 
@@ -554,7 +560,7 @@ require_once 'app/views/layouts/nav.php';
         });
 
         // 2. Load Nhân viên khi chọn Xưởng
-        document.getElementById('filterXuong').addEventListener('change', async function() {
+        document.getElementById('filterXuong').addEventListener('change', async function () {
             const maXuong = this.value;
             const nvSelect = document.getElementById('maNhanVien');
 
@@ -630,9 +636,12 @@ require_once 'app/views/layouts/nav.php';
             if (!confirm(`Xác nhận lưu ${tempList.length} dòng?`)) return;
 
             const payload = {
-                maKHSX,
-                maSanPham,
-                ngayLam,
+                // SỬA: Gom các thông tin chung vào object "header" để khớp với Controller
+                header: {
+                    maKHSX: maKHSX,
+                    maSanPham: maSanPham,
+                    ngayLam: ngayLam
+                },
                 details: tempList
             };
 
@@ -712,7 +721,7 @@ require_once 'app/views/layouts/nav.php';
     function closeModal() {
         document.getElementById('modalDetail').style.display = 'none';
     }
-    window.onclick = function(e) {
+    window.onclick = function (e) {
         if (e.target == document.getElementById('modalDetail')) closeModal();
     }
 </script>

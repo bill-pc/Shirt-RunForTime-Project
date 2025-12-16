@@ -43,7 +43,7 @@ public function getDetailsByRequest($maYCNK) {
 
 
 
-    // 🔹 Lưu phiếu nhập NVL + cập nhật tồn kho (Đơn giản)
+    // 🔹 Lưu phiếu nhập NVL + cập nhật tồn kho
    public function luuPhieuNhap($data) {
     $this->conn->begin_transaction();
 
@@ -53,17 +53,15 @@ public function getDetailsByRequest($maYCNK) {
     }
 
     try {
-        // ✅ Kiểm tra phiếu này đã nhập kho chưa
-        $check = $this->conn->prepare("SELECT trangThai FROM phieuyeucaunhapkhonvl WHERE maYCNK=?");
+        // ✅ Kiểm tra phiếu yêu cầu tồn tại
+        $check = $this->conn->prepare("SELECT maYCNK FROM phieuyeucaunhapkhonvl WHERE maYCNK=?");
         $check->bind_param("i", $data['maYCNK']);
         $check->execute();
-        $result = $check->get_result()->fetch_assoc();
+        $checkResult = $check->get_result()->fetch_assoc();
+        $check->close();
 
-        if (!$result) {
+        if (!$checkResult) {
             throw new Exception("Phiếu yêu cầu không tồn tại!");
-        }
-        if ($result['trangThai'] === 'Đã nhập kho') {
-            throw new Exception("Phiếu này đã được nhập kho trước đó!");
         }
 
         // ✅ Lấy nhà cung cấp từ chi tiết phiếu yêu cầu
@@ -71,18 +69,32 @@ public function getDetailsByRequest($maYCNK) {
         $getNCC->bind_param("i", $data['maYCNK']);
         $getNCC->execute();
         $nccList = $getNCC->get_result()->fetch_all(MYSQLI_ASSOC);
+        $getNCC->close();
         $nccMap = [];
         foreach ($nccList as $row) {
             $nccMap[$row['maNVL']] = $row['nhaCungCap'];
         }
 
         // ✅ Lưu phiếu nhập NVL cho từng NVL
+        $itemsInserted = 0;
         foreach ($data['items'] as $item) {
             $maNVL = (int)$item['maNVL'];
             $soLuong = (int)$item['soLuong'];
 
             // Bỏ qua nếu số lượng <= 0
             if ($soLuong <= 0) continue;
+
+            // Kiểm tra xem (maYCNK, maNVL) này đã được nhập chưa
+            $checkDup = $this->conn->prepare("SELECT maPNVL FROM phieunhapnvl WHERE maYCNK=? AND maNVL=?");
+            $checkDup->bind_param('ii', $data['maYCNK'], $maNVL);
+            $checkDup->execute();
+            $dupResult = $checkDup->get_result()->fetch_assoc();
+            $checkDup->close();
+
+            if ($dupResult) {
+                // NVL này từ phiếu này đã được nhập rồi, bỏ qua
+                continue;
+            }
 
             // Lấy nhà cung cấp từ phiếu yêu cầu
             $nhaCungCap = $nccMap[$maNVL] ?? '';
@@ -114,10 +126,11 @@ public function getDetailsByRequest($maYCNK) {
             if (!$stmtPN->execute()) {
                 $err = $stmtPN->error;
                 $stmtPN->close();
-                throw new Exception('Lỗi execute insert: ' . $err);
+                throw new Exception('Lỗi khi thêm NVL (maNVL=' . $maNVL . '): ' . $err);
             }
 
             $stmtPN->close();
+            $itemsInserted++;
 
             // ✅ Cập nhật tồn kho
             $stmtUpdate = $this->conn->prepare("UPDATE nvl SET soLuongTonKho = soLuongTonKho + ? WHERE maNVL = ?");
@@ -127,17 +140,22 @@ public function getDetailsByRequest($maYCNK) {
             $stmtUpdate->close();
         }
 
+        if ($itemsInserted === 0) {
+            throw new Exception("Không có mục nào được thêm (có thể các NVL đã được nhập trước đó)!");
+        }
+
         // ✅ Đánh dấu phiếu yêu cầu đã nhập kho
         $stmtStatus = $this->conn->prepare("UPDATE phieuyeucaunhapkhonvl SET trangThai='Đã nhập kho' WHERE maYCNK=?");
         $stmtStatus->bind_param('i', $data['maYCNK']);
         $stmtStatus->execute();
+        $stmtStatus->close();
 
         $this->conn->commit();
-        return ['success' => true, 'message' => 'Phiếu nhập kho đã lưu thành công và cập nhật tồn kho!'];
+        return ['success' => true, 'message' => "✅ Đã nhập $itemsInserted NVL vào kho thành công!"];
 
     } catch (Exception $e) {
         $this->conn->rollback();
-        return ['success' => false, 'message' => "❌ Lỗi khi lưu phiếu nhập: " . $e->getMessage()];
+        return ['success' => false, 'message' => "❌ Lỗi: " . $e->getMessage()];
     }
 }
 

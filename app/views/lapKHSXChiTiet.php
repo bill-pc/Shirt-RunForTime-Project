@@ -1,6 +1,30 @@
 <?php
 require_once 'layouts/header.php';
 require_once 'layouts/nav.php';
+
+/* ====== PHẦN SỬA: LOGIC LỌC NVL CHUẨN XÁC ====== */
+$dsVai = [];      
+$dsPhuLieu = []; 
+
+if (isset($danhSachNVL) && is_array($danhSachNVL)) {
+    foreach ($danhSachNVL as $item) {
+        // BƯỚC 1: Chuẩn hóa dữ liệu từ DB (Cắt khoảng trắng thừa, chuyển về chữ thường)
+        // Dùng mb_strtolower với UTF-8 để xử lý tiếng Việt chuẩn
+        $loaiNVL_Chuan = mb_strtolower(trim($item['loaiNVL'] ?? ''), 'UTF-8');
+        
+        // BƯỚC 2: Kiểm tra
+        // Điều kiện 1: Cột loại là "vải" (đã chuyển thường)
+        // Điều kiện 2: Hoặc tên sản phẩm có chứa chữ "vải" (Dự phòng trường hợp cột loại bị nhập sai)
+        $tenNVL_Chuan = mb_strtolower(trim($item['tenNVL'] ?? ''), 'UTF-8');
+        
+        if ($loaiNVL_Chuan === 'vải' || strpos($tenNVL_Chuan, 'vải') !== false) {
+            $dsVai[] = $item;
+        } else {
+            // Tất cả những cái không phải vải -> Vào Phụ liệu
+            $dsPhuLieu[] = $item;
+        }
+    }
+}
 ?>
 
 <div class="main-layout-wrapper">
@@ -11,7 +35,6 @@ require_once 'layouts/nav.php';
             <?= htmlspecialchars($donHang['tenDonHang'] ?? 'Không rõ') ?>
         </h2>
 
-        <!-- Thông tin đơn hàng -->
         <div class="order-info">
             <div><b>Mã Đơn Hàng:</b> <?= htmlspecialchars($donHang['maDonHang']) ?></div>
             <div><b>Sản phẩm:</b> <?= htmlspecialchars($donHang['tenSanPham']) ?></div>
@@ -26,7 +49,6 @@ require_once 'layouts/nav.php';
         <form action="index.php?page=luu-ke-hoach" method="post">
             <input type="hidden" name="maDonHang" value="<?= htmlspecialchars($donHang['maDonHang']) ?>">
 
-            <!-- Ngày bắt đầu tổng (do bạn chọn) -->
             <div class="plan-row">
                 <div class="plan-col">
                     <label class="field-label">Ngày bắt đầu KHSX</label>
@@ -40,7 +62,6 @@ require_once 'layouts/nav.php';
                 </div>
             </div>
 
-            <!-- Xưởng Cắt -->
             <div class="xuong-block cut">
                 <h3 class="xuong-heading">XƯỞNG CẮT ✂️</h3>
                 <div class="xuong-body">
@@ -66,28 +87,39 @@ require_once 'layouts/nav.php';
                     </div>
 
                     <div class="nvl-section" id="xuong-cat-container">
-                        <label class="field-label">Nguyên vật liệu (Cắt)</label>
+                        <label class="field-label">Nguyên vật liệu (Chỉ chọn Vải)</label>
                         <div class="nvl-row">
                             <select name="xuong_cat[nvl_id][]" required>
-                                <option value="">-- Chọn NVL --</option>
-                                <?php foreach ($danhSachNVL as $nvl): ?>
-                                    <option value="<?= $nvl['maNVL'] ?>"><?= htmlspecialchars($nvl['tenNVL']) ?></option>
+                                <option value="" data-dvt="">-- Chọn loại Vải --</option>
+                                <?php foreach ($dsVai as $nvl): ?>
+                                    <option value="<?= $nvl['maNVL'] ?>" data-dvt="<?= htmlspecialchars($nvl['donViTinh'] ?? '') ?>">
+                                        <?= htmlspecialchars($nvl['tenNVL']) ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
 
                             <div class="nvl-inputs">
-                                <label class="small-label">Định mức / 1 SP</label>
-                                <input type="number" name="xuong_cat[nvl_dinhMuc][]" min="0" step="0.01" value="1"
-                                    required>
+                                <div class="input-wrapper">
+                                    <label class="small-label">Định mức / 1 SP</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" name="xuong_cat[nvl_dinhMuc][]" min="0" step="0.01" value="1" required>
+                                        <span class="unit-display">--</span>
+                                    </div>
+                                </div>
 
-                                <label class="small-label">Tổng NVL cần</label>
-                                <input type="number" name="xuong_cat[nvl_soLuong][]" min="0" value="0" readonly>
+                                <div class="input-wrapper">
+                                    <label class="small-label">Tổng NVL cần</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" name="xuong_cat[nvl_soLuong][]" min="0" value="0" readonly>
+                                        <span class="unit-display">--</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <button type="button" class="btn-remove-nvl" title="Xóa NVL">&times;</button>
                         </div>
 
-                        <button type="button" class="btn-add-nvl" data-target="xuong-cat-container">+ Thêm NVL</button>
+                        <button type="button" class="btn-add-nvl" data-target="xuong-cat-container">+ Thêm Vải</button>
                         <div class="nvl-dates" aria-hidden="true">
                             <small style="font-size: 13px;" id="cat-note-start"></small>
                             <small style="font-size: 13px;" id="cat-note-end"></small>
@@ -96,7 +128,6 @@ require_once 'layouts/nav.php';
                 </div>
             </div>
 
-            <!-- Xưởng May -->
             <div class="xuong-block sew">
                 <h3 class="xuong-heading">XƯỞNG MAY 👕</h3>
                 <div class="xuong-body">
@@ -122,28 +153,39 @@ require_once 'layouts/nav.php';
                     </div>
 
                     <div class="nvl-section" id="xuong-may-container">
-                        <label class="field-label">Nguyên vật liệu (May)</label>
+                        <label class="field-label">Nguyên vật liệu (Phụ liệu)</label>
                         <div class="nvl-row">
                             <select name="xuong_may[nvl_id][]" required>
-                                <option value="">-- Chọn NVL --</option>
-                                <?php foreach ($danhSachNVL as $nvl): ?>
-                                    <option value="<?= $nvl['maNVL'] ?>"><?= htmlspecialchars($nvl['tenNVL']) ?></option>
+                                <option value="" data-dvt="">-- Chọn Phụ liệu --</option>
+                                <?php foreach ($dsPhuLieu as $nvl): ?>
+                                    <option value="<?= $nvl['maNVL'] ?>" data-dvt="<?= htmlspecialchars($nvl['donViTinh'] ?? '') ?>">
+                                        <?= htmlspecialchars($nvl['tenNVL']) ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
 
                             <div class="nvl-inputs">
-                                <label class="small-label">Định mức / 1 SP</label>
-                                <input type="number" name="xuong_may[nvl_dinhMuc][]" min="0" value="1" step="0.01"
-                                    required>
+                                <div class="input-wrapper">
+                                    <label class="small-label">Định mức / 1 SP</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" name="xuong_may[nvl_dinhMuc][]" min="0" value="1" step="0.01" required>
+                                        <span class="unit-display">--</span>
+                                    </div>
+                                </div>
 
-                                <label class="small-label">Tổng NVL cần</label>
-                                <input type="number" name="xuong_may[nvl_soLuong][]" min="0" value="0" readonly>
+                                <div class="input-wrapper">
+                                    <label class="small-label">Tổng NVL cần</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" name="xuong_may[nvl_soLuong][]" min="0" value="0" readonly>
+                                        <span class="unit-display">--</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <button type="button" class="btn-remove-nvl" title="Xóa NVL">&times;</button>
                         </div>
 
-                        <button type="button" class="btn-add-nvl" data-target="xuong-may-container">+ Thêm NVL</button>
+                        <button type="button" class="btn-add-nvl" data-target="xuong-may-container">+ Thêm Phụ liệu</button>
                         <div class="nvl-dates" aria-hidden="true">
                             <small style="font-size: 13px;" id="may-note-start"></small>
                             <small style="font-size: 13px;" id="may-note-end"></small>
@@ -160,17 +202,14 @@ require_once 'layouts/nav.php';
 <?php require_once 'layouts/footer.php'; ?>
 
 <script>
-    /* ====== CẤU HÌNH & HELPER ====== */
+    /* ====== CẤU HÌNH & HELPER DATE (GIỮ NGUYÊN) ====== */
     const SO_LUONG = parseInt(document.getElementById('soLuongSanPham').textContent.replace(/\./g, '')) || 0;
-    // Lưu ý: Hàm parseDateVN cần xử lý kỹ chuỗi ngày
     const elNgayGiao = document.getElementById('ngayGiao');
     const NGAY_GIAO = parseDateVN(elNgayGiao.textContent.trim());
 
-    /* Helper: Format ngày VN (dd/mm/yyyy) */
     function formatVN(dateStr) {
         if (!dateStr) return "";
         const d = new Date(dateStr);
-        // Fix lỗi hiển thị ngày do múi giờ
         return [
             String(d.getDate()).padStart(2, '0'),
             String(d.getMonth() + 1).padStart(2, '0'),
@@ -178,21 +217,18 @@ require_once 'layouts/nav.php';
         ].join('/');
     }
 
-    /* Helper: Parse ngày VN sang Date Obj */
     function parseDateVN(dateStr) {
         if (!dateStr) return null;
         const [d, m, y] = dateStr.split('/');
         return new Date(y, m - 1, d);
     }
 
-    /* Helper: Parse ISO (yyyy-mm-dd) sang Date Obj (Local Time - Fix lỗi lệch ngày) */
     function parseDateISO(dateStr) {
         if (!dateStr) return null;
         const [y, m, d] = dateStr.split('-').map(Number);
         return new Date(y, m - 1, d);
     }
 
-    /* Helper: Date Obj sang ISO (yyyy-mm-dd) */
     function formatISO(dateObj) {
         if (!dateObj) return '';
         const y = dateObj.getFullYear();
@@ -201,7 +237,6 @@ require_once 'layouts/nav.php';
         return `${y}-${m}-${d}`;
     }
 
-    /* Helper: Cộng trừ ngày */
     function addDays(dateObj, delta) {
         if (!dateObj) return null;
         const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
@@ -209,10 +244,8 @@ require_once 'layouts/nav.php';
         return d;
     }
 
-    /* Helper: Tính khoảng cách ngày (bao gồm cả ngày bắt đầu) */
     function diffDaysInclusive(start, end) {
         if (!start || !end) return 0;
-        // Reset giờ về 0 để tính chính xác số ngày
         const s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
         const e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
         const ms = e - s;
@@ -242,65 +275,43 @@ require_once 'layouts/nav.php';
 
     /* ====== LOGIC CỐT LÕI (CORE LOGIC) ====== */
     function updatePlan() {
-        // 1. INPUT: Ngày bắt đầu KHSX
+        // --- 1. NGÀY TỔNG ---
         const planStart = parseDateISO(inputNgayKHSX.value) || new Date();
-
-        // 2. INPUT: Ngày kết thúc May (Dự kiến)
-        // Mặc định = Ngày Giao - 2 ngày (để đóng gói/xuất hàng)
-        // User có thể chọn ngày khác, nhưng không được quá Ngày Giao - 1
         let mayEndTarget = parseDateISO(mayEndInput.value);
-        const limitMayEnd = addDays(NGAY_GIAO, -2); // Giới hạn trần
+        const limitMayEnd = addDays(NGAY_GIAO, -2); 
 
         if (!mayEndTarget) {
-            // Nếu chưa có, set mặc định
             mayEndTarget = limitMayEnd;
             mayEndInput.value = formatISO(mayEndTarget);
         } else if (mayEndTarget > addDays(NGAY_GIAO, -1)) {
-            // Nếu chọn quá sát ngày giao -> Cảnh báo & Reset
             alert("⚠️ Ngày kết thúc may phải trước ngày giao hàng ít nhất 1-2 ngày để đóng gói!");
             mayEndTarget = limitMayEnd;
             mayEndInput.value = formatISO(mayEndTarget);
         }
-
-        // Cập nhật ngày kết thúc tổng của Kế hoạch = Ngày giao hàng (cố định)
         inputNgayKetThuc.value = formatISO(NGAY_GIAO);
 
-
-        // --- TÍNH TOÁN XƯỞNG CẮT ---
-
-        // 3. Ngày Bắt đầu Cắt
-        // Mặc định = Plan Start + 1 (hoặc user chọn)
+        // --- 2. XƯỞNG CẮT ---
         let catStart = parseDateISO(catStartInput.value);
         if (!catStart || catStart < planStart) {
             catStart = addDays(planStart, 1);
             catStartInput.value = formatISO(catStart);
         }
 
-        // 4. Ngày Kết thúc Cắt & KPI Cắt
         let catKpi = parseInt(catKpiInput.value) || 0;
         let catDays = 0;
         let catEnd = null;
-
-        // Giới hạn: Cắt phải xong trước khi May xong ít nhất 2 ngày (để còn chuyền hàng)
         const limitCatEnd = addDays(mayEndTarget, -1);
 
         if (catKpi > 0) {
-            // CASE A: User nhập KPI -> Tính ngày kết thúc
             catDays = Math.ceil(SO_LUONG / catKpi);
             catEnd = addDays(catStart, catDays - 1);
-
-            // Kiểm tra va chạm: Nếu làm chậm quá (KPI thấp) -> Vượt quá giới hạn
             if (catEnd > limitCatEnd) {
-                // Ép về giới hạn cuối cùng
                 catEnd = limitCatEnd;
                 catEndInput.value = formatISO(catEnd);
-
-                // Tính lại KPI tối thiểu cần thiết
                 const realDays = diffDaysInclusive(catStart, catEnd);
                 const requiredKpi = Math.ceil(SO_LUONG / Math.max(1, realDays));
-
                 catKpiWarn.style.display = 'inline';
-                catKpiWarn.textContent = `KPI nhập quá thấp! Để kịp tiến độ phải cắt tối thiểu ${requiredKpi} SP/ngày`;
+                catKpiWarn.textContent = `KPI quá thấp! Cần cắt tối thiểu ${requiredKpi} SP/ngày`;
                 catKpiMinEl.textContent = requiredKpi;
             } else {
                 catEndInput.value = formatISO(catEnd);
@@ -308,33 +319,23 @@ require_once 'layouts/nav.php';
                 catKpiMinEl.textContent = Math.ceil(SO_LUONG / Math.max(1, catDays));
             }
         } else {
-            // CASE B: User chưa nhập KPI -> Tính KPI gợi ý dựa trên thời gian max
-            // Mặc định cho Cắt chiếm khoảng 40% tổng thời gian hoặc user tự chỉnh ngày end
-            // Ở đây ta set mặc định Cat End cách May End một khoảng an toàn
             if (!parseDateISO(catEndInput.value)) {
-                // Nếu chưa chọn ngày End, mặc định cho làm đến sát nút (limitCatEnd) để hiển thị Min KPI dễ thở nhất
                 catEnd = limitCatEnd;
                 catEndInput.value = formatISO(catEnd);
             } else {
                 catEnd = parseDateISO(catEndInput.value);
-                // Nếu user chọn ngày End quá xa -> Ép lại
                 if (catEnd > limitCatEnd) {
                     catEnd = limitCatEnd;
                     catEndInput.value = formatISO(catEnd);
                 }
             }
-
             const realDays = diffDaysInclusive(catStart, catEnd);
             const suggestedKpi = Math.ceil(SO_LUONG / Math.max(1, realDays));
             catKpiMinEl.textContent = suggestedKpi;
             catKpiWarn.style.display = 'none';
         }
 
-
-        // --- TÍNH TOÁN XƯỞNG MAY ---
-
-        // 5. Ngày Bắt đầu May
-        // Logic: May Start >= Cắt Start + 1
+        // --- 3. XƯỞNG MAY ---
         let mayStart = parseDateISO(mayStartInput.value);
         const minMayStart = addDays(parseDateISO(catStartInput.value), 1);
 
@@ -343,48 +344,37 @@ require_once 'layouts/nav.php';
             mayStartInput.value = formatISO(mayStart);
         }
 
-        // 6. Ngày Kết thúc May & KPI May
         let mayKpi = parseInt(mayKpiInput.value) || 0;
         let mayDays = 0;
-        // mayEndTarget đã được tính ở bước 2
 
         if (mayKpi > 0) {
-            // CASE A: User nhập KPI -> Tính ngày End
             mayDays = Math.ceil(SO_LUONG / mayKpi);
             let calculatedMayEnd = addDays(mayStart, mayDays - 1);
-
-            // Kiểm tra Deadline
             if (calculatedMayEnd > mayEndTarget) {
-                // Cảnh báo nhưng không tự sửa ngày End (vì ngày End là chốt chặn cuối)
-                // Chỉ báo là KHÔNG KỊP
                 const realDays = diffDaysInclusive(mayStart, mayEndTarget);
                 const requiredKpi = Math.ceil(SO_LUONG / Math.max(1, realDays));
-
                 mayKpiWarn.style.display = 'inline';
                 mayKpiWarn.textContent = `Không kịp giao! Phải may ${requiredKpi} SP/ngày`;
                 mayKpiMinEl.textContent = requiredKpi;
             } else {
-                // Kịp -> Cập nhật ngày kết thúc thực tế (có thể xong sớm hơn dự kiến)
                 mayEndInput.value = formatISO(calculatedMayEnd);
                 mayKpiWarn.style.display = 'none';
                 mayKpiMinEl.textContent = Math.ceil(SO_LUONG / Math.max(1, mayDays));
             }
         } else {
-            // CASE B: Tự tính KPI theo thời gian
             const realDays = diffDaysInclusive(mayStart, mayEndTarget);
             const suggestedKpi = Math.ceil(SO_LUONG / Math.max(1, realDays));
             mayKpiMinEl.textContent = suggestedKpi;
             mayKpiWarn.style.display = 'none';
         }
 
-        // --- CẬP NHẬT NVL ---
+        // --- 4. CẬP NHẬT NVL (TÍNH TỔNG) ---
         document.querySelectorAll('.nvl-row').forEach(row => {
             const dinhMuc = parseFloat(row.querySelector('input[name$="[nvl_dinhMuc][]"]').value) || 0;
             const out = row.querySelector('input[name$="[nvl_soLuong][]"]');
             if (out) out.value = (dinhMuc * SO_LUONG).toFixed(2).replace(/\.00$/, '');
         });
 
-        // --- CẬP NHẬT GHI CHÚ NHỎ ---
         updateNotes();
     }
 
@@ -401,17 +391,26 @@ require_once 'layouts/nav.php';
         if (document.getElementById('may-note-end')) document.getElementById('may-note-end').textContent = `Kết thúc: ${formatVN(formatISO(mayE))}`;
     }
 
+    /* ====== HELPER ĐƠN VỊ TÍNH (MỚI) ====== */
+    function updateUnitLabel(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const unit = selectedOption.getAttribute('data-dvt') || '--';
+        
+        const row = selectElement.closest('.nvl-row');
+        if (!row) return;
+
+        const unitSpans = row.querySelectorAll('.unit-display');
+        unitSpans.forEach(span => {
+            span.textContent = unit;
+        });
+    }
+
     /* ====== EVENT LISTENERS ====== */
-
-    // 1. Thay đổi ngày bắt đầu KHSX
     inputNgayKHSX.addEventListener('change', updatePlan);
-
-    // 2. Thay đổi ngày trong các xưởng
     catStartInput.addEventListener('change', updatePlan);
     catEndInput.addEventListener('change', updatePlan);
     mayStartInput.addEventListener('change', updatePlan);
 
-    // Riêng May End: Khi thay đổi cần check không được quá Ngày Giao
     mayEndInput.addEventListener('change', function () {
         const d = parseDateISO(this.value);
         if (d > addDays(NGAY_GIAO, -1)) {
@@ -421,18 +420,23 @@ require_once 'layouts/nav.php';
         updatePlan();
     });
 
-    // 3. Thay đổi KPI (Debounce nhẹ hoặc change)
-    catKpiInput.addEventListener('input', updatePlan); // Dùng input để tính realtime
+    catKpiInput.addEventListener('input', updatePlan);
     mayKpiInput.addEventListener('input', updatePlan);
 
-    // 4. NVL Events
     document.addEventListener('input', function (e) {
         if (e.target && e.target.matches('input[name$="[nvl_dinhMuc][]"]')) {
             updatePlan();
         }
     });
 
-    // Add/Remove NVL logic (Giữ nguyên như cũ)
+    // MỚI: Sự kiện change cho select NVL để đổi ĐVT
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.matches('select[name$="[nvl_id][]"]')) {
+            updateUnitLabel(e.target);
+        }
+    });
+
+    // Logic Add NVL (Đã cập nhật reset ĐVT và Select)
     const addBtns = document.querySelectorAll('.btn-add-nvl');
     addBtns.forEach(btn => {
         btn.addEventListener('click', function () {
@@ -441,6 +445,10 @@ require_once 'layouts/nav.php';
             const clone = row.cloneNode(true);
             const select = clone.querySelector('select');
             if (select) select.value = '';
+            
+            // Reset ĐVT cho dòng mới clone
+            clone.querySelectorAll('.unit-display').forEach(sp => sp.textContent = '--');
+
             clone.querySelectorAll('input').forEach(inp => {
                 if (inp.hasAttribute('readonly')) {
                     inp.value = 0;
@@ -452,6 +460,7 @@ require_once 'layouts/nav.php';
             updatePlan();
         });
     });
+
     document.addEventListener('click', function (e) {
         if (e.target && e.target.classList.contains('btn-remove-nvl')) {
             const row = e.target.closest('.nvl-row');
@@ -463,544 +472,88 @@ require_once 'layouts/nav.php';
         }
     });
 
-    /* Khởi chạy lần đầu */
+    // Chạy lần đầu
     updatePlan();
 </script>
 
 <style>
-    /* CSS đẹp, đồng đều — giữ gần như layout cũ, chỉnh cho cân chỉnh */
-    body {
-        font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
-        background: #f8f9fa;
-        color: #222;
-    }
+    /* CSS Cũ giữ nguyên */
+    body { font-family: "Segoe UI", system-ui, -apple-system, Arial; background: #f8f9fa; color: #222; }
+    .main-content { padding: 20px; }
+    .page-title { text-align: center; color: #007bff; margin-bottom: 18px; font-size: 22px; font-weight: 600; background: linear-gradient(90deg, #007bff, #005fcc); -webkit-background-clip: text; color: transparent;}
+    .order-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .order-info div { background: #ffffff; border: 1.8px solid #d9d9d9; border-radius: 8px; padding: 12px 14px; font-size: 15px; color: #222; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .order-info b { font-size: 15px; color: #333; font-weight: 700; }
+    .order-info span { font-size: 15px; font-weight: 600; color: #0057c2; }
+    #ngayGiao { color: #d01919 !important; font-size: 15px; font-weight: 700; }
+    .plan-row { display: flex; gap: 18px; margin-bottom: 16px; flex-wrap: wrap; }
+    .plan-col { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+    .field-label { font-weight: 600; margin-bottom: 6px; font-size: 15px; color: #333; }
+    .field-note { font-size: 13px; color: #666; margin-top: 6px; }
+    .row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
+    input[type="date"], input[type="number"], select { padding: 8px 10px; border-radius: 6px; border: 1.5px solid #c6d4e1; height: 40px; font-size: 14px; background: white; transition: 0.2s; }
+    input:focus, select:focus { border-color: #1a73e8; box-shadow: 0 0 3px rgba(26, 115, 232, 0.5); outline: none; }
+    .xuong-block { margin-bottom: 18px; border-radius: 8px; padding: 14px; background: #fff; box-shadow: 0 1px 8px rgba(20, 20, 20, 0.04); border: 1.5px solid #dbe5f3; }
+    .xuong-block.cut { border-left: 4px solid #1565c0; }
+    .xuong-block.sew { border-left: 4px solid #ef6c00; }
+    .xuong-heading { margin: 0 0 8px 0; font-size: 16px; color: #333; font-weight: 700; }
+    .xuong-block.cut .xuong-heading { color: #0a58ca; }
+    .xuong-block.sew .xuong-heading { color: #d35400; }
+    .nvl-section { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+    .nvl-row { display: flex; gap: 10px; padding: 10px; background: #f5f8ff; border-radius: 6px; border: 1px solid #d4e0f2; flex-wrap: wrap; align-items: flex-end; }
+    .nvl-row select { min-width: 180px; flex: 1; }
+    .nvl-dates { margin-top: 4px; display: block; font-size: 12px; color: #6c757d; order: 100; }
+    .kpi-note { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; font-size: 13px; color: #444; }
+    .kpi-note b { color: #0b5ed7; }
+    .kpi-warning { font-size: 13px; margin-left: 8px; font-weight: 600; color: #d9534f !important; }
+    .btn-add-nvl { background: linear-gradient(135deg, #28a745, #1e7e34); color: #fff; font-weight: 600; padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; align-self: flex-start; margin-top: 0; order: 99; }
+    .btn-add-nvl:hover { background: linear-gradient(135deg, #24963f, #176b2b); }
+    .btn-remove-nvl { background: #dc3545; width: 34px; height: 34px; border-radius: 6px; border: none; color: white; font-size: 16px; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; }
+    .btn-remove-nvl:hover { background: #b02a37; }
+    .btn-submit { background: linear-gradient(135deg, #0069d9, #004eac); border: none; padding: 12px; color: white; width: 100%; border-radius: 7px; margin-top: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .btn-submit:hover { background: linear-gradient(135deg, #005fcc, #003f91); }
+    input[readonly] { background: #f3f4f6; cursor: not-allowed; }
+    .small-label { display: block; font-size: 13px; color: #333; margin-bottom: 4px; font-weight: 700; }
 
-    .main-content {
-        padding: 20px;
-    }
-
-    .page-title {
-        text-align: center;
-        color: #007bff;
-        margin-bottom: 18px;
-        font-size: 22px;
-        font-weight: 600;
-    }
-
-    .order-info {
-        background: #fff;
-        padding: 12px 14px;
-        border-radius: 8px;
-        margin-bottom: 18px;
-        display: flex;
-        gap: 18px;
-        flex-wrap: wrap;
-        font-size: 15px;
-        box-shadow: 0 1px 4px rgba(15, 15, 15, 0.05);
-    }
-
-    .plan-row {
-        display: flex;
-        gap: 18px;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-    }
-
-    .plan-col {
-        flex: 1;
-        min-width: 200px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .field-label {
-        font-weight: 600;
-        margin-bottom: 6px;
-        font-size: 15px;
-        color: #333;
-    }
-
-    .field-note {
-        font-size: 13px;
-        color: #666;
-        margin-top: 6px;
-        display: block;
-    }
-
-    .row {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 10px;
-        flex-wrap: wrap;
-    }
-
-    .col {
-        flex: 1;
-        min-width: 180px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    input[type="date"],
-    input[type="number"],
-    select {
-        padding: 8px 10px;
-        border-radius: 6px;
-        border: 1px solid #d0d7de;
-        height: 40px;
-        font-size: 14px;
-        background: white;
-    }
-
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-        opacity: 0.6;
-    }
-
-    .xuong-block {
-        margin-bottom: 18px;
-        border-radius: 8px;
-        padding: 14px;
-        background: #fff;
-        box-shadow: 0 1px 8px rgba(20, 20, 20, 0.04);
-    }
-
-    .xuong-block.cut {
-        border-left: 4px solid #1565c0;
-    }
-
-    .xuong-block.sew {
-        border-left: 4px solid #ef6c00;
-    }
-
-    .xuong-heading {
-        margin: 0 0 8px 0;
-        font-size: 16px;
-        color: #333;
-    }
-
-    .nvl-section {
-        margin-top: 10px;
-    }
-
-    .nvl-row {
-        display: flex;
-        gap: 10px;
-        align-items: flex-end;
-        margin-bottom: 10px;
-        flex-wrap: wrap;
-    }
-
-    .nvl-row select {
-        min-width: 180px;
-        flex: 1;
-    }
-
+    /* ====== CSS MỚI CHO ĐƠN VỊ TÍNH ====== */
     .nvl-inputs {
         display: flex;
-        gap: 8px;
-        align-items: center;
-        flex: 2;
+        gap: 15px; 
+        flex: 2; 
         min-width: 260px;
     }
-
-    .nvl-inputs .small-label {
-        display: block;
-        font-size: 13px;
-        color: #555;
-        margin-bottom: 4px;
-    }
-
-    .nvl-inputs input {
+    .input-wrapper {
         flex: 1;
-        padding: 8px 10px;
-        border-radius: 6px;
-        border: 1px solid #d0d7de;
+        display: flex;
+        flex-direction: column;
+    }
+    .input-with-unit {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .input-with-unit input {
+        width: 100%;
+        padding-right: 45px; /* Chừa chỗ cho ĐVT */
         height: 38px;
     }
-
-    .nvl-dates {
-        margin-top: 8px;
-        display: flex;
-        gap: 8px;
-        color: #555;
-        font-size: 13px;
-    }
-
-    .kpi-note {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 8px;
-        font-size: 13px;
-        color: #444;
-    }
-
-    .kpi-note b {
-        color: #0b5ed7;
-    }
-
-    .kpi-warning {
-        font-size: 13px;
-        margin-left: 8px;
-    }
-
-    .btn-add-nvl {
-        background: #28a745;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 8px 10px;
-        cursor: pointer;
-        font-size: 13px;
-    }
-
-    .btn-remove-nvl {
-        background: #dc3545;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        width: 36px;
-        height: 36px;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 16px;
-    }
-
-    .btn-submit {
-        background: #007bff;
-        color: #fff;
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-
-    .btn-submit:hover {
-        background: #0060d6;
-    }
-
-    input[readonly] {
-        background: #f3f4f6;
-        cursor: not-allowed;
-    }
-
-    .small-label {
-       
-        color: #333;
-        margin-bottom: 4px;
-    }
-
-    @media (max-width:800px) {
-        .plan-row {
-            flex-direction: column;
-        }
-
-        .nvl-inputs {
-            flex-direction: column;
-        }
-    }
-
-    /* ----- CANH CHUẨN CHO KHU VỰC NVL ----- */
-
-    /* Đảm bảo mỗi dòng NVL nằm tách biệt */
-    .nvl-section {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    /* Mỗi row NVL rõ ràng, khoảng cách đẹp */
-    .nvl-row {
-        background: #f9fafb;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #e0e6eb;
-    }
-
-    /* Nút thêm NVL nằm riêng một dòng */
-    .btn-add-nvl {
-        align-self: flex-start;
-        margin-top: 4px;
-    }
-
-    /* Ghi chú nhỏ nằm dưới cùng – không ép nằm cùng dòng */
-    .nvl-dates {
-        margin-top: 4px;
-        display: block !important;
-        /* đổi từ flex → block */
+    .unit-display {
+        position: absolute;
+        right: 10px;
         font-size: 12px;
-        color: #6c757d;
+        color: #666;
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        pointer-events: none;
+        z-index: 2;
     }
 
-    .nvl-dates small {
-        display: inline-block;
-        margin-right: 12px;
-    }
-
-    /* Giảm kích thước dòng NVL khi nhiều item */
-    .nvl-inputs {
-        gap: 12px;
-    }
-
-    /* Responsive tốt hơn */
     @media (max-width: 768px) {
-        .nvl-row {
-            flex-direction: column;
-            align-items: stretch;
-        }
+        .nvl-row { flex-direction: column; align-items: stretch; }
+        .nvl-inputs { flex-direction: column; gap: 10px; }
+        .unit-display { top: 50%; transform: translateY(-50%); }
     }
-
-    /* Bọc khu vực NVL theo chiều dọc */
-    .nvl-section {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    /* Mỗi dòng NVL */
-    .nvl-row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        padding: 10px;
-        border: 1px solid #e4e7ea;
-        border-radius: 6px;
-        background: #fafbfc;
-    }
-
-    /* Nút thêm NVL luôn bám sát ngay dưới các dòng NVL */
-    .btn-add-nvl {
-        align-self: flex-start;
-        margin-top: 0;
-        order: 99;
-        /* đảm bảo đứng sau các .nvl-row */
-    }
-
-    /* Ghi chú luôn dưới nút thêm */
-    .nvl-dates {
-        order: 100;
-        margin-top: -4px;
-        display: block;
-        font-size: 12px;
-        color: #6c757d;
-    }
-
-    /* ====== FONT & BASE ====== */
-    body {
-        font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui;
-        font-size: 14px;
-        line-height: 1.45;
-        color: #1f1f1f;
-    }
-
-    /* ====== PAGE TITLE ====== */
-    .page-title {
-        
-        font-weight: 700;
-        margin-bottom: 18px;
-        text-align: center;
-        background: linear-gradient(90deg, #007bff, #005fcc);
-        -webkit-background-clip: text;
-        color: transparent;
-    }
-
-    /* ====== LABEL ====== */
-    .field-label,
-    .small-label {
-        font-weight: 700;
-        color: #020d1fff;
-    }
-
-   
-
-    .field-note {
-        
-        color: #777;
-    }
-
-    /* ====== INPUTS ====== */
-    input[type="date"],
-    input[type="number"],
-    select {
-        padding: 8px 10px;
-        border-radius: 6px;
-        border: 1.5px solid #c6d4e1;
-        background: white;
-        font-size: 14px;
-        transition: 0.2s;
-    }
-
-    input:focus,
-    select:focus {
-        border-color: #1a73e8;
-        box-shadow: 0 0 3px rgba(26, 115, 232, 0.5);
-        outline: none;
-    }
-
-    /* ====== BLOCK ====== */
-    .xuong-block {
-        padding: 14px;
-        background: #fff;
-        border-radius: 8px;
-        margin-bottom: 18px;
-        border: 1.5px solid #dbe5f3;
-        box-shadow: 0 2px 8px rgba(20, 20, 20, 0.05);
-    }
-
-    /* Màu riêng cho từng xưởng */
-    .xuong-block.cut .xuong-heading {
-        color: #0a58ca;
-        border-left: 4px solid #0d6efd;
-        padding-left: 8px;
-    }
-
-    .xuong-block.sew .xuong-heading {
-        color: #d35400;
-        border-left: 4px solid #f39c12;
-        padding-left: 8px;
-    }
-
-    .xuong-heading {
-        font-size: 17px;
-        font-weight: 700;
-        margin-bottom: 10px;
-    }
-
-    /* ====== NVL ROW ====== */
-    .nvl-row {
-        display: flex;
-        gap: 10px;
-        padding: 10px;
-        background: #f5f8ff;
-        border-radius: 6px;
-        border: 1px solid #d4e0f2;
-    }
-
-    .nvl-inputs input {
-        font-size: 13px;
-    }
-
-    .nvl-dates small {
-        color: #555;
-    }
-
-    /* ====== BUTTONS ====== */
-    .btn-add-nvl {
-        background: linear-gradient(135deg, #28a745, #1e7e34);
-        color: #fff;
-        font-weight: 600;
-        padding: 7px 12px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .btn-add-nvl:hover {
-        background: linear-gradient(135deg, #24963f, #176b2b);
-    }
-
-    .btn-remove-nvl {
-        background: #dc3545;
-        width: 34px;
-        height: 34px;
-        border-radius: 6px;
-        border: none;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    .btn-remove-nvl:hover {
-        background: #b02a37;
-    }
-
-    .btn-submit {
-        background: linear-gradient(135deg, #0069d9, #004eac);
-        border: none;
-        padding: 12px;
-        color: white;
-        width: 100%;
-        border-radius: 7px;
-        margin-top: 10px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .btn-submit:hover {
-        background: linear-gradient(135deg, #005fcc, #003f91);
-    }
-
-    /* ====== ORDER INFO ====== */
-    .order-info {
-        
-        background: #eef4ff;
-        border: 1px solid #ccd9f6;
-        color: #0b3d91;
-    }
-
-    /* ====== KPI NOTE ====== */
-    .kpi-note {
-        font-size: 13px;
-    }
-
-    .kpi-note b {
-        color: #0d6efd;
-    }
-
-    .kpi-warning {
-        font-size: 13px;
-        font-weight: 600;
-        color: #d9534f !important;
-    }
-    /* ==== ORDER INFO: Kiểu đóng khung từng ô ==== */
-.order-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
-}
-
-.order-info div {
-    background: #ffffff;
-    border: 1.8px solid #d9d9d9;
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 15px;
-    color: #222;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-
-    flex-direction: column;
-    gap: 4px;
-}
-
-/* Nhãn */
-.order-info b {
-    font-size: 15px;
-    color: #333;
-    font-weight: 700;
-}
-
-/* Giá trị */
-.order-info span {
-    font-size: 15px;
-    font-weight: 600;
-    color: #0057c2;
-}
-
-/* Ngày giao nổi bật */
-#ngayGiao {
-    color: #d01919 !important;
-    font-size: 15px;
-    font-weight: 700;
-}
-
 </style>

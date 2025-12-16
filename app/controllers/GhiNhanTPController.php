@@ -25,47 +25,67 @@ class GhiNhanThanhPhamController
 
     public function luu()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $inputJSON = file_get_contents('php://input');
-            $input = json_decode($inputJSON, true);
+        header('Content-Type: application/json; charset=utf-8');
 
-            header('Content-Type: application/json');
+        // Nhận JSON từ JS
+        $data = json_decode(file_get_contents("php://input"), true);
 
-            if (!$input || empty($input['details']) || empty($input['maKHSX'])) {
-                echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ hoặc danh sách rỗng.']);
-                exit;
-            }
+        // Kiểm tra dữ liệu đầu vào
+        if (!$data || !isset($data['header']) || !isset($data['details'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Dữ liệu gửi lên thiếu header hoặc details'
+            ]);
+            return;
+        }
 
-            $header = [
-                'maKHSX' => $input['maKHSX'],
-                'maSanPham' => $input['maSanPham'],
-                'ngayLam' => $input['ngayLam']
-            ];
+        require_once './app/models/GhiNhanThanhPhamModel.php';
+        $model = new GhiNhanThanhPhamModel();
 
-            $model = new GhiNhanThanhPhamModel();
+        // Gọi hàm Model (Hàm này trả về TRUE hoặc chuỗi LỖI)
+        $ketQua = $model->luuDanhSach(
+            $data['header'],
+            $data['details']
+        );
 
-            if ($model->luuDanhSach($header, $input['details'])) {
-                echo json_encode(['success' => true, 'message' => 'Lưu thành công!']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Lỗi CSDL khi lưu dữ liệu.']);
-            }
-            exit;
+        // --- ĐOẠN SỬA QUAN TRỌNG ---
+        if ($ketQua === true) {
+            // Nếu đúng là TRUE (boolean) thì mới báo thành công
+            echo json_encode([
+                'success' => true,
+                'message' => 'Lưu thành công!'
+            ]);
+        } else {
+            // Ngược lại (trả về chuỗi lỗi hoặc false) thì báo lỗi
+            // Nếu $ketQua là false (do lỗi hệ thống khác) thì báo lỗi chung
+            $msg = is_string($ketQua) ? $ketQua : 'Lỗi không xác định từ CSDL';
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Lỗi: ' . $msg
+            ]);
         }
     }
 
     public function ajaxGetSanPham()
     {
         $maKHSX = $_GET['maKHSX'] ?? 0;
+
+        require_once 'app/models/KeHoachSanXuatModel.php';
         $model = new KeHoachSanXuatModel();
 
-        $sanPham = $model->getSanPhamChinh($maKHSX);
+        $sanPham = $model->getSanPhamTheoKHSX($maKHSX);
+
+        header('Content-Type: application/json');
 
         if ($sanPham) {
-            echo json_encode([$sanPham]);
+            echo json_encode([$sanPham]); // JS cần ARRAY
         } else {
             echo json_encode([]);
         }
+        exit;
     }
+
 
     public function ajaxGetNhanVienByXuong()
     {

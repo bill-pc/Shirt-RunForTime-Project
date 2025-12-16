@@ -204,9 +204,9 @@ switch ($page) {
         $controller->xuatCSV();
         break;
 
-case 'gioithieu':
-    require_once 'app/views/gioithieu.php';
-    break;
+    case 'gioithieu':
+        require_once 'app/views/gioithieu.php';
+        break;
 
     //kho thành phẩm
     case 'nhap-kho-thanh-pham':
@@ -236,12 +236,12 @@ case 'gioithieu':
         $controller->xuat();
         break;
     case 'xuatthanhpham_chitiet':
-    require 'app/controllers/XuatThanhPhamController.php';
-    $c = new XuatThanhPhamController();
-    $c->chitiet();
-    break;
+        require 'app/controllers/XuatThanhPhamController.php';
+        $c = new XuatThanhPhamController();
+        $c->chitiet();
+        break;
 
-// ===== Thống kê sản phẩm  =====
+    // ===== Thống kê sản phẩm  =====
 
     case 'thongke':
         require_once __DIR__ . '/app/controllers/ThongKeKhoTPController.php';
@@ -273,7 +273,7 @@ case 'gioithieu':
         $controller = new NhapKhoNVLController();
         $controller->index();
         break;
-  
+
     case 'phe-duyet-ke-hoach-sx':
         require_once './app/controllers/PheDuyetKeHoachSXController.php';
         $controller = new PheDuyetKeHoachSXController();
@@ -308,10 +308,10 @@ case 'gioithieu':
         $controller->create();
         break;
     case 'lap-ke-hoach-chi-tiet':
-    require_once './app/controllers/KHSXController.php';
-    $controller = new KHSXController();
-    $controller->lapChiTiet();
-    break;
+        require_once './app/controllers/KHSXController.php';
+        $controller = new KHSXController();
+        $controller->lapChiTiet();
+        break;
     case 'ajax-tim-kiem':
         require_once './app/models/ketNoi.php';
         require_once './app/controllers/KHSXController.php';
@@ -343,20 +343,17 @@ case 'gioithieu':
             require_once './app/controllers/GhiNhanTPController.php';
             $controller = new GhiNhanThanhPhamController();
             $controller->luu();
-        } else {
-            header('Location: index.php?page=ghi-nhan-tp');
-            exit;
+            exit; // 🔥 BẮT BUỘC
         }
-        break;
-        case 'ajax-get-sp-theo-khsx':
-        require_once 'app/models/ketNoi.php';
-        require_once 'app/models/SanPhamModel.php';
-        require_once 'app/models/KeHoachSanXuatModel.php';
-        require_once 'app/controllers/GhiNhanTPController.php';
+        header('Location: index.php?page=ghi-nhan-tp');
+        exit;
 
+    case 'ajax-get-sp-theo-khsx':
+        require_once './app/controllers/GhiNhanTPController.php';
         $controller = new GhiNhanThanhPhamController();
         $controller->ajaxGetSanPham();
-        break;
+        exit;
+
     case 'ajax-get-nv-theo-xuong':
         require_once 'app/models/ketNoi.php';
         require_once 'app/models/XuongModel.php';
@@ -396,7 +393,7 @@ case 'gioithieu':
         $controller = new TaoDonHangSanXuatController();
         $controller->index();
         break;
-        // Cập nhật thành phẩm
+    // Cập nhật thành phẩm
     case 'cap-nhat-thanh-pham':
         require_once 'app/controllers/QCController.php';
         $controller = new QCController();
@@ -409,30 +406,30 @@ case 'gioithieu':
         $controller->update();
         break;
     // case 'bao-cao-chat-luong':
-      case 'baocao-chatluong':
-    require_once 'app/controllers/BaoCaoChatLuongController.php';
-    $controller = new BaoCaoChatLuongController();
-    $controller->index();
-    break;
+    case 'baocao-chatluong':
+        require_once 'app/controllers/BaoCaoChatLuongController.php';
+        $controller = new BaoCaoChatLuongController();
+        $controller->index();
+        break;
 
-case 'baocao-get': 
-    require_once 'app/controllers/BaoCaoChatLuongController.php';
-    $controller = new BaoCaoChatLuongController();
-    $controller->getDetail();
-    break;
+    case 'baocao-get':
+        require_once 'app/controllers/BaoCaoChatLuongController.php';
+        $controller = new BaoCaoChatLuongController();
+        $controller->getDetail();
+        break;
 
-case 'baocao-export':
-    require_once 'app/controllers/BaoCaoChatLuongController.php';
-    $controller = new BaoCaoChatLuongController();
-    $controller->export();
-    break;
+    case 'baocao-export':
+        require_once 'app/controllers/BaoCaoChatLuongController.php';
+        $controller = new BaoCaoChatLuongController();
+        $controller->export();
+        break;
 
 
 
     //     break;
     case 'luu-don-hang-san-xuat':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once 'app/controllers/TaoDonHangSanXuatController.php'; 
+            require_once 'app/controllers/TaoDonHangSanXuatController.php';
             $controller = new TaoDonHangSanXuatController();
             $controller->luu();
         } else {
@@ -456,7 +453,7 @@ case 'baocao-export':
         require_once './app/controllers/YeuCauNhapKhoController.php';
         (new YeuCauNhapKhoController())->luuPhieu();
         break;
-   case 'nhap-kho-nvl':
+    case 'nhap-kho-nvl':
         require_once './app/controllers/NhapKhoNVLController.php';
         $controller = new NhapKhoNVLController();
         $controller->index();
@@ -500,14 +497,37 @@ case 'baocao-export':
         $controller->ajaxGetApprovalHistory();
         break;
 
+    case 'duyet-yc-nhap-kho':
+        require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
+        $controller = new PheDuyetYeuCauNhapKhoController();
+        $controller->approve();
+        break;
+
+    case 'tu-choi-yc-nhap-kho':
+        require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
+        $controller = new PheDuyetYeuCauNhapKhoController();
+        $controller->reject();
+        break;
+
+    case 'chi-tiet-yc-nhap-kho':
+        require_once './app/controllers/PheDuyetYeuCauNhapKhoController.php';
+        $controller = new PheDuyetYeuCauNhapKhoController();
+        $controller->getDetails();
+        break;
 
     default:
         // --- Xử lý trang giới thiệu: gioi-thieu-xxx ---
         if (strpos($page, 'gioi-thieu-') === 0) {
             $danhMucKey = substr($page, strlen('gioi-thieu-'));
             $allowedCategories = [
-                'tong-quan', 'nhan-su', 'san-xuat', 'kho-nvl',
-                'xuong', 'kiem-tra-chat-luong', 'kho-thanh-pham', 'cong-nhan'
+                'tong-quan',
+                'nhan-su',
+                'san-xuat',
+                'kho-nvl',
+                'xuong',
+                'kiem-tra-chat-luong',
+                'kho-thanh-pham',
+                'cong-nhan'
             ];
 
             if (in_array($danhMucKey, $allowedCategories)) {
@@ -523,7 +543,7 @@ case 'baocao-export':
                 http_response_code(404);
                 echo "<h2>⚠️ Danh mục giới thiệu không hợp lệ.</h2>";
             }
-        } 
+        }
         // --- Hoặc thử load view đơn giản ---
         else {
             $filePath = "app/views/{$page}.php";
