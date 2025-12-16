@@ -1344,7 +1344,7 @@ FROM chitietphieuyeucaukiemtrachatluong ct;
 ALTER TABLE chitietphieuyeucaukiemtrachatluong
 ADD CONSTRAINT chk_soLuongKiemTra CHECK (soLuongDat + soLuongHong <= soLuong);
 
-REATE TABLE `nhapkhotp` (
+CREATE TABLE `nhapkhotp` (
   `maPhieu` int(11) NOT NULL,
   `maYC` int(11) NOT NULL,
   `ngayKiemTra` date NOT NULL,
