@@ -38,12 +38,13 @@ class NhapKhoTP_DaCheckQCModel {
                     ORDER BY p.maYC DESC";
             
             $result = $this->conn->query($sql);
-            
+
             if (!$result) {
-                error_log("Lỗi truy vấn danh sách phiếu QC: " . $this->conn->error);
+                // Ghi chi tiết SQL và lỗi để debug
+                error_log("Lỗi truy vấn danh sách phiếu QC. SQL: " . $sql . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
-            
+
             return $result->fetch_all(MYSQLI_ASSOC);
         } catch (Exception $e) {
             error_log("Lỗi getDanhSachPhieuQCDaDat: " . $e->getMessage());
@@ -89,16 +90,18 @@ class NhapKhoTP_DaCheckQCModel {
                     LIMIT 1";
             
             $stmt = $this->conn->prepare($sql);
-            
+
             if (!$stmt) {
-                error_log("Lỗi chuẩn bị truy vấn chi tiết phiếu QC: " . $this->conn->error);
+                // Ghi chi tiết SQL để debug
+                error_log("Lỗi chuẩn bị truy vấn chi tiết phiếu QC. SQL: " . $sql . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
 
             $stmt->bind_param("i", $maYC);
-            
+
             if (!$stmt->execute()) {
-                error_log("Lỗi thực thi truy vấn chi tiết phiếu QC: " . $stmt->error);
+                // Ghi lỗi thực thi cùng SQL và params
+                error_log("Lỗi thực thi truy vấn chi tiết phiếu QC. SQL: " . $sql . " | Params: maYC=" . $maYC . " | Error: " . $stmt->error);
                 $stmt->close();
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
@@ -149,10 +152,15 @@ class NhapKhoTP_DaCheckQCModel {
             
             $checkStmt = $this->conn->prepare($checkSql);
             if (!$checkStmt) {
+                error_log("Lỗi chuẩn bị truy vấn check phiếu. SQL: " . $checkSql . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
             $checkStmt->bind_param("i", $maYC);
-            $checkStmt->execute();
+            if (!$checkStmt->execute()) {
+                error_log("Lỗi thực thi truy vấn check phiếu. SQL: " . $checkSql . " | Params: maYC=" . $maYC . " | Error: " . $checkStmt->error);
+                $checkStmt->close();
+                throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
+            }
             $checkResult = $checkStmt->get_result();
             $phieuData = $checkResult->fetch_assoc();
             
@@ -173,13 +181,14 @@ class NhapKhoTP_DaCheckQCModel {
             
             $stmtNhapKho = $this->conn->prepare($sqlNhapKho);
             if (!$stmtNhapKho) {
+                error_log("Lỗi chuẩn bị truy vấn tạo nhapkhotp. SQL: " . $sqlNhapKho . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
-            
+
             $stmtNhapKho->bind_param("isss", $maYC, $ngayKiemTra, $tenNguoiLapPhieu, $hanhDong);
-            
+
             if (!$stmtNhapKho->execute()) {
-                $errorMsg = "Lỗi tạo phiếu nhập kho: " . $stmtNhapKho->error;
+                $errorMsg = "Lỗi tạo phiếu nhập kho. SQL: " . $sqlNhapKho . " | Params: maYC=" . $maYC . ", ngayKiemTra=" . $ngayKiemTra . ", nguoiLap=" . $tenNguoiLapPhieu . " | Error: " . $stmtNhapKho->error;
                 error_log($errorMsg);
                 throw new Exception("Lỗi tạo phiếu nhập kho. Vui lòng thử lại sau.");
             }
@@ -193,13 +202,14 @@ class NhapKhoTP_DaCheckQCModel {
             
             $stmtChiTiet = $this->conn->prepare($sqlChiTiet);
             if (!$stmtChiTiet) {
+                error_log("Lỗi chuẩn bị truy vấn chitiet_nhapkhotp. SQL: " . $sqlChiTiet . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
-            
+
             $stmtChiTiet->bind_param("iisis", $maPhieuNhapKho, $maSanPham, $tenSanPham, $soLuong, $hanhDong);
-            
+
             if (!$stmtChiTiet->execute()) {
-                $errorMsg = "Lỗi tạo chi tiết nhập kho: " . $stmtChiTiet->error;
+                $errorMsg = "Lỗi tạo chi tiết nhập kho. SQL: " . $sqlChiTiet . " | Params: maPhieu=" . $maPhieuNhapKho . ", maSanPham=" . $maSanPham . ", soLuong=" . $soLuong . " | Error: " . $stmtChiTiet->error;
                 error_log($errorMsg);
                 throw new Exception("Lỗi tạo chi tiết nhập kho. Vui lòng thử lại sau.");
             }
@@ -212,14 +222,16 @@ class NhapKhoTP_DaCheckQCModel {
                            WHERE maSanPham = ?";
             
             $stmtUpdateKho = $this->conn->prepare($sqlUpdateKho);
-            
+
             if (!$stmtUpdateKho) {
+                error_log("Lỗi chuẩn bị truy vấn cập nhật kho. SQL: " . $sqlUpdateKho . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
 
             $stmtUpdateKho->bind_param("ii", $soLuong, $maSanPham);
-            
+
             if (!$stmtUpdateKho->execute()) {
+                error_log("Lỗi cập nhật kho. SQL: " . $sqlUpdateKho . " | Params: soLuong=" . $soLuong . ", maSanPham=" . $maSanPham . " | Error: " . $stmtUpdateKho->error);
                 throw new Exception("Lỗi cập nhật kho. Vui lòng thử lại sau.");
             }
             
@@ -231,14 +243,16 @@ class NhapKhoTP_DaCheckQCModel {
                                   WHERE maYC = ?";
             
             $stmtUpdateTrangThai = $this->conn->prepare($sqlUpdateTrangThai);
-            
+
             if (!$stmtUpdateTrangThai) {
+                error_log("Lỗi chuẩn bị truy vấn cập nhật trạng thái phiếu. SQL: " . $sqlUpdateTrangThai . " | Error: " . $this->conn->error);
                 throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
             }
-            
+
             $stmtUpdateTrangThai->bind_param("i", $maYC);
-            
+
             if (!$stmtUpdateTrangThai->execute()) {
+                error_log("Lỗi cập nhật trạng thái phiếu. SQL: " . $sqlUpdateTrangThai . " | Params: maYC=" . $maYC . " | Error: " . $stmtUpdateTrangThai->error);
                 throw new Exception("Lỗi cập nhật trạng thái phiếu. Vui lòng thử lại sau.");
             }
             

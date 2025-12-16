@@ -1343,6 +1343,25 @@ FROM chitietphieuyeucaukiemtrachatluong ct;
 -- Thêm ràng buộc kiểm tra (optional): Tổng đạt + hỏng không vượt quá số lượng cần kiểm tra
 ALTER TABLE chitietphieuyeucaukiemtrachatluong
 ADD CONSTRAINT chk_soLuongKiemTra CHECK (soLuongDat + soLuongHong <= soLuong);
+
+REATE TABLE `nhapkhotp` (
+  `maPhieu` int(11) NOT NULL,
+  `maYC` int(11) NOT NULL,
+  `ngayKiemTra` date NOT NULL,
+  `nguoiLap` varchar(100) NOT NULL,
+  `hanhDong` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `nhapkhotp`
+--
+
+INSERT INTO `nhapkhotp` (`maPhieu`, `maYC`, `ngayKiemTra`, `nguoiLap`, `hanhDong`) VALUES
+(1, 4, '2025-12-07', 'Trần Kiến Quốc', 'Nhập kho sau QC đạt'),
+(2, 8, '2025-12-08', 'Trần Kiến Quốc', 'Nhập kho sau QC đạt'),
+(3, 10, '2025-12-13', 'Trần Kiến Quốc', 'Nhập kho thành phẩm sau khi kiểm tra chất lượng'),
+(4, 11, '2025-12-14', 'TranKienQuoc', 'Nhập kho thành phẩm sau khi kiểm tra chất lượng');
+
 CREATE TABLE `chitiet_nhapkhotp` (
   `maCTNKTP` int(11) NOT NULL,
   `maPhieu` int(11) NOT NULL,

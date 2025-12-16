@@ -26,7 +26,9 @@ class KetNoi {
 
         // Kiểm tra lỗi kết nối
         if ($this->conn->connect_error) {
-            die("❌ Kết nối thất bại: " . $this->conn->connect_error);
+            // Ghi log và ném exception để lớp gọi (controller/model) có thể bắt và xử lý
+            error_log("Kết nối DB thất bại: " . $this->conn->connect_error);
+            throw new Exception("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
         }
 
         // Thiết lập UTF-8 để lưu tiếng Việt
