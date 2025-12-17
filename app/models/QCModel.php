@@ -14,15 +14,19 @@ class QCModel
     public function getDanhSachCanKiemTra()
     {
         $sql = "SELECT 
-                    p.maYC, 
-                    ct.tenSanPham, 
-                    ct.soLuong AS tongSoLuong, 
-                    p.tenNguoiLap, 
-                    p.trangThai
-                FROM phieuyeucaukiemtrachatluong p
-                JOIN chitietphieuyeucaukiemtrachatluong ct ON p.maYC = ct.maYC
-                WHERE p.trangThai IN ('Chờ kiểm tra', 'Đã duyệt')
-                ORDER BY p.maYC DESC";
+                p.maYC, 
+                ct.tenSanPham, 
+                ct.soLuong AS tongSoLuong, 
+                p.tenNguoiLap, 
+                p.trangThai
+            FROM phieuyeucaukiemtrachatluong p
+            JOIN chitietphieuyeucaukiemtrachatluong ct 
+                ON p.maYC = ct.maYC
+            WHERE 
+                p.trangThai IN ('Chờ kiểm tra', 'Đã duyệt')
+                AND (ct.trangThaiSanPham IS NULL 
+                     OR ct.trangThaiSanPham <> 'Đã kiểm tra')
+            ORDER BY p.maYC DESC";
 
         $result = $this->conn->query($sql);
 
@@ -54,7 +58,8 @@ class QCModel
                        WHERE maYC = ?";
 
         $stmt1 = $this->conn->prepare($sqlChiTiet);
-        if (!$stmt1) return false;
+        if (!$stmt1)
+            return false;
         $stmt1->bind_param("iisi", $slDat, $slHong, $ghiChu, $maYC);
         $kqChiTiet = $stmt1->execute();
 

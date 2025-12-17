@@ -11,14 +11,16 @@ class YeuCauKiemTraChatLuongModel {
     // 🔹 Lấy danh sách kế hoạch từ đơn hàng "Hoàn thành" (chưa có phiếu KTCL)
     // Thời hạn kiểm tra = ngayGiao của đơn hàng + 3 ngày
     public function getApprovedPlans() {
-        $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianBatDau, kh.thoiGianKetThuc,
+        // Lấy kế hoạch dựa trên trạng thái của chính kehoachsanxuat = 'Hoàn thành'
+        // Thời hạn kiểm tra mặc định = thoiGianKetThuc (kế hoạch) + 3 ngày
+        $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianBatDau, kh.thoiGianKetThuc AS ngayKetThuc,
                        sp.maSanPham, sp.tenSanPham, dh.soLuongSanXuat, dh.tenDonHang,
-                       dh.ngayGiao, dh.trangThai,
-                       DATE_ADD(dh.ngayGiao, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
+                       kh.trangThai AS trangThaiKHSX,
+                       DATE_ADD(kh.thoiGianKetThuc, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
                 FROM kehoachsanxuat kh
                 JOIN donhangsanxuat dh ON kh.maDonHang = dh.maDonHang
                 JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
-                WHERE dh.trangThai = 'Hoàn thành'
+                WHERE kh.trangThai = 'Hoàn thành'
                   AND kh.maKHSX NOT IN (
                       SELECT DISTINCT maKHSX
                       FROM phieuyeucaukiemtrachatluong
@@ -33,14 +35,17 @@ class YeuCauKiemTraChatLuongModel {
     // 🔹 Lấy thông tin sản phẩm từ kế hoạch sản xuất
     // Thời hạn kiểm tra = ngayGiao của đơn hàng + 3 ngày
     public function getProductByPlan($maKHSX) {
-        $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianKetThuc,
+        // Trả về thông tin sản phẩm + ngày kết thúc kế hoạch (ngayKetThuc)
+        // và thời hạn kiểm tra mặc định = ngayKetThuc + 3 ngày
+        $sql = "SELECT kh.maKHSX, kh.tenKHSX, kh.thoiGianKetThuc AS ngayKetThuc,
                        sp.maSanPham, sp.tenSanPham, sp.donVi,
-                       dh.soLuongSanXuat, dh.tenDonHang, dh.ngayGiao, dh.trangThai,
-                       DATE_ADD(dh.ngayGiao, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
+                       dh.soLuongSanXuat, dh.tenDonHang,
+                       kh.trangThai AS trangThaiKHSX,
+                       DATE_ADD(kh.thoiGianKetThuc, INTERVAL 3 DAY) as thoiHanKiemTraMacDinh
                 FROM kehoachsanxuat kh
                 JOIN donhangsanxuat dh ON kh.maDonHang = dh.maDonHang
                 JOIN san_pham sp ON dh.maSanPham = sp.maSanPham
-                WHERE kh.maKHSX = ? AND dh.trangThai = 'Hoàn thành'";
+                WHERE kh.maKHSX = ? AND kh.trangThai = 'Hoàn thành'";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $maKHSX);
         $stmt->execute();

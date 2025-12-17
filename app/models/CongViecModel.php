@@ -52,28 +52,22 @@ class CongViecModel {
 
     // ✅ Lấy danh sách công việc theo kế hoạch
     public function getTasksByPlanId($maKHSX) {
-        $sql = "SELECT 
-                    cv.tieuDe,
-                    cv.moTa,
-                    x.tenXuong,
-                    cv.trangThai,
-                    cv.ngayHetHan
-                FROM congviec cv
-                JOIN kehoachsanxuat ct ON cv.maKHSX = ct.maKHSX
-                JOIN xuong x ON cv.maXuong = x.maXuong
-                WHERE ct.maKHSX = ?";
+    $sql = "SELECT 
+                ct.tenNVL AS tieuDe,
+                ct.loaiNVL AS moTa,
+                x.tenXuong,
+                ct.soLuongNVL
+            FROM chitietkehoachsanxuat ct
+            JOIN xuong x ON ct.maXuong = x.maXuong
+            WHERE ct.maKHSX = ?
+            ORDER BY ct.maCTKHSX ASC";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $maKHSX);
-        $stmt->execute();
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("i", $maKHSX);
+    $stmt->execute();
 
-        $result = $stmt->get_result();
-        $tasks = [];
-        while ($row = $result->fetch_assoc()) {
-            $tasks[] = $row;
-        }
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
 
-        return $tasks;
-    }
 }
 ?>

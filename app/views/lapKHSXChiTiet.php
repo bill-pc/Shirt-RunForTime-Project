@@ -63,7 +63,7 @@ if (isset($danhSachNVL) && is_array($danhSachNVL)) {
             </div>
 
             <div class="xuong-block cut">
-                <h3 class="xuong-heading">XƯỞNG CẮT ✂️</h3>
+                <h3 class="xuong-heading">XƯỞNG CẮT</h3>
                 <div class="xuong-body">
                     <div class="row">
                         <label class="field-label">KPI (Sản Phẩm / Ngày)</label>
@@ -129,7 +129,7 @@ if (isset($danhSachNVL) && is_array($danhSachNVL)) {
             </div>
 
             <div class="xuong-block sew">
-                <h3 class="xuong-heading">XƯỞNG MAY 👕</h3>
+                <h3 class="xuong-heading">XƯỞNG MAY</h3>
                 <div class="xuong-body">
                     <div class="row">
                         <label class="field-label">KPI (Sản Phẩm / Ngày)</label>

@@ -39,20 +39,20 @@ class YeuCauKiemTraChatLuongController {
         $product = $model->getProductByPlan($maKHSX);
 
         if (!$product) {
-            echo "<script>alert('❌ Không tìm thấy thông tin sản phẩm!');history.back();</script>";
+            echo "<script>alert('❌ Không tìm thấy thông tin sản phẩm hoặc kế hoạch chưa Hoàn thành!');history.back();</script>";
             exit;
         }
 
-        // Validate: Thời hạn phải >= ngayGiao của đơn hàng (không cho phép chọn trước ngày giao)
-        if (isset($product['ngayGiao']) && $thoiHanHoanThanh < $product['ngayGiao']) {
-            echo "<script>alert('❌ Thời hạn kiểm tra không được trước ngày giao dự kiến ({$product['ngayGiao']})!');history.back();</script>";
+        // Validate: Thời hạn phải >= ngayKetThuc của kế hoạch (không cho phép chọn trước ngày kết thúc kế hoạch)
+        if (isset($product['ngayKetThuc']) && $thoiHanHoanThanh < $product['ngayKetThuc']) {
+            echo "<script>alert('❌ Thời hạn kiểm tra không được trước ngày kết thúc kế hoạch ({$product['ngayKetThuc']})!');history.back();</script>";
             exit;
         }
         
-        // Validate: Thời hạn không được vượt quá 3 ngày từ ngayGiao
-        $maxDate = date('Y-m-d', strtotime($product['ngayGiao'] . ' +3 days'));
+        // Validate: Thời hạn không được vượt quá 3 ngày từ ngayKetThuc
+        $maxDate = date('Y-m-d', strtotime($product['ngayKetThuc'] . ' +3 days'));
         if ($thoiHanHoanThanh > $maxDate) {
-            echo "<script>alert('❌ Thời hạn kiểm tra tối đa là {$maxDate} (Ngày giao + 3 ngày)!');history.back();</script>";
+            echo "<script>alert('❌ Thời hạn kiểm tra tối đa là {$maxDate} (Ngày kết thúc kế hoạch + 3 ngày)!');history.back();</script>";
             exit;
         }
 

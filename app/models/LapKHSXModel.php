@@ -245,14 +245,16 @@ class LapKHSXModel
         $sql = "
         SELECT dh.*
         FROM donhangsanxuat dh
-        WHERE dh.maDonHang NOT IN (
-            SELECT maDonHang FROM kehoachsanxuat
-        )
+        WHERE dh.trangThai = 'Đang thực hiện'
+          AND dh.maDonHang NOT IN (
+              SELECT maDonHang FROM kehoachsanxuat
+          )
         ORDER BY dh.ngayGiao ASC
     ";
 
         $result = $this->conn->query($sql);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
+
 
 }

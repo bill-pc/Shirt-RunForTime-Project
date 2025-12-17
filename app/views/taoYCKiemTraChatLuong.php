@@ -37,10 +37,10 @@ require_once __DIR__ . '/layouts/nav.php';
         </div>
 
         <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px; flex-wrap:wrap;">
-          <label for="thoiHanHoanThanh" style="font-weight:600; min-width:250px;">⏰ Hạn kiểm tra (tối đa +3 ngày):</label>
+          <label for="thoiHanHoanThanh" style="font-weight:600; min-width:250px;">⏰ Hạn kiểm tra tối đa :</label>
           <input type="date" name="thoiHanHoanThanh" id="thoiHanHoanThanh" required
                  style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; min-width:200px;">
-          <span style="color:#666; font-size:14px;">📅 Tính từ ngày giao dự kiến + tối đa 3 ngày</span>
+          <span style="color:#666; font-size:14px;">📅 Tính từ ngày giao dự kiến </span>
         </div>
 
         <button type="submit" id="btnCreate" disabled
@@ -111,27 +111,27 @@ function loadProductInfo() {
   
   // Debug: Kiểm tra dữ liệu nhận được
   console.log('📊 Data từ dropdown:', data);
-  console.log('📅 ngayGiao:', data.ngayGiao);
+  console.log('📅 ngayKetThuc (kế hoạch):', data.ngayKetThuc);
   console.log('⏰ thoiHanKiemTraMacDinh:', data.thoiHanKiemTraMacDinh);
   
-  // Set giá trị mặc định = ngayGiao + 3 ngày
+  // Set giá trị mặc định = ngayKetThuc (kết thúc kế hoạch) + 3 ngày
   if (data.thoiHanKiemTraMacDinh) {
     thoiHanInput.value = data.thoiHanKiemTraMacDinh;
     console.log('✅ Đã set thời hạn từ DB:', data.thoiHanKiemTraMacDinh);
-  } else if (data.ngayGiao) {
-    const calculatedDate = getDateAfterDays(data.ngayGiao, 3);
+  } else if (data.ngayKetThuc) {
+    const calculatedDate = getDateAfterDays(data.ngayKetThuc, 3);
     thoiHanInput.value = calculatedDate;
-    console.log('✅ Đã tính thời hạn:', data.ngayGiao, '+ 3 ngày =', calculatedDate);
+    console.log('✅ Đã tính thời hạn:', data.ngayKetThuc, '+ 3 ngày =', calculatedDate);
   }
-  
-  // Set min date = ngayGiao (không cho chọn trước ngày giao)
-  if (data.ngayGiao) {
-    thoiHanInput.min = data.ngayGiao;
+
+  // Set min date = ngayKetThuc (không cho chọn trước ngày kết thúc kế hoạch)
+  if (data.ngayKetThuc) {
+    thoiHanInput.min = data.ngayKetThuc;
   }
-  
-  // Set max date = ngayGiao + 3 ngày (tối đa)
-  if (data.ngayGiao) {
-    thoiHanInput.max = getDateAfterDays(data.ngayGiao, 3);
+
+  // Set max date = ngayKetThuc + 3 ngày (tối đa)
+  if (data.ngayKetThuc) {
+    thoiHanInput.max = getDateAfterDays(data.ngayKetThuc, 3);
   }
   
   productInfo.innerHTML = `
@@ -152,8 +152,8 @@ function loadProductInfo() {
       <div class="info-value"><strong style="color:#d00; font-size:18px;">${data.soLuongSanXuat}</strong> cái</div>
     </div>
     <div class="info-row">
-      <div class="info-label">📦 Ngày giao dự kiến:</div>
-      <div class="info-value"><strong>${data.ngayGiao || 'N/A'}</strong> <span style="color:#666; font-size:13px; margin-left:5px;">→ Hạn kiểm tra tối đa: ${data.thoiHanKiemTraMacDinh || (data.ngayGiao ? getDateAfterDays(data.ngayGiao, 3) : 'N/A')}</span></div>
+      <div class="info-label">📦 Ngày kết thúc kế hoạch:</div>
+      <div class="info-value"><strong>${data.ngayKetThuc || 'N/A'}</strong> <span style="color:#666; font-size:13px; margin-left:5px;">→ Hạn kiểm tra tối đa: ${data.thoiHanKiemTraMacDinh || (data.ngayKetThuc ? getDateAfterDays(data.ngayKetThuc, 3) : 'N/A')}</span></div>
     </div>
   `;
   

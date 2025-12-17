@@ -138,10 +138,15 @@ async function selectPlan(el, maKHSX) {
 
     if (data.nguyenVatLieu && data.nguyenVatLieu.length > 0) {
       data.nguyenVatLieu.forEach(m => {
+        // Only show the "(loaiNVL)" part when loaiNVL is not empty and not the string/number '0'
+        const loaiStr = (m.loaiNVL !== null && m.loaiNVL !== undefined && String(m.loaiNVL).trim() !== '' && String(m.loaiNVL) !== '0')
+          ? ` (${m.loaiNVL})`
+          : '';
+
         tbody.innerHTML += `
           <tr>
             <td>${m.maNVL}</td>
-            <td>${m.tenNVL} (${m.loaiNVL || ''})</td>
+            <td>${m.tenNVL}${loaiStr}</td>
             <td style="font-weight: 600; color: #142850;">${m.tenXuong || '—'}</td>
             <td>${m.donViTinh || ''}</td>
             <td>${m.soLuongCan}</td>

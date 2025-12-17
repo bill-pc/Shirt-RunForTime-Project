@@ -11,39 +11,48 @@ class ThongKeKhoTPModel {
 
     public function thongKe($search = "") {
 
-    $sql = "
-        SELECT 
-            sp.maSanPham,
-            sp.tenSanPham,
-            sp.donVi,
+        $sql = "
+            SELECT 
+                sp.maSanPham,
+                sp.tenSanPham,
+                sp.donVi,
 
-            sp.soLuongTon AS tongSL,   -- TỔNG SL LẤY TỪ soLuongTon
+                -- TỔNG NHẬP: lấy từ chitiet_nhapkhotp.soLuong
+                COALESCE(nk.tongNhap, 0) AS tongNhap,
 
-            COALESCE(px.tongXuat, 0) AS tongXuat,   -- TỔNG XUẤT
+                -- TỔNG XUẤT
+                COALESCE(px.tongXuat, 0) AS tongXuat,
 
-            (sp.soLuongTon - COALESCE(px.tongXuat, 0)) AS tonKho   -- TỒN = TỔNG SL - TỔNG XUẤT
+                -- TỒN KHO THỰC TẾ
+                sp.soLuongTon AS tonKho
 
-        FROM san_pham sp
+            FROM san_pham sp
 
-        LEFT JOIN (
-            SELECT maSanPham, SUM(soLuongXuat) AS tongXuat
-            FROM phieuxuatthanhpham
-            GROUP BY maSanPham
-        ) px ON sp.maSanPham = px.maSanPham
+            -- JOIN TỔNG NHẬP
+            LEFT JOIN (
+                SELECT maSanPham, SUM(soLuong) AS tongNhap
+                FROM chitiet_nhapkhotp
+                GROUP BY maSanPham
+            ) nk ON sp.maSanPham = nk.maSanPham
 
-        WHERE sp.tenSanPham LIKE ?
-        ORDER BY sp.maSanPham ASC
-    ";
+            -- JOIN TỔNG XUẤT
+            LEFT JOIN (
+                SELECT maSanPham, SUM(soLuongXuat) AS tongXuat
+                FROM phieuxuatthanhpham
+                GROUP BY maSanPham
+            ) px ON sp.maSanPham = px.maSanPham
 
-    $stmt = $this->conn->prepare($sql);
-    $like = "%".$search."%";
-    $stmt->bind_param("s", $like);
-    $stmt->execute();
+            WHERE sp.tenSanPham LIKE ?
+            ORDER BY sp.maSanPham ASC
+        ";
 
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-}
+        $stmt = $this->conn->prepare($sql);
+        $like = "%".$search."%";
+        $stmt->bind_param("s", $like);
+        $stmt->execute();
 
-
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
 
     public function exportCSV($search = "") {
         $data = $this->thongKe($search);
@@ -51,24 +60,23 @@ class ThongKeKhoTPModel {
         header("Content-Type: text/csv; charset=UTF-8");
         header("Content-Disposition: attachment; filename=ThongKeKhoTP_" . date("Ymd_His") . ".csv");
 
-        echo chr(0xEF).chr(0xBB).chr(0xBF); // BOM UTF-8
+        // BOM UTF-8 cho Excel
+        echo chr(0xEF).chr(0xBB).chr(0xBF);
 
         $fp = fopen("php://output", "w");
 
-        fputcsv($fp, ['Mã SP', 'Tên SP', 'Đơn vị', 'Tổng SL', 'Tổng xuất', 'Tồn Kho']);
+        fputcsv($fp, ['Mã SP', 'Tên SP', 'Đơn vị', 'Tổng nhập', 'Tổng xuất', 'Tồn kho']);
 
-foreach ($data as $row) {
-    fputcsv($fp, [
-        $row['maSanPham'],
-        $row['tenSanPham'],
-        $row['donVi'],
-        $row['tongSL'],
-        $row['tongXuat'],
-        $row['tonKho']
-    ]);
-}
-
-
+        foreach ($data as $row) {
+            fputcsv($fp, [
+                $row['maSanPham'],
+                $row['tenSanPham'],
+                $row['donVi'],
+                $row['tongNhap'],
+                $row['tongXuat'],
+                $row['tonKho']
+            ]);
+        }
 
         fclose($fp);
         exit;
