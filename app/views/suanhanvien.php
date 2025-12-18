@@ -205,7 +205,9 @@ require_once 'app/views/layouts/nav.php';
                     <tr>
                         <th>Mã NV</th>
                         <th>Họ tên</th>
-                        <th>Chức vụ</th>
+                        <th>Giới Tính</th>
+                        <th>Ngày Sính</th>
+                        <!-- <th>Chức vụ</th> -->
                         <th>Phòng ban</th>
                         <th>Địa chỉ</th>
                         <th>Email</th>
@@ -218,7 +220,9 @@ require_once 'app/views/layouts/nav.php';
                     <tr>
                         <td><?= htmlspecialchars($nv['maND']) ?></td>
                         <td><?= htmlspecialchars($nv['hoTen']) ?></td>
-                        <td><?= htmlspecialchars($nv['chucVu']) ?></td>
+                        <td><?= htmlspecialchars($nv['gioiTinh']) ?></td>
+                        <td><?= htmlspecialchars($nv['ngaySinh']) ?></td>
+                        <!-- <td><?= htmlspecialchars($nv['chucVu']) ?></td> -->
                         <td><?= htmlspecialchars($nv['phongBan']) ?></td>
                         <td><?= htmlspecialchars($nv['diaChi']) ?></td>
                         <td><?= htmlspecialchars($nv['email']) ?></td>
@@ -322,6 +326,8 @@ function renderTable(data) {
         <tr>
             <td>${nv.maND}</td>
             <td>${nv.hoTen}</td>
+            <td>${nv.gioiTinh}</td>
+            <td>${nv.ngaySinh}</td>
             <td>${nv.chucVu}</td>
             <td>${nv.phongBan}</td>
             <td>${nv.diaChi}</td>

@@ -15,6 +15,12 @@ require_once 'app/views/layouts/nav.php';
                 <label>Họ tên</label>
                 <input type="text" value="<?= htmlspecialchars($nhanvien['hoTen']) ?>" readonly>
 
+                <label>Giới Tính</label>
+                <input type="text" value="<?= htmlspecialchars($nhanvien['gioiTinh']) ?>" readonly>
+
+                <label>Ngày Sinh</label>
+                <input type="text" value="<?= htmlspecialchars($nhanvien['ngaySinh']) ?>" readonly>
+
                 <label>Chức vụ</label>
                 <input type="text" value="<?= htmlspecialchars($nhanvien['chucVu']) ?>" readonly>
 

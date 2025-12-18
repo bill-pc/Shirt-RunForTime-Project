@@ -13,31 +13,45 @@ class NhanVienModel {
      * 🟢 Thêm nhân viên mới vào bảng nguoidung
      */
     public function insert($data) {
-        $sql = "INSERT INTO nguoidung (hoTen, chucVu, soDienThoai, email, diaChi, maTK)
-                VALUES (?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO nguoidung 
+            (hoTen, gioiTinh, ngaySinh, phongBan, soDienThoai, email, diaChi, maTK)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        $stmt = $this->conn->prepare($sql);
-        if (!$stmt) {
-            die("❌ Lỗi prepare: " . $this->conn->error);
-        }
-
-        $hoTen = trim($data['hoTen'] ?? '');
-        $chucVu = trim($data['chucVu'] ?? '');
-        $soDienThoai = trim($data['soDienThoai'] ?? '');
-        $email = trim($data['email'] ?? '');
-        $diaChi = trim($data['diaChi'] ?? '');
-        $maTK = (int)($data['maTK'] ?? 1);
-
-        $stmt->bind_param("sssssi", $hoTen, $chucVu, $soDienThoai, $email, $diaChi, $maTK);
-        $result = $stmt->execute();
-
-        if (!$result) {
-            error_log("❌ Lỗi khi thêm nhân viên: " . $stmt->error);
-        }
-
-        $stmt->close();
-        return $result;
+    $stmt = $this->conn->prepare($sql);
+    if (!$stmt) {
+        die("❌ Lỗi prepare: " . $this->conn->error);
     }
+
+    $hoTen = trim($data['hoTen'] ?? '');
+    $gioiTinh = trim($data['gioiTinh'] ?? '');
+    $ngaySinh = trim($data['ngaySinh'] ?? '');
+    $phongBan = trim($data['phongBan'] ?? '');
+    $soDienThoai = trim($data['soDienThoai'] ?? '');
+    $email = trim($data['email'] ?? '');
+    $diaChi = trim($data['diaChi'] ?? '');
+    $maTK = (int)($data['maTK'] ?? 1);
+
+    $stmt->bind_param(
+        "sssssssi",
+        $hoTen,
+        $gioiTinh,
+        $ngaySinh,
+        $phongBan,
+        $soDienThoai,
+        $email,
+        $diaChi,
+        $maTK
+    );
+
+    $result = $stmt->execute();
+    if (!$result) {
+        error_log("❌ Lỗi execute: " . $stmt->error);
+    }
+
+    $stmt->close();
+    return $result;
+}
+
 
     /**
      * 🟡 Kiểm tra trùng email hoặc số điện thoại

@@ -14,8 +14,18 @@ require_once 'app/views/layouts/nav.php';
                 <label>Họ tên</label>
                 <input type="text" name="hoTen" value="<?= htmlspecialchars($nhanvien['hoTen']) ?>">
 
-                <label>Chức vụ</label>
-                <input type="text" name="chucVu" value="<?= htmlspecialchars($nhanvien['chucVu']) ?>">
+                <label>Giới Tính</label>
+<select name="gioiTinh">
+    <option value="Nam" <?= $nhanvien['gioiTinh']=='Nam'?'selected':'' ?>>Nam</option>
+    <option value="Nữ" <?= $nhanvien['gioiTinh']=='Nữ'?'selected':'' ?>>Nữ</option>
+</select>
+                <label>Ngày sinh</label>
+<input type="date" name="ngaySinh"
+       value="<?= htmlspecialchars($nhanvien['ngaySinh']) ?>">
+
+
+                <!-- <label>Chức vụ</label>
+                <input type="text" name="chucVu" value="<?= htmlspecialchars($nhanvien['chucVu']) ?>"> -->
 
                 <label>Phòng ban</label>
                 <input type="text" name="phongBan" value="<?= htmlspecialchars($nhanvien['phongBan']) ?>">
@@ -69,6 +79,55 @@ input {
     border: none;
     border-radius: 6px;
 }
+select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* Hover */
+select:hover {
+    border-color: #007bff;
+}
+
+/* Khi focus */
+select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
+}
+input[type="date"] {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* Hover */
+input[type="date"]:hover {
+    border-color: #007bff;
+}
+
+/* Focus */
+input[type="date"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
+}
+
+/* Icon lịch (Chrome, Edge) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
 </style>
 
 <?php require_once 'app/views/layouts/footer.php'; ?>

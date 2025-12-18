@@ -11,9 +11,9 @@ class XoaNhanVienModel {
 
     // ✅ Lấy tất cả nhân viên đang hoạt động (chưa xóa)
     public function getAll() {
-        $sql = "SELECT maND, hoTen, chucVu, phongBan, diaChi, email, soDienThoai 
+        $sql = "SELECT maND, hoTen, gioiTinh, ngaySinh, phongBan, chucVu, ngaySinh, diaChi, email, soDienThoai 
                 FROM nguoidung 
-                WHERE trangThai = 1 AND chucVu NOT IN ('Giám đốc')
+                WHERE trangThai = 1 AND chucVu = 'Nhân viên'
                 ORDER BY maND ASC";
 
         $result = $this->conn->query($sql);
@@ -87,7 +87,7 @@ class XoaNhanVienModel {
     public function search($keyword) {
         $like = "%{$keyword}%";
         $stmt = $this->conn->prepare("
-            SELECT maND, hoTen, chucVu, phongBan, diaChi, email, soDienThoai
+            SELECT maND, hoTen, gioiTinh, ngaySinh, phongBan, chucVu, ngaySinh, diaChi, email, soDienThoai
             FROM nguoidung
             WHERE trangThai = 1 AND chucVu NOT IN ('Giám đốc')
             AND (hoTen LIKE ? OR chucVu LIKE ? OR phongBan LIKE ? OR email LIKE ?)

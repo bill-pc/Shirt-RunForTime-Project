@@ -46,7 +46,8 @@ class SuaNhanVienController {
         $data = [
             'maND' => $_POST['maND'],
             'hoTen' => $_POST['hoTen'],
-            'chucVu' => $_POST['chucVu'],
+            'gioiTinh' => $_POST['gioiTinh']?? '',
+            'ngaySinh' => $_POST['ngaySinh'],
             'phongBan' => $_POST['phongBan'],
             'diaChi' => $_POST['diaChi'],
             'email' => $_POST['email'],

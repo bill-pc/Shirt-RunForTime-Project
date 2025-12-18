@@ -15,14 +15,16 @@ class ThemNhanVienController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Lấy dữ liệu từ form
             $hoTen = trim($_POST['fullName'] ?? '');
+            $gioiTinh = trim($_POST['gioiTinh'] ?? '');
+            $ngaySinh = trim($_POST['ngaySinh'] ?? '');
             $diaChi = trim($_POST['address'] ?? '');
             $soDienThoai = trim($_POST['phone'] ?? '');
             $email = trim($_POST['email'] ?? '');
-            $chucVu = trim($_POST['position'] ?? '');
+            $phongBan = trim($_POST['position'] ?? '');
 
             // --- 1. Kiểm tra bắt buộc ---
-            if ($hoTen === '' || $soDienThoai === '' || $email === '' || $chucVu === '') {
-                $message = 'Vui lòng nhập đầy đủ Họ tên, Số điện thoại, Email và Chức vụ.';
+            if ($hoTen === '' || $soDienThoai === '' || $email === '' || $phongBan === '') {
+                $message = 'Vui lòng nhập đầy đủ Họ tên, Số điện thoại, Email và Phòng ban.';
                 header('Location: index.php?page=themnhanvien&error=' . urlencode($message));
                 exit;
             }
@@ -65,10 +67,12 @@ class ThemNhanVienController {
             // --- 6. Thêm nhân viên ---
             $success = $this->nhanVienModel->insert([
                 'hoTen' => $hoTen,
+                'gioiTinh' => $gioiTinh,
+                'ngaySinh' => $ngaySinh,
                 'diaChi' => $diaChi,
                 'soDienThoai' => $soDienThoai,
                 'email' => $email,
-                'chucVu' => $chucVu,
+                'phongBan' => $phongBan,
                 'maTK' => $maTK
             ]);
 

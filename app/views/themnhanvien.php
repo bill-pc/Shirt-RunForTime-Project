@@ -49,17 +49,19 @@ require_once 'app/views/layouts/nav.php';
         margin-left: 2px;
     }
     #employeeFormContainer .form-group input[type="text"],
-    #employeeFormContainer .form-group input[type="tel"],
-    #employeeFormContainer .form-group input[type="email"],
-    #employeeFormContainer .form-group select {
-        width: 100%;
-        padding: 12px;
-        font-size: 14px;
-        color: #333;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        box-sizing: border-box;
-    }
+#employeeFormContainer .form-group input[type="tel"],
+#employeeFormContainer .form-group input[type="email"],
+#employeeFormContainer .form-group input[type="date"],
+#employeeFormContainer .form-group select {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    height: 44px; /* rất quan trọng để không lệch */
+}
     #employeeFormContainer .form-group select {
         background-color: #fff;
     }
@@ -140,6 +142,19 @@ require_once 'app/views/layouts/nav.php';
                             <label for="fullName">Họ Tên <span class="required">*</span></label>
                             <input type="text" id="fullName" name="fullName" placeholder="Nhập họ tên" required>
                         </div>
+                        <div class="form-group">
+                            <label for="gioiTinh">Giới Tính <span class="required">*</span></label>
+                            <select id="gioiTinh" name="gioiTinh" required>
+                                <option value="">-- Chọn giới tính --</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+    <label for="ngaySinh">Ngày Sinh <span class="required">*</span></label>
+    <input type="date" id="ngaySinh" name="ngaySinh" required max="<?= date('Y-m-d') ?>">
+</div>
 
                         <div class="form-group">
                             <label for="address">Địa Chỉ</label>
@@ -158,11 +173,11 @@ require_once 'app/views/layouts/nav.php';
 
                         <!-- Trường mới: Chức vụ -->
                         <div class="form-group">
-                            <label for="position">Chức vụ <span class="required">*</span></label>
+                            <label for="position">Phòng ban <span class="required">*</span></label>
                             <select id="position" name="position" required>
-                                <option value="">-- Chọn chức vụ --</option>
-                                <option value="Nhân viên xưởng Cắt">Nhân viên xưởng Cắt</option>
-                                <option value="Nhân viên xưởng May">Nhân viên xưởng May</option>
+                                <option value="">-- Chọn phòng ban --</option>
+                                <option value="Nhân viên xưởng Cắt">Xưởng Cắt</option>
+                                <option value="Nhân viên xưởng May">Xưởng May</option>
                             </select>
                         </div>
 
