@@ -51,11 +51,18 @@ class ThemNhanVienController {
             }
 
             // --- 5. Tạo tài khoản ---
-            $tenDangNhap = explode('@', $email)[0]; // Lấy phần trước @
-            $matKhau = password_hash('123456', PASSWORD_DEFAULT); // Mật khẩu mặc định
+            // Lấy phần trước @ từ email, chuẩn hóa (lowercase, chỉ chữ/số)
+            $tenDangNhap = strtolower(preg_replace('/[^a-z0-9]/', '', explode('@', $email)[0] ?? ''));
+            if ($tenDangNhap === '') {
+                // Fallback nếu tên rỗng: dùng một phần của số điện thoại
+                $tenDangNhap = preg_replace('/[^0-9]/', '', $soDienThoai);
+            }
+
+            // Mật khẩu mặc định (đã mã hóa MD5)
+            $matKhau = md5('12345'); // Mật khẩu mặc định: 12345 → MD5
             $trangThai = 'Hoạt động';
 
-            // Gọi hàm createAccount (đúng cú pháp, truyền 2 tham số)
+            // Gọi hàm createAccount (model sẽ đảm bảo username duy nhất và hash mật khẩu)
             $maTK = $this->taiKhoanModel->createAccount($tenDangNhap, $matKhau, $trangThai);
 
             if (!$maTK) {
