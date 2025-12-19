@@ -15,12 +15,12 @@ class NhapKhoTP_DaCheckQCModel {
      */
     public function getDanhSachPhieuQCDaDat() {
         try {
-            // Lấy danh sách phiếu QC chưa nhập kho
+            // Lấy danh sách phiếu QC chưa nhập kho - CHỈ LẤY SỐ LƯỢNG ĐẠT (soLuongDat)
             $sql = "SELECT 
                         p.maYC AS maPhieu,
                         p.maYC AS maYC,
                         COALESCE(ct.tenSanPham, sp.tenSanPham) AS sanPham,
-                        ct.soLuong AS soLuong,
+                        ct.soLuongDat AS soLuong,
                         ct.soLuongDat AS soLuongDat,
                         ct.ngayKiemTra AS ngayKiemTra,
                         p.maSanPham,
@@ -60,9 +60,8 @@ class NhapKhoTP_DaCheckQCModel {
                         p.maYC AS maPhieu,
                         p.maYC AS maYC,
                         COALESCE(ct.tenSanPham, sp.tenSanPham) AS sanPham,
-                        ct.soLuong AS soLuong,
+                        ct.soLuongDat AS soLuong,
                         ct.soLuongDat AS soLuongDat,
-                        ct.soLuongHong AS soLuongHong,
                         ct.ngayKiemTra AS ngayKiemTra,
                         p.maSanPham,
                         p.tenNguoiLap,

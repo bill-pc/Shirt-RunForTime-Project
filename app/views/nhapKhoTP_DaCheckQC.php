@@ -45,7 +45,7 @@ require_once 'app/views/layouts/nav.php';
                             <tr style="background-color: #f8f9fa;">
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Mã Phiếu</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Sản Phẩm</th>
-                                <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Số Lượng</th>
+                                <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Số Lượng Đạt</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Người Lập</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Ngày Kiểm Tra</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Hành Động</th>
@@ -128,7 +128,7 @@ require_once 'app/views/layouts/nav.php';
 
                             <div class="form-group">
                                 <label for="soLuong" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
-                                    Số Lượng: *
+                                    Số Lượng Đạt: *
                                 </label>
                                 <input 
                                     type="number" 
@@ -144,7 +144,7 @@ require_once 'app/views/layouts/nav.php';
                                     onblur="this.style.borderColor='#ddd'"
                                 >
                                 <small style="color: #6c757d; font-size: 0.9em;">
-                                    (Tối đa: <?= number_format($chiTietPhieu['soLuong']) ?>)
+                                    (Tối đa: <?= number_format($chiTietPhieu['soLuong']) ?> - Chỉ nhập kho số lượng đạt từ phiếu kiểm tra)
                                 </small>
                             </div>
 
