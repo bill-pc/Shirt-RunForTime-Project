@@ -20,11 +20,12 @@ class LoginController {
         $db = new KetNoi();
         $conn = $db->connect();
 
-        $sql = "SELECT tk.*, nd.hoTen 
+        // Kiểm tra tài khoản (không filter theo trangThai để kiểm tra riêng)
+        $sql = "SELECT tk.*, nd.hoTen, nd.chucVu, nd.phongBan, nd.maND, nd.trangThai as trangThaiND, tk.trangThai as trangThaiTK
         FROM taikhoan tk 
         LEFT JOIN nguoidung nd ON tk.maTK = nd.maTK 
-        WHERE tk.tenDangNhap = ? AND (nd.trangThai = 1 OR nd.trangThai IS NULL)
-        ";
+        WHERE tk.tenDangNhap = ?";
+        
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -33,19 +34,34 @@ class LoginController {
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
             
-
-            // So sánh mật khẩu bằng MD5
-            if (md5($password) === $user['matKhau']) {
-
-                $_SESSION['user'] = [
-                    'maTK' => $user['maTK'],
-                    'tenDangNhap' => $user['tenDangNhap'],
-                    'hoTen' => $user['hoTen'] ?? ''
-                ];
-
-                header("Location: index.php?page=home");
+            // Kiểm tra mật khẩu trước
+            if (md5($password) !== $user['matKhau']) {
+                header("Location: index.php?page=login&error=1");
                 exit;
             }
+
+            // ✅ Kiểm tra trạng thái tài khoản (taikhoan hoặc nguoidung)
+            $trangThaiTK = $user['trangThaiTK'] ?? '';
+            $trangThaiND = $user['trangThaiND'] ?? 1;
+            
+            if ($trangThaiTK !== 'Hoạt động' || $trangThaiND != 1) {
+                // Tài khoản bị ngừng hoạt động
+                header("Location: index.php?page=login&error=inactive");
+                exit;
+            }
+
+            // Đăng nhập thành công
+            $_SESSION['user'] = [
+                'maTK' => $user['maTK'],
+                'maND' => $user['maND'] ?? null,
+                'tenDangNhap' => $user['tenDangNhap'],
+                'hoTen' => $user['hoTen'] ?? '',
+                'vaiTro' => $user['chucVu'] ?? 'Công nhân',
+                'phongBan' => $user['phongBan'] ?? ''
+            ];
+
+            header("Location: index.php?page=home");
+            exit;
         }
 
         // Sai tài khoản hoặc mật khẩu

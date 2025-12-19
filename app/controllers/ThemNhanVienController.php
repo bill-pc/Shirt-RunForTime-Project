@@ -20,10 +20,10 @@ class ThemNhanVienController {
             $diaChi = trim($_POST['address'] ?? '');
             $soDienThoai = trim($_POST['phone'] ?? '');
             $email = trim($_POST['email'] ?? '');
-            $phongBan = trim($_POST['position'] ?? '');
+            $chucVu = trim($_POST['position'] ?? ''); // Phòng ban = chức vụ
 
             // --- 1. Kiểm tra bắt buộc ---
-            if ($hoTen === '' || $soDienThoai === '' || $email === '' || $phongBan === '') {
+            if ($hoTen === '' || $soDienThoai === '' || $email === '' || $chucVu === '') {
                 $message = 'Vui lòng nhập đầy đủ Họ tên, Số điện thoại, Email và Phòng ban.';
                 header('Location: index.php?page=themnhanvien&error=' . urlencode($message));
                 exit;
@@ -79,7 +79,8 @@ class ThemNhanVienController {
                 'diaChi' => $diaChi,
                 'soDienThoai' => $soDienThoai,
                 'email' => $email,
-                'phongBan' => $phongBan,
+                'phongBan' => $chucVu, // Lưu vào cả phongBan
+                'chucVu' => $chucVu,   // Và chucVu
                 'maTK' => $maTK
             ]);
 

@@ -87,12 +87,175 @@ if (isLoggedIn && introToSection[pageName]) {
     // --- Hiển thị sidebar mặc định ---
     if (!isLoggedIn) {
         localStorage.removeItem("lastSelectedSection");
+        localStorage.removeItem("lastSelectedCategory");
         sidebarList.innerHTML = `<li class="sidebar-alert">⚠️ Hãy đăng nhập trước để sử dụng các chức năng</li>`;
-    } else if (isHomePage) {
-        sidebarList.innerHTML = `<li class="sidebar-alert">Vui lòng chọn danh mục ở trên</li>`;
     } else {
-        const lastSection = localStorage.getItem("lastSelectedSection");
-        if (lastSection) populateSidebar(lastSection);
+        // ✅ LUÔN LUÔN hiển thị sidebar với tất cả chức năng được phân nhóm
+        loadAllMenuItemsByRoleGrouped();
+    }
+    
+    // --- Function load tất cả menu items theo role (không nhóm) ---
+    function loadAllMenuItemsByRole() {
+        if (!sidebarList) return;
+        
+        // Lấy trang hiện tại từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPage = urlParams.get('page') || 'home';
+        
+        // Fetch menu items từ backend theo role
+        fetch('index.php?page=get-menu-by-role')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.menuItems) {
+                    let html = '';
+                    // Chỉ hiển thị các chức năng, KHÔNG CẦN category headers
+                    for (const [categoryName, items] of Object.entries(data.menuItems)) {
+                        items.forEach(item => {
+                            const isActive = item.link === currentPage ? 'active' : '';
+                            html += `<li><a href="index.php?page=${item.link}" class="menu-item-btn ${isActive}" data-page="${item.link}">
+                                ${item.text}
+                            </a></li>`;
+                        });
+                    }
+                    sidebarList.innerHTML = html || `<li class="sidebar-alert">Không có chức năng nào</li>`;
+                    
+                    // Thêm event listener cho các menu items
+                    setupMenuItemClickHandlers();
+                } else {
+                    sidebarList.innerHTML = `<li class="sidebar-alert">Không thể tải menu</li>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading menu:', error);
+                sidebarList.innerHTML = `<li class="sidebar-alert">Lỗi tải menu</li>`;
+            });
+    }
+    
+    // --- Function load tất cả menu items theo role (có nhóm category) ---
+    function loadAllMenuItemsByRoleGrouped() {
+        if (!sidebarList) return;
+        
+        // Lấy trang hiện tại từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPage = urlParams.get('page') || 'home';
+        
+        // Fetch menu items từ backend theo role
+        fetch('index.php?page=get-menu-by-role')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.menuItems) {
+                    let html = '';
+                    // ✅ Hiển thị các chức năng THEO NHÓM với category headers
+                    for (const [categoryName, items] of Object.entries(data.menuItems)) {
+                        if (items && items.length > 0) {
+                            // Thêm header cho category
+                            html += `<li class="sidebar-category-header">${categoryName}</li>`;
+                            
+                            // Thêm các items trong category
+                            items.forEach(item => {
+                                const isActive = item.link === currentPage ? 'active' : '';
+                                html += `<li><a href="index.php?page=${item.link}" class="menu-item-btn ${isActive}" data-page="${item.link}">
+                                    ${item.text}
+                                </a></li>`;
+                            });
+                        }
+                    }
+                    sidebarList.innerHTML = html || `<li class="sidebar-alert">Không có chức năng nào</li>`;
+                    
+                    // Thêm event listener cho các menu items
+                    setupMenuItemClickHandlers();
+                } else {
+                    sidebarList.innerHTML = `<li class="sidebar-alert">Không thể tải menu</li>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading menu:', error);
+                sidebarList.innerHTML = `<li class="sidebar-alert">Lỗi tải menu</li>`;
+            });
+    }
+    
+    // --- Function setup click handlers cho menu items ---
+    function setupMenuItemClickHandlers() {
+        const menuItems = document.querySelectorAll('.menu-item-btn');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                // Lưu trang vào localStorage để active state persist sau redirect
+                const pageLink = this.getAttribute('data-page');
+                if (pageLink) {
+                    localStorage.setItem('lastActivePage', pageLink);
+                }
+                
+                // Remove active từ tất cả items
+                menuItems.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active vào item được click
+                this.classList.add('active');
+            });
+        });
+    }
+    
+    // --- Function update active state based on current URL ---
+    function updateActiveMenuItem() {
+        if (!sidebarList) return;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPage = urlParams.get('page') || 'home';
+        
+        // Remove active từ tất cả
+        const menuItems = document.querySelectorAll('.menu-item-btn');
+        menuItems.forEach(item => {
+            const pageLink = item.getAttribute('data-page');
+            if (pageLink === currentPage) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+    
+    // --- Function load sidebar theo category cụ thể ---
+    function loadSidebarByCategory(categoryKey, categoryName) {
+        if (!sidebarList) return;
+        
+        // Lưu category vào localStorage
+        localStorage.setItem('lastSelectedCategory', categoryKey);
+        localStorage.setItem('lastSelectedCategoryName', categoryName);
+        
+        // Lấy trang hiện tại
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPage = urlParams.get('page') || 'home';
+        
+        // Fetch menu items từ backend
+        fetch('index.php?page=get-menu-by-role')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.menuItems) {
+                    // Filter chỉ lấy items của category được chọn
+                    const categoryItems = data.menuItems[categoryName];
+                    
+                    if (categoryItems && categoryItems.length > 0) {
+                        let html = '';
+                        categoryItems.forEach(item => {
+                            const isActive = item.link === currentPage ? 'active' : '';
+                            html += `<li><a href="index.php?page=${item.link}" class="menu-item-btn ${isActive}" data-page="${item.link}">
+                                ${item.text}
+                            </a></li>`;
+                        });
+                        sidebarList.innerHTML = html;
+                        
+                        // Setup click handlers
+                        setupMenuItemClickHandlers();
+                    } else {
+                        sidebarList.innerHTML = `<li class="sidebar-alert">Không có chức năng nào trong mục này</li>`;
+                    }
+                } else {
+                    sidebarList.innerHTML = `<li class="sidebar-alert">Không thể tải menu</li>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading category menu:', error);
+                sidebarList.innerHTML = `<li class="sidebar-alert">Lỗi tải menu</li>`;
+            });
     }
 
     // --- Dropdown ---
@@ -106,25 +269,72 @@ if (isLoggedIn && introToSection[pageName]) {
         });
 
        dropdown.querySelectorAll("button[data-section]").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
         if (!isLoggedIn) {
             alert("Vui lòng đăng nhập để chọn chức năng!");
             return;
         }
         const section = btn.dataset.section;
-        // Chuyển hướng tới trang giới thiệu cho danh mục đó
-        const introPages = {
-            tongquan: "gioi-thieu-tong-quan",
-            nhansu: "gioi-thieu-nhan-su",
-            sanxuat: "gioi-thieu-san-xuat",
-            khoNVL: "gioi-thieu-kho-nvl",
-            xuong: "gioi-thieu-xuong",
-            qc: "gioi-thieu-kiem-tra-chat-luong",
-            khoTP: "gioi-thieu-kho-thanh-pham",
-            congnhan: "gioi-thieu-cong-nhan"
+        
+        // Đóng dropdown
+        dropdown.classList.remove("show");
+        
+        // Mapping section sang category key cho API
+        const categoryMap = {
+            tongquan: "tong-quan",
+            nhansu: "nhan-su",
+            sanxuat: "san-xuat",
+            khoNVL: "kho-nvl",
+            xuong: "xuong",
+            qc: "kiem-tra-chat-luong",
+            khoTP: "kho-thanh-pham",
+            congnhan: "cong-nhan"
         };
-        const page = introPages[section] || "home";
-        window.location.href = `index.php?page=${page}`;
+        
+        // Mapping tên category để hiển thị
+        const categoryNames = {
+            tongquan: "Tổng quan & Báo cáo",
+            nhansu: "Quản lý Nhân sự",
+            sanxuat: "Quản lý Sản xuất",
+            khoNVL: "Kho Nguyên vật liệu",
+            xuong: "Xưởng sản xuất",
+            qc: "Kiểm tra chất lượng",
+            khoTP: "Kho Thành phẩm",
+            congnhan: "Công việc & Báo cáo"
+        };
+        
+        const category = categoryMap[section];
+        
+        // ✅ Kiểm tra quyền và load sidebar với chức năng của category
+        try {
+            const response = await fetch(`index.php?page=check-permission&category=${category}`);
+            const result = await response.json();
+            
+            if (result.hasPermission) {
+                // ✅ Có quyền → Load sidebar với chức năng của category này
+                loadSidebarByCategory(section, categoryNames[section]);
+                
+                // Redirect đến trang giới thiệu
+                const introPages = {
+                    tongquan: "gioi-thieu-tong-quan",
+                    nhansu: "gioi-thieu-nhan-su",
+                    sanxuat: "gioi-thieu-san-xuat",
+                    khoNVL: "gioi-thieu-kho-nvl",
+                    xuong: "gioi-thieu-xuong",
+                    qc: "gioi-thieu-kiem-tra-chat-luong",
+                    khoTP: "gioi-thieu-kho-thanh-pham",
+                    congnhan: "gioi-thieu-cong-nhan"
+                };
+                const page = introPages[section] || "home";
+                window.location.href = `index.php?page=${page}`;
+            } else {
+                // ❌ Không có quyền → Hiển thị modal đẹp
+                showPermissionModal(result.categoryName, result.userRole);
+            }
+        } catch (error) {
+            console.error("Lỗi kiểm tra quyền:", error);
+            alert("Có lỗi xảy ra. Vui lòng thử lại!");
+        }
     });
 });
 
@@ -136,4 +346,107 @@ if (isLoggedIn && introToSection[pageName]) {
             }
         });
     }
+});
+
+// ✅ Function hiển thị modal không có quyền truy cập
+function showPermissionModal(categoryName, userRole) {
+    // Xóa modal cũ nếu có
+    const oldModal = document.getElementById('permissionModal');
+    if (oldModal) {
+        oldModal.remove();
+    }
+
+    // Tạo modal HTML
+    const modalHTML = `
+        <div id="permissionModal" class="permission-modal-overlay">
+            <div class="permission-modal-content">
+                <button class="modal-close-btn" onclick="closePermissionModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="modal-icon-container">
+                    <i class="fas fa-lock modal-lock-icon"></i>
+                </div>
+                <h2 class="modal-title">TRUY CẬP BỊ TỪ CHỐI</h2>
+                <div class="modal-message">
+                    <p>Bạn không có quyền truy cập danh mục</p>
+                    <p class="category-name"><strong>${categoryName}</strong></p>
+                 
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-primary" onclick="window.location.href='index.php?page=home'">
+                        <i class="fas fa-home"></i> Về trang chủ
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Thêm modal vào body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Animation fade in
+    setTimeout(() => {
+        document.getElementById('permissionModal').classList.add('show');
+    }, 10);
+}
+
+// ✅ Function đóng modal
+function closePermissionModal() {
+    const modal = document.getElementById('permissionModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
+    }
+}
+
+// ✅ Đóng modal khi click vào overlay
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('permission-modal-overlay')) {
+        closePermissionModal();
+    }
+});
+
+// ✅ Update active menu item khi trang load hoặc sau navigation
+window.addEventListener('load', function() {
+    // Đợi một chút để sidebar load xong
+    setTimeout(() => {
+        const sidebarList = document.getElementById("sidebarList");
+        if (sidebarList) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPage = urlParams.get('page') || 'home';
+            
+            const menuItems = document.querySelectorAll('.menu-item-btn');
+            menuItems.forEach(item => {
+                const pageLink = item.getAttribute('data-page');
+                if (pageLink === currentPage) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+    }, 500);
+});
+
+// ✅ Update active state khi navigate back/forward
+window.addEventListener('pageshow', function() {
+    setTimeout(() => {
+        const sidebarList = document.getElementById("sidebarList");
+        if (sidebarList) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPage = urlParams.get('page') || 'home';
+            
+            const menuItems = document.querySelectorAll('.menu-item-btn');
+            menuItems.forEach(item => {
+                const pageLink = item.getAttribute('data-page');
+                if (pageLink === currentPage) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+    }, 300);
 });

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Trang chủ - Hệ thống quản lý sản xuất</title>
-    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="public/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
@@ -321,20 +321,6 @@
                         }]
                     }
                 });
-                document.querySelectorAll('.dropdown-item').forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        const section = this.dataset.section;
-                        loadSidebar(section);
-                    });
-                });
-
-                function loadSidebar(sectionName) {
-                    fetch('loadSidebar.php?section=' + sectionName)
-                        .then(res => res.text())
-                        .then(html => {
-                            document.querySelector('.sidebar').innerHTML = html;
-                        });
-                }
             </script>
 
         <?php endif; ?>

@@ -855,6 +855,67 @@ INSERT INTO `xuong` (`maXuong`, `tenXuong`) VALUES
 (1, 'Xưởng cắt'),
 (2, 'Xưởng may');
 
+
+INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
+(100, 'giamdoc', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(101, 'qlnhansu', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(102, 'qlsanxuat', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(103, 'qlkhonvl', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(104, 'nhanvienqc', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(105, 'qlkhotp', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(106, 'congnhancat', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(107, 'congnhanmay', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động');
+
+-- BƯỚC 1: Thêm tài khoản vào bảng taikhoan (PHẢI LÀM TRƯỚC)
+INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
+(200, 'qlxuong', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động');
+
+-- ========================================
+-- BƯỚC 2: THÊM NGƯỜI DÙNG VÀO BẢNG `nguoidung`
+-- ========================================
+
+INSERT INTO `nguoidung` (`maND`, `hoTen`, `gioiTinh`, `ngaySinh`, `chucVu`, `phongBan`, `soDienThoai`, `email`, `diaChi`, `maTK`, `trangThai`, `hinhAnh`) VALUES
+-- 1. GIÁM ĐỐC - Quyền làm tất cả
+(100, 'Nguyễn Văn A', 'Nam', '1980-01-15', 'Giám đốc', 'Ban Giám Đốc', '0901234567', 'giamdoc@company.com', '123 Nguyễn Huệ, Q.1, TP.HCM', 100, 1, ''),
+
+-- 2. QUẢN LÝ NHÂN SỰ - Thêm/xóa/sửa/xem nhân viên
+(101, 'Trần Thị B', 'Nữ', '1985-03-20', 'Quản lý nhân sự', 'Phòng Nhân Sự', '0902345678', 'qlnhansu@company.com', '456 Lê Lợi, Q.1, TP.HCM', 101, 1, ''),
+
+-- 3. QUẢN LÝ SẢN XUẤT - Tạo đơn hàng, lập KHSX, phê duyệt
+(102, 'Lê Văn C', 'Nam', '1982-05-10', 'Quản lý sản xuất', 'Phòng Sản Xuất', '0903456789', 'qlsanxuat@company.com', '789 Hai Bà Trưng, Q.3, TP.HCM', 102, 1, ''),
+
+-- 4. QUẢN LÝ KHO NVL - Nhập/xuất/thống kê kho NVL
+(103, 'Phạm Thị D', 'Nữ', '1988-07-25', 'Quản lý kho NVL', 'Kho Nguyên Vật Liệu', '0904567890', 'qlkhonvl@company.com', '321 Võ Văn Tần, Q.3, TP.HCM', 103, 1, ''),
+
+-- 5. NHÂN VIÊN QC - Kiểm tra chất lượng, cập nhật thành phẩm
+(104, 'Hoàng Văn E', 'Nam', '1990-09-12', 'Nhân viên QC', 'Bộ Phận Kiểm Tra Chất Lượng', '0905678901', 'nhanvienqc@company.com', '654 Nguyễn Trãi, Q.5, TP.HCM', 104, 1, ''),
+
+-- 6. QUẢN LÝ KHO THÀNH PHẨM - Nhập/xuất/thống kê kho TP
+(105, 'Vũ Thị F', 'Nữ', '1987-11-30', 'Quản lý kho TP', 'Kho Thành Phẩm', '0906789012', 'qlkhotp@company.com', '987 Cách Mạng Tháng 8, Q.10, TP.HCM', 105, 1, ''),
+
+-- 7. CÔNG NHÂN XƯỞNG CẮT - Xem lịch làm việc, báo cáo sự cố
+(106, 'Đỗ Văn G', 'Nam', '1992-02-18', 'Công nhân', 'Xưởng Cắt', '0907890123', 'congnhancat@company.com', '135 Lý Thường Kiệt, Gò Vấp, TP.HCM', 106, 1, ''),
+
+-- 8. CÔNG NHÂN XƯỞNG MAY - Xem lịch làm việc, báo cáo sự cố
+(107, 'Ngô Thị H', 'Nữ', '1993-04-22', 'Công nhân', 'Xưởng May', '0908901234', 'congnhanmay@company.com', '246 Phan Văn Trị, Bình Thạnh, TP.HCM', 107, 1, '');
+
+
+
+
+-- BƯỚC 2: Thêm thông tin nhân viên vào bảng nguoidung (SAU KHI ĐÃ CÓ TAIKHOAN)
+INSERT INTO `nguoidung` (`maND`, `hoTen`, `gioiTinh`, `ngaySinh`, `chucVu`, `phongBan`, `soDienThoai`, `email`, `diaChi`, `maTK`, `trangThai`, `hinhAnh`) VALUES
+(200, 'Trần Văn Đức', 'Nam', '1988-07-20', 'Quản lý xưởng', 'Xưởng sản xuất', '0909876543', 'tranvanduc.qlx2024@company.com', '456 Đường Lê Lợi, Quận 1, TP.HCM', 200, 1, '');
+
+
+-- ========================================
+-- 9. THÊM TÀI KHOẢN QUẢN LÝ XƯỞNG
+-- ========================================
+-- Username: qlxuong
+-- Password: 12345 (đã mã hóa MD5)
+-- Vai trò: Quản lý xưởng - Quản lý công việc xưởng sản xuất
+-- Quyền: Xem công việc, Tạo yêu cầu NVL, Yêu cầu kiểm tra QC, Ghi nhận TP
+-- ========================================
+
 --
 -- Chỉ mục cho các bảng đã đổ
 --

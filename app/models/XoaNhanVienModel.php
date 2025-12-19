@@ -9,11 +9,12 @@ class XoaNhanVienModel {
         $this->conn = $db->connect(); // mysqli connection
     }
 
-    // ✅ Lấy tất cả nhân viên đang hoạt động (chưa xóa)
+    // ✅ Lấy tất cả nhân viên/công nhân đang hoạt động (loại trừ các chức vụ quản lý)
     public function getAll() {
-        $sql = "SELECT maND, hoTen, gioiTinh, ngaySinh, phongBan, chucVu, ngaySinh, diaChi, email, soDienThoai 
+        $sql = "SELECT maND, hoTen, gioiTinh, ngaySinh, phongBan, chucVu, diaChi, email, soDienThoai 
                 FROM nguoidung 
-                WHERE trangThai = 1 AND chucVu = 'Nhân viên'
+                WHERE trangThai = 1 
+                AND chucVu NOT IN ('Giám đốc', 'Quản lý nhân sự', 'Quản lý sản xuất', 'Quản lý kho NVL', 'Quản lý kho TP', 'Nhân viên QC')
                 ORDER BY maND ASC";
 
         $result = $this->conn->query($sql);
@@ -83,13 +84,14 @@ class XoaNhanVienModel {
         return $success;
     }
 
-    // ✅ Tìm kiếm nhân viên
+    // ✅ Tìm kiếm nhân viên/công nhân (loại trừ các role quản lý)
     public function search($keyword) {
         $like = "%{$keyword}%";
         $stmt = $this->conn->prepare("
-            SELECT maND, hoTen, gioiTinh, ngaySinh, phongBan, chucVu, ngaySinh, diaChi, email, soDienThoai
+            SELECT maND, hoTen, gioiTinh, ngaySinh, phongBan, chucVu, diaChi, email, soDienThoai
             FROM nguoidung
-            WHERE trangThai = 1 AND chucVu NOT IN ('Giám đốc')
+            WHERE trangThai = 1
+            AND chucVu NOT IN ('Giám đốc', 'Quản lý nhân sự', 'Quản lý sản xuất', 'Quản lý kho NVL', 'Quản lý kho TP', 'Nhân viên QC')
             AND (hoTen LIKE ? OR chucVu LIKE ? OR phongBan LIKE ? OR email LIKE ?)
             ORDER BY maND ASC
         ");

@@ -205,8 +205,8 @@ require_once 'app/views/layouts/nav.php';
                     <tr>
                         <th>Mã NV</th>
                         <th>Họ tên</th>
-                        <th>Giới Tính</th>
-                        <th>Ngày Sính</th>
+                        <th>Giới tính</th>
+                        <th>Ngày sinh</th>
                         <!-- <th>Chức vụ</th> -->
                         <th>Phòng ban</th>
                         <th>Địa chỉ</th>

@@ -50,3 +50,65 @@
         }
     </script>
 </nav>
+
+<style>
+/* Đảm bảo dropdown hoạt động */
+.dropdown {
+    display: none;
+    position: absolute;
+    background: white;
+    min-width: 280px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    padding: 10px 0;
+    margin-top: 8px;
+    z-index: 1000;
+    animation: dropdownFadeIn 0.2s ease;
+}
+
+.dropdown.show {
+    display: block;
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    background: transparent;
+    color: #2c3e50;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dropdown button i {
+    color: #3498db;
+    font-size: 1.1em;
+    width: 20px;
+}
+
+.dropdown button:hover {
+    background: #f0f8ff;
+    color: #2980b9;
+}
+
+.dropdown button:hover i {
+    color: #2980b9;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>

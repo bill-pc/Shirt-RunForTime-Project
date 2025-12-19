@@ -171,13 +171,13 @@ require_once 'app/views/layouts/nav.php';
                             <input type="email" id="email" name="email" placeholder="Nhập email" required>
                         </div>
 
-                        <!-- Trường mới: Chức vụ -->
+                        <!-- Phòng ban (sẽ lưu vào cột chucVu) -->
                         <div class="form-group">
                             <label for="position">Phòng ban <span class="required">*</span></label>
                             <select id="position" name="position" required>
                                 <option value="">-- Chọn phòng ban --</option>
-                                <option value="Nhân viên xưởng Cắt">Xưởng Cắt</option>
-                                <option value="Nhân viên xưởng May">Xưởng May</option>
+                                <option value="Công nhân xưởng Cắt">Công nhân xưởng Cắt</option>
+                                <option value="Công nhân xưởng May">Công nhân xưởng May</option>
                             </select>
                         </div>
 

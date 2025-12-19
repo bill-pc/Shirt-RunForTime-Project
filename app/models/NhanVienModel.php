@@ -14,8 +14,8 @@ class NhanVienModel {
      */
     public function insert($data) {
     $sql = "INSERT INTO nguoidung 
-            (hoTen, gioiTinh, ngaySinh, phongBan, soDienThoai, email, diaChi, maTK)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            (hoTen, gioiTinh, ngaySinh, phongBan, chucVu, soDienThoai, email, diaChi, maTK, trangThai)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
 
     $stmt = $this->conn->prepare($sql);
     if (!$stmt) {
@@ -26,17 +26,19 @@ class NhanVienModel {
     $gioiTinh = trim($data['gioiTinh'] ?? '');
     $ngaySinh = trim($data['ngaySinh'] ?? '');
     $phongBan = trim($data['phongBan'] ?? '');
+    $chucVu = trim($data['chucVu'] ?? 'Công nhân'); // Mặc định là Công nhân
     $soDienThoai = trim($data['soDienThoai'] ?? '');
     $email = trim($data['email'] ?? '');
     $diaChi = trim($data['diaChi'] ?? '');
     $maTK = (int)($data['maTK'] ?? 1);
 
     $stmt->bind_param(
-        "sssssssi",
+        "ssssssssi",
         $hoTen,
         $gioiTinh,
         $ngaySinh,
         $phongBan,
+        $chucVu,
         $soDienThoai,
         $email,
         $diaChi,

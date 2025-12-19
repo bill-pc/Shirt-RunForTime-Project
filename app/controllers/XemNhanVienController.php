@@ -8,7 +8,7 @@ class XemNhanVienController {
         $this->model = new XoaNhanVienModel(); // dùng lại model có sẵn
     }
 
-    // ✅ Trang chính quản lý nhân viên
+    // ✅ Trang chính xem danh sách nhân viên (dùng view xoanhanvien.php vì nó có table)
     public function index() {
         $keyword = isset($_GET['search']) ? $_GET['search'] : '';
 
@@ -35,14 +35,16 @@ class XemNhanVienController {
         echo json_encode([]);
         exit;
     }
+
+    // ✅ Xem chi tiết 1 nhân viên
     public function show($id) {
         $nhanvien = $this->model->getById($id);
+        
         if ($nhanvien) {
             require 'app/views/xemnhanvien.php';
         } else {
-            echo "<p>Không tìm thấy nhân viên.</p>";
+            echo "<p style='text-align:center;margin-top:50px;'>❌ Không tìm thấy nhân viên.</p>";
         }
     }
-
 }
 ?>

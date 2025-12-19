@@ -38,6 +38,68 @@ if ($page === 'login' || $page === 'login-process' || $page === 'logout') {
 }
 
 // ---------------------------
+// ✅ API: Kiểm tra quyền truy cập danh mục (AJAX)
+// ---------------------------
+if ($page === 'check-permission') {
+    require_once 'app/middleware/AuthMiddleware.php';
+    
+    header('Content-Type: application/json');
+    
+    if (!isset($_SESSION['user'])) {
+        echo json_encode([
+            'hasPermission' => false,
+            'categoryName' => '',
+            'userRole' => 'Chưa đăng nhập'
+        ]);
+        exit;
+    }
+    
+    $category = isset($_GET['category']) ? $_GET['category'] : '';
+    $hasPermission = AuthMiddleware::canAccessCategory($category);
+    $categoryName = AuthMiddleware::getCategoryNamePublic($category);
+    $userRole = $_SESSION['user']['vaiTro'] ?? 'Không xác định';
+    
+    echo json_encode([
+        'hasPermission' => $hasPermission,
+        'categoryName' => $categoryName,
+        'userRole' => $userRole
+    ]);
+    exit;
+}
+
+// ---------------------------
+// ✅ API: Lấy danh sách menu theo role (AJAX)
+// ---------------------------
+if ($page === 'get-menu-by-role') {
+    require_once 'app/middleware/AuthMiddleware.php';
+    require_once 'app/controllers/HomeController.php';
+    
+    header('Content-Type: application/json');
+    
+    if (!isset($_SESSION['user'])) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Chưa đăng nhập'
+        ]);
+        exit;
+    }
+    
+    $homeController = new HomeController();
+    // Sử dụng reflection để gọi private method
+    $reflection = new ReflectionClass($homeController);
+    $method = $reflection->getMethod('getMenuItemsByRole');
+    $method->setAccessible(true);
+    $menuItems = $method->invoke($homeController);
+    
+    echo json_encode([
+        'success' => true,
+        'menuItems' => $menuItems,
+        'role' => $_SESSION['user']['vaiTro'] ?? 'Không xác định'
+    ]);
+    exit;
+}
+
+// ---------------------------
 // Kiểm tra session trước các trang khác
 // ---------------------------
 if (!isset($_SESSION['user']) && $page !== 'home') {
@@ -143,6 +205,7 @@ switch ($page) {
         break;
     // ✅ Trang hiển thị lịch làm việc
     case 'lichlamviec':
+    case 'calamviec':
         require_once './app/controllers/XemCaLamViecController.php';
         $controller = new XemLichLamViecController();
         $controller->index();
@@ -531,6 +594,10 @@ switch ($page) {
             ];
 
             if (in_array($danhMucKey, $allowedCategories)) {
+                // ✅ Kiểm tra quyền truy cập danh mục
+                require_once 'app/middleware/AuthMiddleware.php';
+                AuthMiddleware::requireCategoryAccess($danhMucKey);
+                
                 $viewFileName = str_replace('-', '', $danhMucKey);
                 $viewPath = "app/views/gioithieu/{$viewFileName}.php";
                 if (file_exists($viewPath)) {
