@@ -46,18 +46,21 @@ class XuatKhoNVLController
 
     // ✅ Lưu phiếu xuất NVL
     public function luuPhieu()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: index.php?page=xuat-kho-nvl");
-            exit();
-        }
-
-        if ($this->model->createPhieuXuatNVL($_POST)) {
-            header("Location: index.php?page=xuat-kho-nvl&success=1");
-        } else {
-            header("Location: index.php?page=xuat-kho-nvl&error=1");
-        }
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header("Location: index.php?page=xuat-kho-nvl");
         exit();
     }
+
+    if ($this->model->createPhieuXuatNVL($_POST)) {
+        header("Location: index.php?page=xuat-kho-nvl&success=1");
+    } else {
+        // Lấy thông báo lỗi cụ thể từ session nếu có
+        $msg = isset($_SESSION['error_message']) ? urlencode($_SESSION['error_message']) : '1';
+        unset($_SESSION['error_message']); // Xóa sau khi dùng
+        header("Location: index.php?page=xuat-kho-nvl&error=" . $msg);
+    }
+    exit();
+}
 
 }

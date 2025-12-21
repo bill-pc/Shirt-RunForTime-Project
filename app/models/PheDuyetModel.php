@@ -96,8 +96,7 @@ public function getAllNhapKho() {
                 y.trangThai,
                 c.tenNVL,
                 c.soLuong,
-                c.donViTinh,
-                c.nhaCungCap
+                c.donViTinh
             FROM phieuyeucaucungcapnvl y
             LEFT JOIN chitiet_phieuyeucaucapnvl c 
                 ON y.maYCCC = c.maYCCC

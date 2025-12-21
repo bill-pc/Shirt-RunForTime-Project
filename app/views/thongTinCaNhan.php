@@ -39,7 +39,7 @@ require_once 'app/views/layouts/nav.php';
                         <div class="input-box"><?php echo htmlspecialchars($user['chucVu'] ?? ''); ?></div>
                     </div>
                     <div class="form-group">
-                        <label>Ngày tháng năm sinh</label>
+                        <label>Ngày sinh</label>
                         <div class="input-box"><?php 
                             // Giả sử tên cột trong DB là 'ngaySinh'. 
                             // Nếu có dữ liệu thì format sang ngày/tháng/năm (VN), nếu không thì để trống.

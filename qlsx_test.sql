@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th12 16, 2025 lúc 06:03 PM
+-- Thời gian đã tạo: Th12 21, 2025 lúc 05:43 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Cơ sở dữ liệu: `test`
+-- Cơ sở dữ liệu: `dlck`
 --
 
 -- --------------------------------------------------------
@@ -37,21 +37,6 @@ CREATE TABLE `baocaoloi` (
   `maThietBi` int(11) DEFAULT NULL,
   `maND` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `baocaoloi`
---
-
-INSERT INTO `baocaoloi` (`maBaoCao`, `tenBaoCao`, `loaiLoi`, `hinhAnh`, `thoiGian`, `moTa`, `maThietBi`, `maND`) VALUES
-(49, 'Báo cáo sự cố - Máy may hãng A - Nguyễn Văn An', 'phancung', NULL, '2025-11-08', '', 9, 6),
-(50, 'Báo cáo sự cố - Máy ép nhiệt - TranKienQuoc', 'phancung', NULL, '2025-11-08', '', 7, 1),
-(51, 'Báo cáo sự cố - Máy may D - TranKienQuoc', 'phancung', NULL, '2025-11-09', '', 10, 1),
-(52, 'Báo cáo sự cố - Máy cắt vải - TranKienQuoc', 'phancung', NULL, '2025-11-09', '', 8, 1),
-(53, 'Báo cáo sự cố - Máy may hãng A - TranKienQuoc', 'phanmem', NULL, '2025-11-09', '', 9, 1),
-(54, 'Báo cáo sự cố - Máy ép nhiệt - TranKienQuoc', 'phanmem', 'uploads/img1763087644_hinh-nen-hoa-mau-don-1.jpg', '2025-11-14', '', 7, 1),
-(55, 'Báo cáo sự cố - Máy cắt vải - TranKienQuoc', 'khac', 'uploads/img/1763087805_z5274512085563_3acd4ad5b0faf289efc6542709efbac3.jpg', '2025-11-14', '', 8, 1),
-(56, 'Báo cáo sự cố - Máy ép nhiệt - TranKienQuoc', 'phancung', 'uploads/img/1763089681_TheSV.jpg', '2025-11-14', '', 7, 1),
-(57, 'Báo cáo sự cố - Máy ép nhiệt', 'phanmem', 'uploads/img/1765894912_Screenshot_2025-12-16_200604.png', '2025-12-16', 'fhgfadgfdg', 7, 1);
 
 -- --------------------------------------------------------
 
@@ -258,26 +243,6 @@ CREATE TABLE `chitiet_phieuyeucaucapnvl` (
   `maYCCC` int(11) NOT NULL,
   `maNVL` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `chitiet_phieuyeucaucapnvl`
---
-
-INSERT INTO `chitiet_phieuyeucaucapnvl` (`maCTPhieuYCCC`, `tenNVL`, `nhaCungCap`, `soLuong`, `donViTinh`, `maYCCC`, `maNVL`) VALUES
-(36, 'Vải cotton', NULL, 20, 'Tấm', 24, 1),
-(37, 'Nút áo', NULL, 200, 'Cái', 24, 2),
-(38, 'Vải cotton', NULL, 20, 'Tấm', 25, 1),
-(39, 'Nút áo', NULL, 200, 'Cái', 25, 2),
-(40, 'Vải cotton', NULL, 300, 'Tấm', 26, 1),
-(41, 'Chỉ may đen', NULL, 300, 'Cuộn', 26, 3),
-(42, 'Vải cotton', NULL, 20, 'Tấm', 27, 1),
-(43, 'Nút áo', NULL, 200, 'Cái', 27, 2),
-(44, 'Vải cotton', NULL, 300, 'Tấm', 28, 1),
-(45, 'Chỉ may đen', NULL, 300, 'Cuộn', 28, 3),
-(46, 'Vải cotton', NULL, 20, 'Tấm', 29, 1),
-(47, 'Nút áo', NULL, 200, 'Cái', 29, 2),
-(48, 'Vải cotton', NULL, 20, 'Tấm', 30, 1),
-(49, 'Nút áo', NULL, 200, 'Cái', 30, 2);
 
 -- --------------------------------------------------------
 
@@ -518,12 +483,21 @@ CREATE TABLE `nguoidung` (
 
 INSERT INTO `nguoidung` (`maND`, `hoTen`, `gioiTinh`, `ngaySinh`, `chucVu`, `phongBan`, `soDienThoai`, `email`, `diaChi`, `maTK`, `trangThai`, `hinhAnh`) VALUES
 (1, 'TranKienQuoc', 'Nam', '2004-10-12', 'Giám đốc', '', '0346512104', 'trankienquoc@gmail.com', '54/12 Quang Trung, Gò Vấp', 1, 1, 'avatar1.png'),
-(6, 'Nguyễn Văn B', 'Nam', NULL, 'Trưởng phòng', 'Xưởng may', '0901234567', 'an.nguyen@company.com', '123 Võ Văn Tần, Q.3, TP.HCM', 2, 1, ''),
-(7, 'Trần Thị Bình', 'Nữ', NULL, 'Nhân viên', 'Xưởng may', '0987654321', 'binh.tran@company.com', '456 Lê Lợi, Q.1, TP.HCM', 3, 1, ''),
-(8, 'Lê Minh Cường', 'Nam', NULL, 'Kỹ thuật viên', 'Xưởng cắt', '0912345678', 'cuong.le@company.com', '789 Nguyễn Trãi, Q.5, TP.HCM', 4, 1, ''),
+(6, 'Nguyễn Văn B', 'Nam', '2002-01-12', 'Trưởng phòng', 'Xưởng may', '0901234567', 'an.nguyen@company.com', '123 Võ Văn Tần, Q.3, TP.HCM', 2, 1, ''),
+(7, 'Trần Thị Bình', 'Nữ', '2001-04-20', 'Nhân viên', 'Xưởng may', '0987654321', 'binh.tran@company.com', '456 Lê Lợi, Q.1, TP.HCM', 3, 1, ''),
+(8, 'Lê Minh Cường', 'Nam', '1994-07-10', 'Kỹ thuật viên', 'Xưởng cắt', '0912345678', 'cuong.le@company.com', '789 Nguyễn Trãi, Q.5, TP.HCM', 4, 1, ''),
 (15, 'Mai Van Vu', 'Nam', NULL, 'Nhân viên xưởng Cắt', 'Xưởng cắt', '12222222222', '1232221@gmail.com', '581 Nguyen Oanh', 10, 0, ''),
-(17, 'Vũ Mai', '', NULL, 'Nhân viên xưởng Cắt', 'Xưởng cắt', '1900232323', 'maivu@gmail.com', 'Chu Văn An, Phường 26', 16, 1, ''),
-(18, 'Nguyễn Văn C', '', NULL, 'Nhân viên xưởng Cắt', '', '0345456734', 'trankienuoc@gmail.com', '54 Nguyễn Trãi, Hồ Chí Minh', 17, 0, '');
+(17, 'Vũ Mai', '', '1990-03-19', 'Nhân viên xưởng Cắt', 'Xưởng cắt', '1900232323', 'maivu@gmail.com', 'Chu Văn An, Phường 26', 16, 1, ''),
+(18, 'Nguyễn Văn C', '', NULL, 'Nhân viên xưởng Cắt', '', '0345456734', 'trankienuoc@gmail.com', '54 Nguyễn Trãi, Hồ Chí Minh', 17, 0, ''),
+(100, 'Nguyễn Văn A', 'Nam', '1980-01-15', 'Giám đốc', 'Ban Giám Đốc', '0901234567', 'giamdoc@company.com', '123 Nguyễn Huệ, Q.1, TP.HCM', 100, 1, 'avatar1.png'),
+(101, 'Trần Thị B', 'Nữ', '1985-03-20', 'Quản lý nhân sự', 'Phòng Nhân Sự', '0902345678', 'qlnhansu@company.com', '456 Lê Lợi, Q.1, TP.HCM', 101, 1, ''),
+(102, 'Lê Văn C', 'Nam', '1982-05-10', 'Quản lý sản xuất', 'Phòng Sản Xuất', '0903456789', 'qlsanxuat@company.com', '789 Hai Bà Trưng, Q.3, TP.HCM', 102, 1, ''),
+(103, 'Phạm Thị D', 'Nữ', '1988-07-25', 'Quản lý kho NVL', 'Kho Nguyên Vật Liệu', '0904567890', 'qlkhonvl@company.com', '321 Võ Văn Tần, Q.3, TP.HCM', 103, 1, ''),
+(104, 'Hoàng Văn E', 'Nam', '1990-09-12', 'Nhân viên QC', 'Bộ Phận Kiểm Tra Chất Lượng', '0905678901', 'nhanvienqc@company.com', '654 Nguyễn Trãi, Q.5, TP.HCM', 104, 1, ''),
+(105, 'Vũ Thị F', 'Nữ', '1987-11-30', 'Quản lý kho TP', 'Kho Thành Phẩm', '0906789012', 'qlkhotp@company.com', '987 Cách Mạng Tháng 8, Q.10, TP.HCM', 105, 1, ''),
+(106, 'Đỗ Văn G', 'Nam', '1992-02-18', 'Công nhân', 'Xưởng Cắt', '0907890123', 'congnhancat@company.com', '135 Lý Thường Kiệt, Gò Vấp, TP.HCM', 106, 1, ''),
+(107, 'Ngô Thị H', 'Nữ', '1993-04-22', 'Công nhân', 'Xưởng May', '0908901234', 'congnhanmay@company.com', '246 Phan Văn Trị, Bình Thạnh, TP.HCM', 107, 1, ''),
+(200, 'Trần Văn Đức', 'Nam', '1988-07-20', 'Quản lý xưởng', 'Xưởng sản xuất', '0909876543', 'tranvanduc.qlx2024@company.com', '456 Đường Lê Lợi, Quận 1, TP.HCM', 200, 1, '');
 
 -- --------------------------------------------------------
 
@@ -684,7 +658,8 @@ CREATE TABLE `phieuyeucaucungcapnvl` (
 
 INSERT INTO `phieuyeucaucungcapnvl` (`maYCCC`, `ngayLap`, `trangThai`, `tenNguoiLap`, `maND`, `maKHSX`, `tenPhieu`, `ghiChu`) VALUES
 (30, '2025-11-21', 'Đã duyệt', 'TranKienQuoc', 1, 1, 'Yêu cầu NVL cho KHSX1', ''),
-(31, '2025-12-16', 'Đang xuất NVL', 'TranKienQuoc', 1, 13, 'Yêu cầu NVL cho KHSX cho ĐH 12', '');
+(31, '2025-12-16', 'Đang xuất NVL', 'TranKienQuoc', 1, 13, 'Yêu cầu NVL cho KHSX cho ĐH 12', ''),
+(32, '2025-12-21', 'Chờ duyệt', 'TranKienQuoc', 1, 2, 'Yêu cầu NVL cho KHSX2', '');
 
 -- --------------------------------------------------------
 
@@ -812,7 +787,16 @@ INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
 (13, 'duy', '1', 'Hoạt động'),
 (15, 'trang', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
 (16, 'maivu', '$2y$10$tfkm.PX0OiDg44Zi4xIdv.rYTZ8r55WZ6ajaHf.vrh0FqZqNkQRoi', 'Hoạt động'),
-(17, 'trankienuoc', '$2y$10$70U1s26.Nx6NoffcJvG3.OwQfbTNTI5FVRo2bHKYKFKOfAHk2NQYW', 'không hoạt động');
+(17, 'trankienuoc', '$2y$10$70U1s26.Nx6NoffcJvG3.OwQfbTNTI5FVRo2bHKYKFKOfAHk2NQYW', 'không hoạt động'),
+(100, 'giamdoc', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(101, 'qlnhansu', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(102, 'qlsanxuat', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(103, 'qlkhonvl', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(104, 'nhanvienqc', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(105, 'qlkhotp', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(106, 'congnhancat', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(107, 'congnhanmay', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
+(200, 'qlxuong', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động');
 
 -- --------------------------------------------------------
 
@@ -854,67 +838,6 @@ CREATE TABLE `xuong` (
 INSERT INTO `xuong` (`maXuong`, `tenXuong`) VALUES
 (1, 'Xưởng cắt'),
 (2, 'Xưởng may');
-
-
-INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
-(100, 'giamdoc', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
-(101, 'qlnhansu', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
-(102, 'qlsanxuat', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
-(103, 'qlkhonvl', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
-(104, 'nhanvienqc', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
-(105, 'qlkhotp', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
-(106, 'congnhancat', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động'),
-(107, 'congnhanmay', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động');
-
--- BƯỚC 1: Thêm tài khoản vào bảng taikhoan (PHẢI LÀM TRƯỚC)
-INSERT INTO `taikhoan` (`maTK`, `tenDangNhap`, `matKhau`, `trangThai`) VALUES
-(200, 'qlxuong', '827ccb0eea8a706c4c34a16891f84e7b', 'Hoạt động');
-
--- ========================================
--- BƯỚC 2: THÊM NGƯỜI DÙNG VÀO BẢNG `nguoidung`
--- ========================================
-
-INSERT INTO `nguoidung` (`maND`, `hoTen`, `gioiTinh`, `ngaySinh`, `chucVu`, `phongBan`, `soDienThoai`, `email`, `diaChi`, `maTK`, `trangThai`, `hinhAnh`) VALUES
--- 1. GIÁM ĐỐC - Quyền làm tất cả
-(100, 'Nguyễn Văn A', 'Nam', '1980-01-15', 'Giám đốc', 'Ban Giám Đốc', '0901234567', 'giamdoc@company.com', '123 Nguyễn Huệ, Q.1, TP.HCM', 100, 1, ''),
-
--- 2. QUẢN LÝ NHÂN SỰ - Thêm/xóa/sửa/xem nhân viên
-(101, 'Trần Thị B', 'Nữ', '1985-03-20', 'Quản lý nhân sự', 'Phòng Nhân Sự', '0902345678', 'qlnhansu@company.com', '456 Lê Lợi, Q.1, TP.HCM', 101, 1, ''),
-
--- 3. QUẢN LÝ SẢN XUẤT - Tạo đơn hàng, lập KHSX, phê duyệt
-(102, 'Lê Văn C', 'Nam', '1982-05-10', 'Quản lý sản xuất', 'Phòng Sản Xuất', '0903456789', 'qlsanxuat@company.com', '789 Hai Bà Trưng, Q.3, TP.HCM', 102, 1, ''),
-
--- 4. QUẢN LÝ KHO NVL - Nhập/xuất/thống kê kho NVL
-(103, 'Phạm Thị D', 'Nữ', '1988-07-25', 'Quản lý kho NVL', 'Kho Nguyên Vật Liệu', '0904567890', 'qlkhonvl@company.com', '321 Võ Văn Tần, Q.3, TP.HCM', 103, 1, ''),
-
--- 5. NHÂN VIÊN QC - Kiểm tra chất lượng, cập nhật thành phẩm
-(104, 'Hoàng Văn E', 'Nam', '1990-09-12', 'Nhân viên QC', 'Bộ Phận Kiểm Tra Chất Lượng', '0905678901', 'nhanvienqc@company.com', '654 Nguyễn Trãi, Q.5, TP.HCM', 104, 1, ''),
-
--- 6. QUẢN LÝ KHO THÀNH PHẨM - Nhập/xuất/thống kê kho TP
-(105, 'Vũ Thị F', 'Nữ', '1987-11-30', 'Quản lý kho TP', 'Kho Thành Phẩm', '0906789012', 'qlkhotp@company.com', '987 Cách Mạng Tháng 8, Q.10, TP.HCM', 105, 1, ''),
-
--- 7. CÔNG NHÂN XƯỞNG CẮT - Xem lịch làm việc, báo cáo sự cố
-(106, 'Đỗ Văn G', 'Nam', '1992-02-18', 'Công nhân', 'Xưởng Cắt', '0907890123', 'congnhancat@company.com', '135 Lý Thường Kiệt, Gò Vấp, TP.HCM', 106, 1, ''),
-
--- 8. CÔNG NHÂN XƯỞNG MAY - Xem lịch làm việc, báo cáo sự cố
-(107, 'Ngô Thị H', 'Nữ', '1993-04-22', 'Công nhân', 'Xưởng May', '0908901234', 'congnhanmay@company.com', '246 Phan Văn Trị, Bình Thạnh, TP.HCM', 107, 1, '');
-
-
-
-
--- BƯỚC 2: Thêm thông tin nhân viên vào bảng nguoidung (SAU KHI ĐÃ CÓ TAIKHOAN)
-INSERT INTO `nguoidung` (`maND`, `hoTen`, `gioiTinh`, `ngaySinh`, `chucVu`, `phongBan`, `soDienThoai`, `email`, `diaChi`, `maTK`, `trangThai`, `hinhAnh`) VALUES
-(200, 'Trần Văn Đức', 'Nam', '1988-07-20', 'Quản lý xưởng', 'Xưởng sản xuất', '0909876543', 'tranvanduc.qlx2024@company.com', '456 Đường Lê Lợi, Quận 1, TP.HCM', 200, 1, '');
-
-
--- ========================================
--- 9. THÊM TÀI KHOẢN QUẢN LÝ XƯỞNG
--- ========================================
--- Username: qlxuong
--- Password: 12345 (đã mã hóa MD5)
--- Vai trò: Quản lý xưởng - Quản lý công việc xưởng sản xuất
--- Quyền: Xem công việc, Tạo yêu cầu NVL, Yêu cầu kiểm tra QC, Ghi nhận TP
--- ========================================
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -1164,7 +1087,7 @@ ALTER TABLE `chitiet_nhapkhotp`
 -- AUTO_INCREMENT cho bảng `chitiet_phieuyeucaucapnvl`
 --
 ALTER TABLE `chitiet_phieuyeucaucapnvl`
-  MODIFY `maCTPhieuYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `maCTPhieuYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT cho bảng `chitiet_phieuyeucaunhapkhonvl`
@@ -1212,7 +1135,7 @@ ALTER TABLE `lichsupheduyet`
 -- AUTO_INCREMENT cho bảng `nguoidung`
 --
 ALTER TABLE `nguoidung`
-  MODIFY `maND` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `maND` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=201;
 
 --
 -- AUTO_INCREMENT cho bảng `nhapkhotp`
@@ -1248,7 +1171,7 @@ ALTER TABLE `phieuxuatthanhpham`
 -- AUTO_INCREMENT cho bảng `phieuyeucaucungcapnvl`
 --
 ALTER TABLE `phieuyeucaucungcapnvl`
-  MODIFY `maYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `maYCCC` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT cho bảng `phieuyeucaukiemtrachatluong`
@@ -1272,7 +1195,7 @@ ALTER TABLE `san_pham`
 -- AUTO_INCREMENT cho bảng `taikhoan`
 --
 ALTER TABLE `taikhoan`
-  MODIFY `maTK` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `maTK` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=201;
 
 --
 -- AUTO_INCREMENT cho bảng `thietbi`
@@ -1289,6 +1212,13 @@ ALTER TABLE `xuong`
 --
 -- Các ràng buộc cho các bảng đã đổ
 --
+
+--
+-- Các ràng buộc cho bảng `baocaoloi`
+--
+ALTER TABLE `baocaoloi`
+  ADD CONSTRAINT `FK_BCL_ND_ID` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`),
+  ADD CONSTRAINT `FK_BCL_THIETBI_ID` FOREIGN KEY (`maThietBi`) REFERENCES `thietbi` (`maThietBi`);
 
 --
 -- Các ràng buộc cho bảng `chitietkehoachsanxuat`
@@ -1317,6 +1247,20 @@ ALTER TABLE `chitietphieuyeucaukiemtrachatluong`
 ALTER TABLE `chitiet_nhapkhotp`
   ADD CONSTRAINT `chitiet_nhapkhotp_ibfk_1` FOREIGN KEY (`maPhieu`) REFERENCES `nhapkhotp` (`maPhieu`) ON DELETE CASCADE,
   ADD CONSTRAINT `chitiet_nhapkhotp_ibfk_2` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
+
+--
+-- Các ràng buộc cho bảng `chitiet_phieuyeucaucapnvl`
+--
+ALTER TABLE `chitiet_phieuyeucaucapnvl`
+  ADD CONSTRAINT `FK_CT_NVL_ID` FOREIGN KEY (`maNVL`) REFERENCES `nvl` (`maNVL`),
+  ADD CONSTRAINT `FK_CT_YCCC_ID` FOREIGN KEY (`maYCCC`) REFERENCES `phieuyeucaucungcapnvl` (`maYCCC`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `chitiet_phieuyeucaunhapkhonvl`
+--
+ALTER TABLE `chitiet_phieuyeucaunhapkhonvl`
+  ADD CONSTRAINT `FK_CT_YCNK_ID` FOREIGN KEY (`maYCNK`) REFERENCES `phieuyeucaunhapkhonvl` (`maYCNK`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_CT_YCNK_NVL` FOREIGN KEY (`maNVL`) REFERENCES `nvl` (`maNVL`);
 
 --
 -- Các ràng buộc cho bảng `congviec`
@@ -1363,6 +1307,41 @@ ALTER TABLE `nguoidung`
 --
 ALTER TABLE `nvl`
   ADD CONSTRAINT `fk_nvl_kho` FOREIGN KEY (`maKho`) REFERENCES `kho` (`maKho`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `phieuxuatnvl`
+--
+ALTER TABLE `phieuxuatnvl`
+  ADD CONSTRAINT `FK_PX_ND` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`),
+  ADD CONSTRAINT `FK_PX_YCCC` FOREIGN KEY (`maYCCC`) REFERENCES `phieuyeucaucungcapnvl` (`maYCCC`);
+
+--
+-- Các ràng buộc cho bảng `phieuxuatthanhpham`
+--
+ALTER TABLE `phieuxuatthanhpham`
+  ADD CONSTRAINT `FK_PXTP_DONHANG` FOREIGN KEY (`maDonHang`) REFERENCES `donhangsanxuat` (`maDonHang`),
+  ADD CONSTRAINT `FK_PXTP_SANPHAM` FOREIGN KEY (`maSanPham`) REFERENCES `san_pham` (`maSanPham`);
+
+--
+-- Các ràng buộc cho bảng `phieuyeucaucungcapnvl`
+--
+ALTER TABLE `phieuyeucaucungcapnvl`
+  ADD CONSTRAINT `FK_YCCC_KHSX` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`),
+  ADD CONSTRAINT `FK_YCCC_ND` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`);
+
+--
+-- Các ràng buộc cho bảng `phieuyeucaukiemtrachatluong`
+--
+ALTER TABLE `phieuyeucaukiemtrachatluong`
+  ADD CONSTRAINT `FK_KTCL_KHSX_NEW` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`),
+  ADD CONSTRAINT `FK_KTCL_NGUOIDUNG` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`);
+
+--
+-- Các ràng buộc cho bảng `phieuyeucaunhapkhonvl`
+--
+ALTER TABLE `phieuyeucaunhapkhonvl`
+  ADD CONSTRAINT `FK_YCNK_KHSX_ID` FOREIGN KEY (`maKHSX`) REFERENCES `kehoachsanxuat` (`maKHSX`),
+  ADD CONSTRAINT `FK_YCNK_ND_ID` FOREIGN KEY (`maND`) REFERENCES `nguoidung` (`maND`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -1,73 +1,84 @@
 <?php
-require_once __DIR__ . '/ketnoi.php';
+require_once 'app/models/ketNoi.php';
 
-class CongViecModel {
+class CongViecModel
+{
     private $conn;
 
-    public function __construct() {
-        $database = new KetNoi(); // ✅ Tên class bạn đang dùng
-        $this->conn = $database->connect();
+    public function __construct()
+    {
+        $db = new KetNoi();
+        $this->conn = $db->connect();
     }
 
-    // ✅ Lấy danh sách kế hoạch sản xuất đã duyệt
-    public function getApprovedPlans() {
-        $sql = "SELECT 
-                    maKHSX, 
-                    tenKHSX, 
-                    thoiGianBatDau, 
-                    thoiGianKetThuc
+    // KHSX đã duyệt
+    public function getApprovedPlans()
+    {
+        $sql = "SELECT maKHSX, tenKHSX, thoiGianBatDau, thoiGianKetThuc
                 FROM kehoachsanxuat
                 WHERE trangThai = 'Đã duyệt'
                 ORDER BY maKHSX DESC";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-        $plans = [];
-        while ($row = $result->fetch_assoc()) {
-            $plans[] = $row;
-        }
-
-        return $plans;
+        $rs = $this->conn->query($sql);
+        return $rs ? $rs->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // ✅ Lấy chi tiết kế hoạch theo ID
-    public function getPlanById($id) {
+    // KHSX + người lập
+    public function getPlanById($maKHSX)
+    {
         $sql = "SELECT 
-                    maKHSX, 
-                    tenKHSX, 
-                    thoiGianBatDau, 
-                    thoiGianKetThuc
-                FROM kehoachsanxuat
-                WHERE maKHSX = ?";
+                    kh.tenKHSX,
+                    kh.thoiGianBatDau,
+                    kh.thoiGianKetThuc,
+                    nd.hoTen AS tenNguoiLap
+                FROM kehoachsanxuat kh
+                JOIN nguoidung nd ON kh.maND = nd.maND
+                WHERE kh.maKHSX = ?";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $id);
+        $stmt->bind_param("i", $maKHSX);
         $stmt->execute();
-
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        return $stmt->get_result()->fetch_assoc();
     }
 
-    // ✅ Lấy danh sách công việc theo kế hoạch
-    public function getTasksByPlanId($maKHSX) {
-    $sql = "SELECT 
-                ct.tenNVL AS tieuDe,
-                ct.loaiNVL AS moTa,
-                x.tenXuong,
-                ct.soLuongNVL
-            FROM chitietkehoachsanxuat ct
-            JOIN xuong x ON ct.maXuong = x.maXuong
-            WHERE ct.maKHSX = ?
-            ORDER BY ct.maCTKHSX ASC";
+    // 👉 ĐƠN HÀNG (BỔ SUNG MỚI)
+    public function getDonHangByKHSX($maKHSX)
+    {
+        $sql = "SELECT 
+                    dh.maDonHang,
+                    dh.tenDonHang,
+                    dh.tenSanPham,
+                    dh.soLuongSanXuat,
+                    dh.ngayGiao
+                FROM donhangsanxuat dh
+                JOIN kehoachsanxuat kh ON dh.maDonHang = kh.maDonHang
+                WHERE kh.maKHSX = ?
+                LIMIT 1";
 
-    $stmt = $this->conn->prepare($sql);
-    $stmt->bind_param("i", $maKHSX);
-    $stmt->execute();
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $maKHSX);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
 
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    // Chi tiết KHSX
+    public function getChiTietByKHSX($maKHSX)
+    {
+        $sql = "SELECT
+                    maXuong,
+                    tenNVL,
+                    soLuongNVL,
+                    ngayBatDau,
+                    ngayKetThuc,
+                    KPI,
+                    dinhMuc
+                FROM chitietkehoachsanxuat
+                WHERE maKHSX = ?
+                ORDER BY maXuong ASC";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $maKHSX);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
 }
-
-}
-?>

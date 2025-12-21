@@ -8,16 +8,20 @@ class ThongKeKhoTPController {
         $this->model = new ThongKeKhoTPModel();
     }
 
-    // Trang thống kê
     public function index() {
         $search = $_GET['search'] ?? '';
-        $data = $this->model->thongKe($search);
+        $from   = $_GET['from'] ?? null;
+        $to     = $_GET['to'] ?? null;
+
+        $data = $this->model->thongKe($search, $from, $to);
         require 'app/views/thongkekhotp.php';
     }
 
-    // Xuất CSV
     public function export() {
         $search = $_GET['search'] ?? '';
-        $this->model->exportCSV($search);
+        $from   = $_GET['from'] ?? null;
+        $to     = $_GET['to'] ?? null;
+
+        $this->model->exportCSV($search, $from, $to);
     }
 }
