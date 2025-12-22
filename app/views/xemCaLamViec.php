@@ -20,6 +20,11 @@ require_once 'app/views/layouts/nav.php';
 ?>
 
 <style>
+    .main-content {
+        background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
     * {
         margin: 0;
         padding: 0;
@@ -211,7 +216,7 @@ require_once 'app/views/layouts/nav.php';
     <main class="main-content">
         <div class="container-lich-lam-viec">
             <div class="header-lich">
-                <h1>Xem Lịch Làm Việc</h1>
+                <h1 style="text-align:center;">XEM LỊCH LÀM VIỆC</h1>
             </div>
 
             <!-- Week Tabs -->

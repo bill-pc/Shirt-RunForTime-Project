@@ -5,7 +5,14 @@
     <?php require_once 'app/views/layouts/sidebar.php'; ?>
 
     <main class="main-content">
-        <h2 class="main-title" style="text-align:center; color:#0d1a44;">KIỂM TRA CHẤT LƯỢNG (QC)</h2>
+        <style>
+        .main-content {
+            background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        </style>
+        <h2 class="main-title" style="text-align:center; color:#fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 700;">KIỂM TRA CHẤT LƯỢNG (QC)</h2>
 
         <div class="table-container" style="background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
             <h3 style="margin-bottom:15px; color:#0056b3;">Danh sách phiếu chờ kiểm tra</h3>

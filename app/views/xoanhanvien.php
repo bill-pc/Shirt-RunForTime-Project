@@ -193,7 +193,7 @@ require_once 'app/views/layouts/nav.php';
 }
 
         </style>
-        <h2>Quản lý nhân sự</h2>
+        <h2>QUẢN LÝ NHÂN SỰ</h2>
         <div class="search-bar" style="position: relative;">
     <input type="text" id="search" placeholder="Tìm kiếm nhân viên...">
     <button id="refreshBtn">Tìm</button>

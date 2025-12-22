@@ -7,8 +7,15 @@ require_once 'app/views/layouts/nav.php';
     <?php require_once 'app/views/layouts/sidebar.php'; ?>
 
     <main class="main-content">
+        <style>
+        .main-content {
+            background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        </style>
         <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-            <h2 class="main-title" style="text-align: center; font-size: 1.5em; margin-bottom: 30px; color: #085da7;">
+            <h2 class="main-title" style="text-align: center; font-size: 1.5em; margin-bottom: 30px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 700;">
                 LẬP BÁO CÁO LỖI & SỰ CỐ
             </h2>
 

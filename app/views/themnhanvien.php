@@ -5,6 +5,13 @@ require_once 'app/views/layouts/nav.php';
 ?>
 
 <style>
+    /* --- BACKGROUND CHO MAIN-CONTENT --- */
+    .main-content {
+        background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+
     /* --- 1. CSS ĐỂ ẨN CÁC PHẦN TỬ KHÁC & CĂN GIỮA FORM --- */
     .main-content .header {
         display: none;
@@ -121,7 +128,14 @@ require_once 'app/views/layouts/nav.php';
     
     <main class="main-content">
         <div class="container">
-             <h2 class="main-title" style="text-align:center; font-size: 1.3em; margin-bottom: 20px;">
+             <style>
+             .main-content {
+                background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+                background-attachment: fixed;
+                min-height: 100vh;
+            }
+             </style>
+             <h2 class="main-title" style="text-align:center; font-size: 1.3em; margin-bottom: 20px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 700;">
             THÊM NHÂN VIÊN MỚI
             </h2>
             <div class="main-content-inner">

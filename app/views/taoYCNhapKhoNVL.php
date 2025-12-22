@@ -6,15 +6,21 @@ require_once './app/views/layouts/nav.php';
   <?php require_once './app/views/layouts/sidebar.php'; ?>
 
   <main class="main-content">
+    <style>
+      .main-content {
+          background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+          background-attachment: fixed;
+          min-height: 100vh;
+      }
+    </style>
     <div class="container">
 
       <!-- Tabs -->
       <div class="page-header">
-        <h2>TẠO YÊU CẦU NHẬP KHO NGUYÊN VẬT LIỆU</h2>
+        <h2 style="text-align:center;color: #ffff;">TẠO YÊU CẦU NHẬP KHO NGUYÊN VẬT LIỆU</h2>
         <div class="tabs">
-          <button class="tab active" onclick="switchTab('list', event)">Danh sách phiếu</button>
-          <button class="tab" onclick="switchTab('create', event)">Lập phiếu mới</button>
-        </div>
+          <button class="tab active" onclick="switchTab('list', event)" style="background-color:#ffff; color:0; margin-right:2px;"> Danh sách phiếu </button>        
+          <button class="tab" onclick="switchTab('create', event)" style="background-color:#ffff; color: 0;"> Lập phiếu mới </button>        </div>
       </div>
 
       <!-- Section: Danh sách phiếu -->

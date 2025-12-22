@@ -7,8 +7,15 @@ require_once 'app/views/layouts/nav.php';
     <?php require_once 'app/views/layouts/sidebar.php'; ?>
 
     <main class="main-content">
+        <style>
+        .main-content {
+            background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        </style>
         <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-            <h2 class="main-title" style="text-align: center; font-size: 1.5em; margin-bottom: 30px; color: #085da7;">
+            <h2 class="main-title" style="text-align: center; font-size: 1.5em; margin-bottom: 30px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 700;">
                 NHẬP KHO THÀNH PHẨM - PHIẾU KIỂM TRA CHẤT LƯỢNG ĐÃ ĐẠT
             </h2>
 
@@ -45,7 +52,7 @@ require_once 'app/views/layouts/nav.php';
                             <tr style="background-color: #f8f9fa;">
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Mã Phiếu</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Sản Phẩm</th>
-                                <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Số Lượng Đạt</th>
+                                <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Số Lượng</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Người Lập</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Ngày Kiểm Tra</th>
                                 <th style="border: 1px solid #dee2e6; padding: 12px; text-align: center; font-weight: 600;">Hành Động</th>
@@ -128,7 +135,7 @@ require_once 'app/views/layouts/nav.php';
 
                             <div class="form-group">
                                 <label for="soLuong" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
-                                    Số Lượng Đạt: *
+                                    Số Lượng: *
                                 </label>
                                 <input 
                                     type="number" 
@@ -144,7 +151,7 @@ require_once 'app/views/layouts/nav.php';
                                     onblur="this.style.borderColor='#ddd'"
                                 >
                                 <small style="color: #6c757d; font-size: 0.9em;">
-                                    (Tối đa: <?= number_format($chiTietPhieu['soLuong']) ?> - Chỉ nhập kho số lượng đạt từ phiếu kiểm tra)
+                                    (Tối đa: <?= number_format($chiTietPhieu['soLuong']) ?>)
                                 </small>
                             </div>
 

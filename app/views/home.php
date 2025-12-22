@@ -20,7 +20,7 @@
             justify-content: center;
             align-items: center;
             padding: 60px 20px;
-            background: #fff;
+            background: url('uploads/img/bg.png') center/cover no-repeat;
             animation: fadeIn .8s ease-in-out;
         }
 
@@ -35,16 +35,62 @@
         }
 
         .login-btn {
-            background: linear-gradient(45deg, #006bff, #004bd1);
+            background: linear-gradient(135deg, #ff0080 0%, #006bff 25%, #00d4ff 50%, #ff5e00 75%, #ff0080 100%);
+            background-size: 300% 300%;
             color: #fff;
-            border: none;
-            padding: 14px 40px;
-            border-radius: 35px;
-            font-size: 1.05em;
-            font-weight: 600;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            padding: 16px 48px;
+            border-radius: 50px;
+            font-size: 1.15em;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 123, 255, .35);
-            transition: .25s;
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.6), 0 0 40px rgba(0, 107, 255, 0.4), 0 0 60px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+            animation: pulse-glow-color 3s ease-in-out infinite, shimmer 2.5s ease-in-out infinite;
+            position: relative;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .login-btn:hover {
+            background-position: 100% 0%;
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.8), 0 0 50px rgba(0, 107, 255, 0.6), 0 0 80px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: scale(1.12) translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .login-btn:active {
+            transform: scale(1.08) translateY(-1px);
+        }
+
+        @keyframes pulse-glow-color {
+            0% {
+                box-shadow: 0 0 20px rgba(255, 0, 128, 0.6), 0 0 40px rgba(0, 107, 255, 0.4), 0 0 60px rgba(0, 212, 255, 0.3);
+            }
+            25% {
+                box-shadow: 0 0 30px rgba(0, 107, 255, 0.7), 0 0 50px rgba(0, 212, 255, 0.5), 0 0 70px rgba(255, 94, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 212, 255, 0.8), 0 0 60px rgba(255, 94, 0, 0.5), 0 0 80px rgba(255, 0, 128, 0.4);
+            }
+            75% {
+                box-shadow: 0 0 35px rgba(255, 94, 0, 0.7), 0 0 55px rgba(255, 0, 128, 0.6), 0 0 75px rgba(0, 107, 255, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(255, 0, 128, 0.6), 0 0 40px rgba(0, 107, 255, 0.4), 0 0 60px rgba(0, 212, 255, 0.3);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         @keyframes fadeIn {
@@ -156,7 +202,7 @@
             <!-- ============ GIAO DIỆN CHƯA ĐĂNG NHẬP ============ -->
             <div class="welcome-container">
                 <div class="welcome-card">
-                    <h1 style="font-size:2.2em;font-weight:800;color:#0b63ce;margin-bottom:12px;">👋 Chào mừng bạn đến hệ
+                    <h1 style="font-size:2.2em;font-weight:800;color:#0b63ce;margin-bottom:12px;font-family:'Inter', sans-serif;">👋 Chào mừng bạn đến hệ
                         thống QLSX</h1>
                     <p style="font-size:1.05em;color:#555;line-height:1.6;margin-bottom:28px;">
                         Giải pháp quản lý sản xuất thông minh – theo dõi kế hoạch, nguyên vật liệu và năng suất trong một

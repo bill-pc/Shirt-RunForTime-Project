@@ -10,6 +10,11 @@ require_once("layouts/nav.php");
 
     <main class="main-content">
         <style>
+            .main-content {
+                background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+                background-attachment: fixed;
+                min-height: 100vh;
+            }
             /* ===== MAIN CONTENT ===== */
             /* Bố cục 2 cột */
             .main-content {

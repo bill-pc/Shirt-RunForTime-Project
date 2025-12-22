@@ -7,6 +7,11 @@
 <main class="main-content">
 
 <style>
+.main-content {
+    background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
 /* ===== CARD TỔNG ===== */
 .kh-box{
     background:#fff;

@@ -7,7 +7,7 @@ require_once 'app/views/layouts/nav.php';
     <?php require_once 'app/views/layouts/sidebar.php'; ?>
     <main class="main-content">
         <div class="nhanvien-container">
-            <h2>Quản lý nhân viên</h2>
+            <h2>QUẢN LÝ NHÂN SỰ</h2>
             <form class="form-view">
                 <label>Mã nhân viên</label>
                 <input type="text" value="<?= htmlspecialchars($nhanvien['maND']) ?>" readonly>

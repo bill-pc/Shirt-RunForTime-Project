@@ -3,13 +3,21 @@ require_once 'app/views/layouts/header.php';
 require_once 'app/views/layouts/nav.php';
 ?>
 
+<style>
+    .main-content {
+        background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+</style>
+
 <div class="main-layout-wrapper">
     <?php require_once 'app/views/layouts/sidebar.php'; ?>
 
     <main class="main-content">
 
-        <h2 class="main-title" style="text-align:center; font-size: 1.5em; margin-bottom: 20px;">
-            ĐĂNG NHẬP HỆ THỐNG
+        <h2 class="main-title" style="text-align:center; font-size: 1.5em; margin-bottom: 20px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 700;">
+            ĐĂNG NHẬP VÀO HỆ THỐNG
         </h2>
 
         <section class="login-section" style="display:flex; justify-content:center; align-items:center;">
@@ -19,7 +27,7 @@ require_once 'app/views/layouts/nav.php';
                 <form action="index.php?page=login-process" method="POST">
                     <div style="text-align:center; margin-bottom:25px;">
                         
-                        <p style="color:#666; font-size:0.9em;">Hệ Thống Quản Lý Nhà Máy Sản Xuất Áo Sơ Mi</p>
+                        <p style="color:#666; font-size:0.9em; font-weight:600; white-space:nowrap; margin:0;">Hệ Thống Quản Lý Nhà Máy Sản Xuất Áo Sơ Mi</p>
                     </div>
 
                     <div style="margin-bottom:15px;">

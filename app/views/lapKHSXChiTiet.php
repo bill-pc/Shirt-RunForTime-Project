@@ -31,6 +31,13 @@ if (isset($danhSachNVL) && is_array($danhSachNVL)) {
     <?php require_once 'layouts/sidebar.php'; ?>
 
     <main class="main-content">
+        <style>
+        .main-content {
+            background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        </style>
         <h2 class="page-title">📋 Lập Kế hoạch Sản xuất - Đơn hàng:
             <?= htmlspecialchars($donHang['tenDonHang'] ?? 'Không rõ') ?>
         </h2>

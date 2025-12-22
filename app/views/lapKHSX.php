@@ -8,6 +8,11 @@ require_once 'layouts/nav.php';
 
     <main class="main-content">
         <style>
+            .main-content {
+                background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+                background-attachment: fixed;
+                min-height: 100vh;
+            }
             /* --- CSS CHUNG --- */
             .form-control,
             input[type="text"],
@@ -342,7 +347,7 @@ require_once 'layouts/nav.php';
         </style>
 
         <div class="kehoach-form-container">
-            <h2><?= $pageTitle ?? 'Lập kế hoạch sản xuất' ?></h2>
+            <h2 style="text-align:center;color: #ffff"><?= $pageTitle ?? 'LẬP KẾ HOẠCH SẢN XUẤT' ?></h2>
             <hr>
 
             <!-- FILTER ĐƠN HÀNG -->
@@ -411,7 +416,7 @@ require_once 'layouts/nav.php';
             </table>
 
             <!-- DANH SÁCH KẾ HOẠCH ĐÃ LẬP -->
-            <h3 style="margin-top:30px;">Danh sách Kế hoạch đã lập</h3>
+            <h3 style="margin-top:30px;color: #ffff;text-align:center;">DANH SÁCH KẾ HOẠCH ĐÃ LẬP</h3>
             <table class="table-results">
                 <thead>
                     <tr>

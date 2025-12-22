@@ -5,6 +5,20 @@
   <title>Phê Duyệt Phiếu Yêu Cầu Nhập Kho NVL</title>
   <link rel="stylesheet" href="public/css/style.css"/>
   <style>
+    body {
+      background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat fixed;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 1200px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
     .status-pending { color: #FF9800; font-weight: bold; }
     .status-approved { color: #4CAF50; font-weight: bold; }
     .status-rejected { color: #F44336; font-weight: bold; }

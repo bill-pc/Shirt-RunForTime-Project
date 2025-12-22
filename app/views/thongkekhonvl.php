@@ -8,6 +8,11 @@ require_once 'app/views/layouts/nav.php';
 
     <main class="main-content">
         <style>
+            .main-content {
+                background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+                background-attachment: fixed;
+                min-height: 100vh;
+            }
             .report-container {
                 background-color: #fff;
                 border-radius: 12px;

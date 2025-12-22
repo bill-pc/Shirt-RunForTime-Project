@@ -183,7 +183,14 @@
 <?php require_once 'app/views/layouts/sidebar.php'; ?>
 
 <main class="main-content">
-    <h2 class="main-title" style="text-align: center; font-size: 1.5em; margin-bottom: 30px; color: #085da7;">
+    <style>
+    .main-content {
+        background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+    </style>
+    <h2 class="main-title" style="text-align: center; font-size: 1.5em; margin-bottom: 30px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 700;">
                 DANH SÁCH BÁO CÁO CHẤT LƯỢNG
             </h2>
 

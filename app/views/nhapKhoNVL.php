@@ -6,6 +6,13 @@ require_once 'app/views/layouts/nav.php';
   <?php require_once './app/views/layouts/sidebar.php'; ?>
 
   <main class="main-content">
+    <style>
+      .main-content {
+          background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+          background-attachment: fixed;
+          min-height: 100vh;
+      }
+    </style>
     <div class="container">
       <div class="card form-section">
         <h2>NHẬP KHO NGUYÊN VẬT LIỆU</h2>

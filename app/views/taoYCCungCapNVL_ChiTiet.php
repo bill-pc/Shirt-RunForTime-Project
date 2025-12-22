@@ -16,7 +16,15 @@ require_once 'app/views/layouts/nav.php';
 
     <main class="main-content">
 
-        <h2 class="main-title" style="text-align:center; font-size: 1.3em; margin-bottom: 20px;">
+        <style>
+        .main-content {
+            background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        </style>
+
+        <h2 class="main-title" style="text-align:center; font-size: 1.3em; margin-bottom: 20px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 700;">
             TẠO YÊU CẦU CUNG CẤP NGUYÊN VẬT LIỆU
         </h2>
         <h3 class="section-title" style="text-align:center; background: #9bc3ebff; color:#495057; padding: 10px 15px; border-radius: 5px; font-weight: 600;">
@@ -49,7 +57,7 @@ require_once 'app/views/layouts/nav.php';
             </div>
 
             <div class="materials-section">
-                <h4 class="materials-subtitle" style="font-weight: bold; font-size: 1.1em; margin-top: 30px; margin-bottom: 15px;">Thông tin nguyên vật liệu</h4>
+                <h4 class="materials-subtitle"  style="text-align:center;font-weight: bold; font-size: 1.1em; margin-top: 30px; margin-bottom: 15px; color:#ffff">THÔNG TIN CÁC NGUYÊN VẬT LIỆU</h4>
                 <table class="data-table list-table" style="width:100%; border-collapse: collapse; border: 1px solid #dee2e6;">
                     <thead>
                         <tr style="background-color: #f8f9fa;">

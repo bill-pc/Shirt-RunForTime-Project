@@ -2,7 +2,12 @@
 <?php require 'app/views/layouts/nav.php'; ?>
 
 <style>
-.main-content { padding:20px; background:#f6f8fb; }
+.main-content { 
+    padding:20px;
+    background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
 .title { font-size:22px; font-weight:700; color:#0d1a44; margin-bottom:15px; }
 
 /* FILTER */
@@ -62,7 +67,7 @@ th { background:#eef3ff; font-weight:600; }
 
 <main class="main-content">
 
-    <h2 class="main-title" style="text-align: center; font-size: 1.5em; margin-bottom: 30px; color: #085da7;">
+    <h2 class="main-title" style="text-align: center; font-size: 1.5em; margin-bottom: 30px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 700;">
                 THỐNG KÊ KHO THÀNH PHẨM
             </h2>
 
@@ -71,18 +76,18 @@ th { background:#eef3ff; font-weight:600; }
         <input type="hidden" name="page" value="thongke">
 
         <div class="filter-box">
-            <label >Tên sản phẩm</label>
+            <label  style="color:#ffff;">Tên sản phẩm</label>
             <input type="text"
                    name="search"
                    placeholder="Nhập tên sản phẩm..."
                    value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
 
-            <label>Từ ngày</label>
+            <label  style="color:#ffff;">Từ ngày</label>
             <input type="date"
                    name="from"
                    value="<?= htmlspecialchars($_GET['from'] ?? '') ?>">
 
-            <label>Đến ngày</label>
+            <label  style="color:#ffff;">Đến ngày</label>
             <input type="date"
                    name="to"
                    value="<?= htmlspecialchars($_GET['to'] ?? '') ?>">

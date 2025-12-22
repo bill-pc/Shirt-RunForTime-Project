@@ -6,12 +6,17 @@ require_once __DIR__ . '/layouts/nav.php';
   <?php require_once __DIR__ . '/layouts/sidebar.php'; ?>
 
   <main class="main-content" style="padding: 30px;">
+    <style>
+      .main-content {
+          background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+          background-attachment: fixed;
+          min-height: 100vh;
+      }
+    </style>
     <div class="container">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
         
-        <h1 style="font-size:26px; color:#1d3557; font-weight:700; margin:0;">
-          Tạo Yêu Cầu Kiểm Tra Chất Lượng
-        </h1>
+        <h1 style="font-size:26px; color:#ffff; font-weight:700; margin:0; text-align:center;">TẠO YÊU CẦU KIỂM TRA CHẤT LƯỢNG SẢN PHẨM</h1>
       </div>
 
       <!-- Form chọn kế hoạch -->
