@@ -82,6 +82,8 @@ if (!empty($_SESSION['user']['maND'])) {
             if (!empty($tenThietBi)) {
                 $tenBaoCao .= " - " . $tenThietBi;
             }
+            // Trạng thái mặc định
+        $trangThai = "đang chờ xử lý"; // <-- THÊM DÒNG NÀY
 
             // Xử lý upload hình ảnh (nếu có)
             $hinhAnh = null;
@@ -99,7 +101,7 @@ if (!empty($_SESSION['user']['maND'])) {
             }
 
             // Gọi model để lưu (lưu maND, maThietBi, tenBaoCao tự sinh, loaiLoi, moTa, hinhAnh)
-            $result = $this->model->themBaoCao($maND, $maThietBi, $tenBaoCao, $loaiLoi, $moTa, $hinhAnh);
+            $result = $this->model->themBaoCao($maND, $maThietBi, $tenBaoCao, $loaiLoi, $moTa, $hinhAnh, $trangThai);
 
             // Phản hồi
             if ($result) {

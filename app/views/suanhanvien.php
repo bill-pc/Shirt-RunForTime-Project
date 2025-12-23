@@ -193,7 +193,7 @@ require_once 'app/views/layouts/nav.php';
 }
 
         </style>
-        <h2>QUẢN LÝ NHÂN SỰ</h2>
+        <h2>Quản lý nhân sự</h2>
         <div class="search-bar" style="position: relative;">
     <input type="text" id="search" placeholder="Tìm kiếm nhân viên...">
     <button id="refreshBtn">Tìm</button>
@@ -205,8 +205,8 @@ require_once 'app/views/layouts/nav.php';
                     <tr>
                         <th>Mã NV</th>
                         <th>Họ tên</th>
-                        <th>Giới tính</th>
-                        <th>Ngày sinh</th>
+                        <th>Giới Tính</th>
+                        <th>Ngày Sinh</th>
                         <!-- <th>Chức vụ</th> -->
                         <th>Phòng ban</th>
                         <th>Địa chỉ</th>

@@ -328,7 +328,6 @@ function renderTable(data) {
             <td>${nv.hoTen}</td>
             <td>${nv.gioiTinh}</td>
             <td>${nv.ngaySinh}</td>
-            <td>${nv.chucVu}</td>
             <td>${nv.phongBan}</td>
             <td>${nv.diaChi}</td>
             <td>${nv.email}</td>

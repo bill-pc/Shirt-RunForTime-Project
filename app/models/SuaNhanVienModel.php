@@ -9,35 +9,35 @@ class SuaNhanVienModel {
         $this->conn = $db->connect();
     }
 
-   public function update($data)
-{
-    $sql = "UPDATE nguoidung 
-        SET hoTen=?, gioiTinh=?, ngaySinh=?, phongBan=?, diaChi=?, email=?, soDienThoai=?
-        WHERE maND=?";
+    // Trả về: ['ok'=>bool, 'affected'=>int, 'error'=>string|null]
+    public function update($data) {
+        $sql = "UPDATE nguoidung
+                SET hoTen=?, gioiTinh=?, ngaySinh=?, phongBan=?, diaChi=?, email=?, soDienThoai=?
+                WHERE maND=?";
 
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            return ['ok' => false, 'affected' => 0, 'error' => $this->conn->error];
+        }
 
-    $stmt = $this->conn->prepare($sql);
-    if (!$stmt) {
-        die("Lỗi prepare: " . $this->conn->error);
+        $stmt->bind_param(
+            "sssssssi",
+            $data['hoTen'],
+            $data['gioiTinh'],
+            $data['ngaySinh'],
+            $data['phongBan'],
+            $data['diaChi'],
+            $data['email'],
+            $data['soDienThoai'],
+            $data['maND']
+        );
+
+        $ok = $stmt->execute();
+        $affected = $stmt->affected_rows;
+        $err = $stmt->error ?: null;
+
+        $stmt->close();
+
+        return ['ok' => $ok, 'affected' => $affected, 'error' => $err];
     }
-
-    $stmt->bind_param(
-    "sssssssi",
-    $data['hoTen'],
-    $data['gioiTinh'],
-    $data['ngaySinh'],
-    $data['phongBan'],
-    $data['diaChi'],
-    $data['email'],
-    $data['soDienThoai'],
-    $data['maND']
-);
-
-
-    $result = $stmt->execute();
-    $stmt->close();
-
-    return $result;
-}
-
 }
