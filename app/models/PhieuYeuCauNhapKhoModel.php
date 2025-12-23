@@ -84,9 +84,11 @@ public function createPhieuYeuCauNhapKho($data) {
         $tenPhieu = 'Phiếu yêu cầu nhập kho NVL - KHSX ' . $maKHSX;
         
         // Lấy thông tin người dùng từ session
-        session_start();
-        $tenNguoiLap = $_SESSION['username'] ?? 'Admin';
-        $maND = $_SESSION['user_id'] ?? 1;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $tenNguoiLap = $_SESSION['user']['hoTen'] ?? ($_SESSION['user']['tenDangNhap'] ?? 'Không xác định');
+        $maND = $_SESSION['user']['maND'] ?? null;
 
         // Lưu phiếu chính
         $sqlPhieu = "INSERT INTO phieuyeucaunhapkhonvl (maYCNK, tenPhieu, maKHSX, ngayLap, tenNguoiLap, maND, trangThai)
