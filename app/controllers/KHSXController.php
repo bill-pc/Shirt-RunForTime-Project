@@ -72,18 +72,29 @@ class KHSXController
             exit;
         }
 
+        // Đảm bảo session đã được khởi động để lấy thông tin người dùng
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Lấy maND từ session (tên biến tùy thuộc vào lúc bạn viết code Login, thường là 'maND' hoặc 'user_id')
+        // Truy cập vào mảng 'user' trước rồi mới lấy 'maND'
+        $maND_hien_tai = $_SESSION['user']['maND'] ?? 1;
+        
+
         $this->conn->begin_transaction();
 
         try {
-
             // ===== 1. Tạo kế hoạch cha =====
             $maKHSX = $this->keHoachModel->createKHSX([
                 'tenKHSX' => "KHSX cho ĐH " . $_POST['maDonHang'],
                 'maDonHang' => $_POST['maDonHang'],
                 'thoiGianBatDau' => $_POST['ngay_bat_dau'],
                 'thoiGianKetThuc' => $_POST['ngay_ket_thuc'],
-                'maND' => 1
+                'maND' => $maND_hien_tai // ĐÃ SỬA: Thay số 1 bằng biến động
             ]);
+
+            // ... giữ nguyên phần còn lại của code
 
             if (!$maKHSX) {
                 throw new Exception("Không thể tạo kế hoạch!");

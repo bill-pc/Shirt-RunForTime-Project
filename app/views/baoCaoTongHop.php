@@ -138,7 +138,7 @@ require_once 'app/views/layouts/nav.php';
         </style>
 
         <div class="report-container">
-            <h2>BÁO CÁO TỔNG HỢP (Giám đốc)</h2>
+            <h2>BÁO CÁO TỔNG HỢP</h2>
 
             <form method="POST" action="index.php?page=bao-cao-tong-hop" class="filter-form">
                 <div>

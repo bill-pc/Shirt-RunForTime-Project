@@ -6,7 +6,7 @@ class KetNoi {
     private $pass = "";     // Mật khẩu XAMPP của bạn (thường là rỗng)
     
     // Tên CSDL bạn đã import (ví dụ: QLAo)
-    private $dbname = "dlck";   
+    private $dbname = "dl_final";   
     // =============================================
 
     private $conn; // Biến để giữ kết nối

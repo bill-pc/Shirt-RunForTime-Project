@@ -13,6 +13,7 @@ require_once 'layouts/nav.php';
                 background-attachment: fixed;
                 min-height: 100vh;
             }
+
             /* --- CSS CHUNG --- */
             .form-control,
             input[type="text"],
@@ -343,7 +344,6 @@ require_once 'layouts/nav.php';
             .table-results tbody tr:last-child td {
                 border-bottom: none;
             }
-            
         </style>
 
         <div class="kehoach-form-container">
@@ -361,15 +361,7 @@ require_once 'layouts/nav.php';
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">Ngày giao:</label>
                         <input type="date" id="filter-ngayGiao">
                     </div>
-                    <div style="flex:1;">
-                        <label style="font-weight:bold; display:block; margin-bottom:5px;">Trạng thái:</label>
-                        <select id="filter-trangThai">
-                            <option value="">-- Tất cả trạng thái --</option>
-                            <option value="Chờ duyệt">Chờ duyệt</option>
-                            <option value="Đang thực hiện">Đang thực hiện</option>
-                            <option value="Đã xuất kho">Đã xuất kho</option>
-                        </select>
-                    </div>
+
                     <div style="display:flex; align-items:end;">
                         <button id="btn-clear-filters" class="btn-secondary"
                             style="height:38px; padding:0 15px; background:#6c757d; color:white; border:none; border-radius:4px; cursor:pointer;">Xóa
@@ -379,6 +371,7 @@ require_once 'layouts/nav.php';
             </div>
 
             <!-- DANH SÁCH ĐƠN HÀNG -->
+            <h3 style="margin-top:30px;color: #ffff;text-align:center;">DANH SÁCH CÁC ĐƠN HÀNG</h3>
             <table class="table-results">
                 <thead>
                     <tr>
@@ -416,7 +409,7 @@ require_once 'layouts/nav.php';
             </table>
 
             <!-- DANH SÁCH KẾ HOẠCH ĐÃ LẬP -->
-            <h3 style="margin-top:30px;color: #ffff;text-align:center;">DANH SÁCH KẾ HOẠCH ĐÃ LẬP</h3>
+            <h3 style="margin-top:30px;color: #ffff;text-align:center;">DANH SÁCH CÁC KẾ HOẠCH ĐÃ LẬP</h3>
             <table class="table-results">
                 <thead>
                     <tr>
@@ -483,102 +476,42 @@ require_once 'layouts/nav.php';
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const searchBox = document.getElementById("search-box");
-        const filterNgayGiao = document.getElementById("filter-ngayGiao");
-        const filterTrangThai = document.getElementById("filter-trangThai");
-        const btnClearFilters = document.getElementById("btn-clear-filters");
-        const tbodyDonHang = document.getElementById("donhang-tbody");
+    const searchBox = document.getElementById("search-box");
+    const filterNgayGiao = document.getElementById("filter-ngayGiao");
+    const btnClearFilters = document.getElementById("btn-clear-filters");
+    const tableRows = document.querySelectorAll("#donhang-tbody tr");
 
-        const modal = document.getElementById("modal-lap-khsx");
-        const modalClose = document.getElementById("modal-close");
-        const formLapKHSX = document.getElementById("form-lap-khsx");
-        const modalMaDonHang = document.getElementById("modal-maDonHang");
-        const xuongCatList = document.getElementById("xuong-cat-list");
-        const xuongMayList = document.getElementById("xuong-may-list");
+    function filterTable() {
+        const searchTerm = searchBox.value.toLowerCase().trim();
+        const searchDate = filterNgayGiao.value;
 
-        function renderDonHang(data) {
-            if (!data || data.length === 0) {
-                tbodyDonHang.innerHTML = `<tr>
-                <td colspan="5" style="text-align:center; padding:20px;">Chưa có đơn hàng nào</td>
-            </tr>`;
-                return;
-            }
-            tbodyDonHang.innerHTML = data.map(dh => `
-            <tr>
-                <td>${dh.maDonHang}</td>
-                <td>${dh.tenDonHang}</td>
-                <td>${dh.ngayGiao}</td>
-                <td>${dh.trangThai}</td>
-                <td>
-                    <button class="btn btn-primary btn-lap-khsx" data-madonhang="${dh.maDonHang}">Lập KHSX</button>
-                </td>
-            </tr>
-        `).join('');
-            attachModalButtons();
-        }
+        tableRows.forEach(row => {
+            // Lấy dữ liệu từ các cột tương ứng
+            const maDH = row.cells[0].textContent.toLowerCase();
+            const tenDH = row.cells[1].textContent.toLowerCase();
+            const ngayGiao = row.cells[2].textContent.trim();
 
-        function fetchDonHang() {
-            const query = searchBox.value.trim();
-            const ngayGiao = filterNgayGiao.value;
-            const trangThai = filterTrangThai.value;
+            // Kiểm tra điều kiện khớp mã/tên VÀ khớp ngày (nếu có chọn ngày)
+            const matchesSearch = maDH.includes(searchTerm) || tenDH.includes(searchTerm);
+            const matchesDate = searchDate === "" || ngayGiao === searchDate;
 
-            const params = new URLSearchParams({ query, ngayGiao, trangThai });
-            fetch(`index.php?page=ajax-tim-donhang&${params.toString()}`)
-                .then(res => res.json())
-                .then(data => renderDonHang(data))
-                .catch(err => console.error("Lỗi fetch:", err));
-        }
-
-        searchBox.addEventListener("input", fetchDonHang);
-        filterNgayGiao.addEventListener("change", fetchDonHang);
-        filterTrangThai.addEventListener("change", fetchDonHang);
-        btnClearFilters.addEventListener("click", () => {
-            searchBox.value = '';
-            filterNgayGiao.value = '';
-            filterTrangThai.value = '';
-            fetchDonHang();
-        });
-
-        fetchDonHang(); // initial load
-
-        // MODAL
-        function attachModalButtons() {
-            document.querySelectorAll(".btn-lap-khsx").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const maDH = btn.dataset.madonhang;
-                    modalMaDonHang.value = maDH;
-                    xuongCatList.innerHTML = '';
-                    xuongMayList.innerHTML = '';
-                    modal.classList.add("show");
-                });
-            });
-        }
-
-        modalClose.addEventListener("click", () => modal.classList.remove("show"));
-        modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("show"); });
-
-        // Thêm NVL
-        document.querySelectorAll(".btn-add-nvl").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const xuong = btn.dataset.xuong;
-                const listContainer = xuong === 'cat' ? xuongCatList : xuongMayList;
-                const index = listContainer.children.length;
-                const html = `
-                <div class="nvl-row">
-                    <input type="hidden" name="xuong_${xuong}[nvl_id][]" value="">
-                    <input type="text" name="xuong_${xuong}[nvl_ten][]" placeholder="Tên NVL">
-                    <input type="number" name="xuong_${xuong}[nvl_soLuong][]" placeholder="Số lượng" min="1" value="1">
-                    <button type="button" class="btn-remove-nvl">&times;</button>
-                </div>`;
-                listContainer.insertAdjacentHTML('beforeend', html);
-            });
-        });
-
-        // Xóa NVL
-        document.addEventListener("click", e => {
-            if (e.target.classList.contains("btn-remove-nvl")) {
-                e.target.closest(".nvl-row").remove();
+            if (matchesSearch && matchesDate) {
+                row.style.display = ""; // Hiển thị
+            } else {
+                row.style.display = "none"; // Ẩn
             }
         });
+    }
+
+    // Lắng nghe sự kiện nhập liệu
+    searchBox.addEventListener("input", filterTable);
+    filterNgayGiao.addEventListener("change", filterTable);
+
+    // Xử lý nút Xóa lọc
+    btnClearFilters.addEventListener("click", () => {
+        searchBox.value = "";
+        filterNgayGiao.value = "";
+        tableRows.forEach(row => row.style.display = ""); // Hiện lại tất cả
     });
+});
 </script>

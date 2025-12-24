@@ -38,7 +38,7 @@ if (isset($danhSachNVL) && is_array($danhSachNVL)) {
             min-height: 100vh;
         }
         </style>
-        <h2 class="page-title">📋 Lập Kế hoạch Sản xuất - Đơn hàng:
+        <h2 class="page-title" style="color: #ffffffff;">Lập Kế hoạch Sản xuất - Đơn hàng:
             <?= htmlspecialchars($donHang['tenDonHang'] ?? 'Không rõ') ?>
         </h2>
 
@@ -58,14 +58,14 @@ if (isset($danhSachNVL) && is_array($danhSachNVL)) {
 
             <div class="plan-row">
                 <div class="plan-col">
-                    <label class="field-label">Ngày bắt đầu KHSX</label>
+                    <label class="field-label1" style="color: white;">Ngày bắt đầu KHSX</label>
                     <input type="date" id="ngay_bat_dau" name="ngay_bat_dau">
-                    <small class="field-note">Chọn ngày bắt đầu kế hoạch (mặc định là ngày lập)</small>
+                    <small class="field-note" style="color: #ffffffff;">Chọn ngày bắt đầu kế hoạch (mặc định là ngày lập)</small>
                 </div>
                 <div class="plan-col">
-                    <label class="field-label">Ngày kết thúc KHSX</label>
+                    <label class="field-label1" style="color: white;">Ngày kết thúc KHSX</label>
                     <input type="date" id="ngay_ket_thuc" name="ngay_ket_thuc" readonly>
-                    <small class="field-note"> Ngày kết thúc KHSX mặc định là ngày giao hàng</small>
+                    <small class="field-note" style="color: white;"> Ngày kết thúc KHSX mặc định là ngày giao hàng</small>
                 </div>
             </div>
 
@@ -487,7 +487,7 @@ if (isset($danhSachNVL) && is_array($danhSachNVL)) {
     /* CSS Cũ giữ nguyên */
     body { font-family: "Segoe UI", system-ui, -apple-system, Arial; background: #f8f9fa; color: #222; }
     .main-content { padding: 20px; }
-    .page-title { text-align: center; color: #007bff; margin-bottom: 18px; font-size: 22px; font-weight: 600; background: linear-gradient(90deg, #007bff, #005fcc); -webkit-background-clip: text; color: transparent;}
+    .page-title { text-align: center; color: #ffffffff; margin-bottom: 18px; font-size: 22px; font-weight: 600; background: linear-gradient(90deg, #007bff, #005fcc); -webkit-background-clip: text; color: transparent;}
     .order-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-bottom: 20px; }
     .order-info div { background: #ffffff; border: 1.8px solid #d9d9d9; border-radius: 8px; padding: 12px 14px; font-size: 15px; color: #222; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .order-info b { font-size: 15px; color: #333; font-weight: 700; }
