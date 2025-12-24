@@ -14,65 +14,52 @@ class GhiNhanThanhPhamModel
     }
 
     /**
-     * Lưu danh sách nhiều dòng cùng lúc và Cập nhật trạng thái Kế hoạch nếu đủ số lượng
-     */
-   /**
-     * Lưu và Chỉ cập nhật trạng thái Hoàn thành khi XƯỞNG MAY làm đủ số lượng
+     * Lưu danh sách ghi nhận và chỉ cập nhật trạng thái KHSX 
+     * dựa trên sản lượng của Xưởng May
      */
     public function luuDanhSach($header, $details)
     {
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         $this->conn->begin_transaction();
 
         try {
-            // ---------------------------------------------------------
-            // 1. INSERT SẢN LƯỢNG (Vẫn lưu bình thường cho tất cả bộ phận)
-            // ---------------------------------------------------------
+            // 1. Thực hiện lưu tất cả chi tiết ghi nhận vào bảng
             $sql = "INSERT INTO ghinhanthanhphamtheongay 
                     (maNhanVien, maSanPham, soLuongSPHoanThanh, ngayLam, maKHSX) 
                     VALUES (?, ?, ?, ?, ?)";
             $stmt = $this->conn->prepare($sql);
 
-            $maNV_bind = 0;
             $maSP_bind = (int) $header['maSanPham'];
-            $soLuong_bind = 0;
             $ngayLam_bind = $header['ngayLam'];
             $maKHSX_bind = (int) $header['maKHSX'];
-
-            $stmt->bind_param("iiisi", $maNV_bind, $maSP_bind, $soLuong_bind, $ngayLam_bind, $maKHSX_bind);
 
             foreach ($details as $item) {
                 if (empty($item['maNhanVien']) || !isset($item['soLuong']) || $item['soLuong'] <= 0) {
                     throw new Exception("Dữ liệu chi tiết không hợp lệ");
                 }
-                $maNV_bind = (int) $item['maNhanVien'];
-                $soLuong_bind = (int) $item['soLuong'];
+                $maNV_i = (int) $item['maNhanVien'];
+                $soLuong_i = (int) $item['soLuong'];
+                
+                $stmt->bind_param("iiisi", $maNV_i, $maSP_bind, $soLuong_i, $ngayLam_bind, $maKHSX_bind);
                 $stmt->execute();
             }
             $stmt->close();
 
-            // ---------------------------------------------------------
-            // 2. TÍNH TỔNG SẢN LƯỢNG (CHỈ TÍNH CỦA XƯỞNG MAY)
-            // ---------------------------------------------------------
-            // Logic: Join bảng ghinhan với nguoidung để lọc theo phongBan = 'Xưởng may'
+            // 2. Tính TỔNG sản lượng lũy kế của riêng XƯỞNG MAY cho KHSX này
+            // Sử dụng n.phongBan để lọc chính xác đội May
             $sqlTongMay = "SELECT COALESCE(SUM(g.soLuongSPHoanThanh), 0) AS tongMay
                            FROM ghinhanthanhphamtheongay g
                            JOIN nguoidung n ON g.maNhanVien = n.maND
                            WHERE g.maKHSX = ? 
-                           AND n.phongBan = 'Xưởng may'"; 
-            
-            // Lưu ý: Chuỗi 'Xưởng may' phải khớp y hệt trong bảng nguoidung của bạn
+                           AND n.phongBan LIKE '%Xưởng may%'"; 
             
             $stmtTong = $this->conn->prepare($sqlTongMay);
             $stmtTong->bind_param("i", $maKHSX_bind);
             $stmtTong->execute();
             $ketQuaTong = $stmtTong->get_result()->fetch_assoc();
-            $tongDaMay = (int) $ketQuaTong['tongMay']; // Tổng này chỉ tính riêng đội may
+            $tongDaMay = (int) $ketQuaTong['tongMay'];
             $stmtTong->close();
 
-            // ---------------------------------------------------------
-            // 3. LẤY MỤC TIÊU TỪ ĐƠN HÀNG
-            // ---------------------------------------------------------
+            // 3. Lấy số lượng mục tiêu cần sản xuất từ Đơn hàng liên kết với KHSX
             $sqlKH = "SELECT d.soLuongSanXuat 
                       FROM kehoachsanxuat k
                       JOIN donhangsanxuat d ON k.maDonHang = d.maDonHang 
@@ -83,13 +70,9 @@ class GhiNhanThanhPhamModel
             $resultKH = $stmtKH->get_result()->fetch_assoc();
             $stmtKH->close();
 
-            // ---------------------------------------------------------
-            // 4. SO SÁNH (XƯỞNG MAY vs ĐƠN HÀNG) & CẬP NHẬT
-            // ---------------------------------------------------------
+            // 4. So sánh: Nếu sản lượng Xưởng May >= Mục tiêu đơn hàng -> Cập nhật trạng thái
             if ($resultKH) {
                 $soLuongCanLam = (int) $resultKH['soLuongSanXuat'];
-
-                // Nếu Xưởng May làm đủ số lượng -> Hoàn thành
                 if ($soLuongCanLam > 0 && $tongDaMay >= $soLuongCanLam) {
                     $sqlUpdate = "UPDATE kehoachsanxuat 
                                   SET trangThai = 'Hoàn thành' 
@@ -106,13 +89,14 @@ class GhiNhanThanhPhamModel
 
         } catch (Exception $e) {
             $this->conn->rollback();
-            error_log("❌ Lỗi: " . $e->getMessage());
+            error_log("❌ Lỗi Model: " . $e->getMessage());
             return $e->getMessage(); 
         }
     }
 
-    // --- CÁC HÀM KHÁC GIỮ NGUYÊN ---
-
+    /**
+     * Lấy lịch sử hiển thị ra View (Tách cột BTP và TP bằng PIVOT SQL)
+     */
     public function getLichSuGhiNhan($limit = 5)
     {
         $sql = "SELECT 
@@ -120,11 +104,15 @@ class GhiNhanThanhPhamModel
                     g.maKHSX,
                     k.tenKHSX,
                     s.tenSanPham,
-                    SUM(g.soLuongSPHoanThanh) as tongSoLuong,
-                    COUNT(g.maNhanVien) as soNhanVien
+                    -- Bán thành phẩm (Xưởng cắt)
+                    SUM(CASE WHEN n.phongBan LIKE '%Xưởng cắt%' THEN g.soLuongSPHoanThanh ELSE 0 END) as slBanThanhPham,
+                    -- Thành phẩm (Xưởng may)
+                    SUM(CASE WHEN n.phongBan LIKE '%Xưởng may%' THEN g.soLuongSPHoanThanh ELSE 0 END) as slThanhPham,
+                    COUNT(DISTINCT g.maNhanVien) as soNhanVien
                 FROM ghinhanthanhphamtheongay g
                 LEFT JOIN kehoachsanxuat k ON g.maKHSX = k.maKHSX
                 LEFT JOIN san_pham s ON g.maSanPham = s.maSanPham
+                LEFT JOIN nguoidung n ON g.maNhanVien = n.maND
                 GROUP BY g.ngayLam, g.maKHSX, k.tenKHSX, s.tenSanPham
                 ORDER BY g.ngayLam DESC, g.maKHSX DESC
                 LIMIT ?";

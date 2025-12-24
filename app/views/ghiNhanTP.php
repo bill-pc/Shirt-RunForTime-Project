@@ -9,11 +9,11 @@ require_once 'app/views/layouts/nav.php';
 
     <main class="main-content">
         <style>
-        .main-content {
-            background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-        }
+            .main-content {
+                background: url('uploads/img/shirt-factory-bg.jpg') center/cover no-repeat;
+                background-attachment: fixed;
+                min-height: 100vh;
+            }
         </style>
         <div class="container">
 
@@ -130,15 +130,16 @@ require_once 'app/views/layouts/nav.php';
                                 <thead>
                                     <tr>
                                         <th>Ngày</th>
-                                        <th>Kế hoạch</th>
-                                        <th class="text-center">Tổng SL</th>
+                                        <th>Kế hoạch / Sản phẩm</th>
+                                        <th class="text-center">BTP (Cắt)</th>
+                                        <th class="text-center">TP (May)</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if (empty($lichSuGhiNhan)): ?>
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted py-4">Chưa có lịch sử</td>
+                                            <td colspan="5" class="text-center text-muted py-4">Chưa có lịch sử</td>
                                         </tr>
                                     <?php else: ?>
                                         <?php foreach ($lichSuGhiNhan as $row): ?>
@@ -150,7 +151,14 @@ require_once 'app/views/layouts/nav.php';
                                                     <small
                                                         class="text-muted"><?= htmlspecialchars($row['tenSanPham']) ?></small>
                                                 </td>
-                                                <td class="text-center fw-bold text-success"><?= $row['tongSoLuong'] ?></td>
+                                                <td class="text-center">
+                                                    <span
+                                                        class="qty-badge btp"><?= number_format($row['slBanThanhPham'] ?? 0) ?></span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span
+                                                        class="qty-badge tp"><?= number_format($row['slThanhPham'] ?? 0) ?></span>
+                                                </td>
                                                 <td class="text-end">
                                                     <button class="btn-icon"
                                                         onclick="viewDetail('<?= $row['ngayLam'] ?>', <?= $row['maKHSX'] ?>)">
@@ -496,6 +504,37 @@ require_once 'app/views/layouts/nav.php';
 
     .close-btn:hover {
         opacity: 1;
+    }
+
+    /* Style cho các nhãn số lượng */
+    .qty-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        min-width: 45px;
+        text-align: center;
+    }
+
+    /* Màu cho Bán thành phẩm (Cắt) - Thường dùng màu vàng/cam */
+    .qty-badge.btp {
+        background-color: #fff3e0;
+        color: #e65100;
+        border: 1px solid #ffe0b2;
+    }
+
+    /* Màu cho Thành phẩm (May) - Thường dùng màu xanh lá */
+    .qty-badge.tp {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+
+    /* Tăng độ rộng cột để không bị gãy dòng */
+    .custom-table th:nth-child(3),
+    .custom-table th:nth-child(4) {
+        width: 100px;
     }
 
     @keyframes slideIn {

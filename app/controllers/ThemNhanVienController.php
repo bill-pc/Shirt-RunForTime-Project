@@ -79,8 +79,8 @@ class ThemNhanVienController {
                 'diaChi' => $diaChi,
                 'soDienThoai' => $soDienThoai,
                 'email' => $email,
-                'phongBan' => $chucVu, // Lưu vào cả phongBan
-                'chucVu' => $chucVu,   // Và chucVu
+                'phongBan' => $chucVu, // Phòng ban từ form
+                // 'chucVu' không gửi - sẽ để mặc định là 'Công nhân' trong model
                 'maTK' => $maTK
             ]);
 

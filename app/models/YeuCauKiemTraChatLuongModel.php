@@ -74,8 +74,8 @@ class YeuCauKiemTraChatLuongModel {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         
-        // ✅ Đảm bảo bind_param đúng: s=string, i=int, s=string, s=string, s=string, i=int, i=int, s=string
-        $stmt->bind_param("sisissis", $tenPhieu, $maSanPham, $trangThai, $ngayLap, $tenNguoiLap, $maND, $maKHSX, $thoiHanHoanThanh);
+        // ✅ Đảm bảo bind_param đúng: s=string, i=int, s=string, s=string (ngayLap), s=string, i=int, i=int, s=string
+        $stmt->bind_param("sisssiis", $tenPhieu, $maSanPham, $trangThai, $ngayLap, $tenNguoiLap, $maND, $maKHSX, $thoiHanHoanThanh);
         
         if ($stmt->execute()) {
             return $this->conn->insert_id;
