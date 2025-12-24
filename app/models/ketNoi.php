@@ -7,7 +7,7 @@ class KetNoi {
     
     // Tên CSDL bạn đã import (ví dụ: QLAo)
 
-    private $dbname = "qlsx_test";   
+    private $dbname = "dl_final";
     // =============================================
 
     private $conn; // Biến để giữ kết nối

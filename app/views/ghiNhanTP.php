@@ -17,7 +17,7 @@ require_once 'app/views/layouts/nav.php';
         </style>
         <div class="container">
 
-            <h2 class="page-title" style="color:#ffff;">GHI NHẬN THÀNH PHẨM (DANH SÁCH)</h2>
+            <h2 class="page-title" style="color:#ffff;">GHI NHẬN THÀNH PHẨM</h2>
 
             <div class="content-wrapper">
 
